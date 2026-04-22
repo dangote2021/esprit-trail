@@ -3,10 +3,10 @@
 // Doc : https://developers.strava.com/docs/reference/
 // OAuth 2.0 + refresh token flow.
 //
-// Scopes requis pour Esprit trail :
+// Scopes requis pour Ravito :
 //   activity:read_all         → lire toutes les activités (même privées)
 //   profile:read_all          → lire le profil
-//   activity:write (option)   → pousser dans Strava depuis Esprit trail (post-MVP)
+//   activity:write (option)   → pousser dans Strava depuis Ravito (post-MVP)
 
 const STRAVA_OAUTH_URL = "https://www.strava.com/oauth/authorize";
 const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
@@ -108,7 +108,7 @@ export async function listActivities(
   return res.json();
 }
 
-// Map Strava activity → Esprit trail Run
+// Map Strava activity → Ravito Run
 export function stravaToRun(a: StravaActivity, userId: string) {
   const distanceKm = a.distance / 1000;
   const avgPaceSec = distanceKm > 0 ? a.moving_time / distanceKm : 0;

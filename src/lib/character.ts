@@ -25,7 +25,7 @@ export type HatBrand =
   | "lasportiva"
   | "buff"
   | "casquette-verte" // easter egg — clin d'oeil
-  | "esprit-trail"; // easter egg — la maison
+  | "ravito"; // easter egg — la maison
 
 export interface Character {
   skinTone: SkinTone;
@@ -139,10 +139,10 @@ export const HAT_BRANDS: Record<HatBrand, { label: string; textColor: string; sh
     short: "CV",
     easterEgg: true,
   },
-  "esprit-trail": {
-    label: "Esprit trail 🏠",
+  ravito: {
+    label: "Ravito 🏠",
     textColor: "#0a0f1c",
-    short: "ESPRIT",
+    short: "RAVITO",
     easterEgg: true,
   },
 };

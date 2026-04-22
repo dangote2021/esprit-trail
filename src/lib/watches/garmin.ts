@@ -24,7 +24,7 @@ export interface GarminActivity {
 
 export function buildAuthorizeUrl(): string {
   throw new Error(
-    "Garmin OAuth 1.0a — implémentation bloquée tant que le programme partenaire n'est pas validé. En attendant, suggère à l'utilisateur de connecter son Garmin à Strava, puis Esprit trail via Strava."
+    "Garmin OAuth 1.0a — implémentation bloquée tant que le programme partenaire n'est pas validé. En attendant, suggère à l'utilisateur de connecter son Garmin à Strava, puis Ravito via Strava."
   );
 }
 

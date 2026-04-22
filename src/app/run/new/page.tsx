@@ -12,7 +12,7 @@ export default function NewRunPage() {
           Choisis ta source
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-ink-muted">
-          Tu peux lancer un tracking Esprit trail ou laisser ta montre enregistrer
+          Tu peux lancer un tracking Ravito ou laisser ta montre enregistrer
           et l'importer automatiquement.
         </p>
       </div>
@@ -26,7 +26,7 @@ export default function NewRunPage() {
           </div>
           <div className="flex-1">
             <div className="font-display text-base font-black">
-              Tracking Esprit trail
+              Tracking Ravito
             </div>
             <div className="text-xs text-ink-muted">
               GPS mobile, quêtes live, coaching audio

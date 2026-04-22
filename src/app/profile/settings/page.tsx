@@ -433,7 +433,7 @@ export default function SettingsPage() {
           </Link>
         </div>
         <div className="text-[10px] font-mono text-ink-dim">
-          Esprit trail v0.2.0 · Build {new Date().toISOString().slice(0, 10)}
+          Ravito v0.3.0 · Build {new Date().toISOString().slice(0, 10)}
         </div>
         <button className="mt-3 text-[11px] font-mono text-peach hover:text-peach-glow">
           Se déconnecter

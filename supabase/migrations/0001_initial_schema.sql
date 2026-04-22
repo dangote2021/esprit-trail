@@ -1,5 +1,5 @@
--- ====== ESPRIT TRAIL — SCHÉMA INITIAL ======
--- Migration v1 — Auth Supabase (auth.users) + profil Esprit trail + runs + gamification.
+-- ====== RAVITO — SCHÉMA INITIAL ======
+-- Migration v1 — Auth Supabase (auth.users) + profil Ravito + runs + gamification.
 -- À jouer dans l'éditeur SQL Supabase, ou via `supabase db push`.
 
 -- Extensions

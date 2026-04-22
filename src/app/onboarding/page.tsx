@@ -22,7 +22,7 @@ import {
 } from "@/lib/character";
 import type { TrailerClass, TrailerStats } from "@/lib/types";
 
-// ====== ONBOARDING Esprit trail v3 — RPG CHARACTER CREATION ======
+// ====== ONBOARDING Ravito v3 — RPG CHARACTER CREATION ======
 // Un flow de création de perso de jeu vidéo :
 // 0 NOUVELLE PARTIE (splash)
 // 1 MODE (Aventure / Performance)

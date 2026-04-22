@@ -17,17 +17,26 @@ export default function TQLogo({
           style={{ width: size * 0.7, height: size * 0.7 }}
           className="text-bg"
         >
-          {/* Mountain range stylisée */}
+          {/* Gobelet ravito + goutte — l'arrêt au ravitaillement */}
           <path
-            d="M4 24L10 14L14 20L20 10L28 24H4Z"
+            d="M8 10 L24 10 L22 26 Q22 28 20 28 L12 28 Q10 28 10 26 Z"
             fill="currentColor"
           />
-          <circle cx="24" cy="8" r="2" fill="currentColor" />
+          <path
+            d="M10 10 L22 10 L22 13 L10 13 Z"
+            fill="currentColor"
+            opacity="0.55"
+          />
+          {/* Goutte d'eau au-dessus */}
+          <path
+            d="M16 2 Q12 7 12 9 Q12 11 16 11 Q20 11 20 9 Q20 7 16 2 Z"
+            fill="currentColor"
+          />
         </svg>
       </div>
       <div className="leading-none">
         <span className="block font-display text-lg font-black tracking-tight">
-          Esprit trail
+          Ravito
         </span>
         {showBaseline && (
           <span className="mt-0.5 block text-[9px] font-mono font-bold uppercase tracking-widest text-lime">

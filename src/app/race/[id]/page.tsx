@@ -200,7 +200,7 @@ export default function RaceDetailPage({ params }: { params: { id: string } }) {
             Quête de préparation
           </div>
           <h3 className="mt-1 font-display text-lg font-black">
-            Plan d'entraînement Esprit trail
+            Plan d'entraînement Ravito
           </h3>
           <p className="mt-1 text-xs text-ink-muted">
             Active la quête et on génère un plan sur mesure : séances clés,

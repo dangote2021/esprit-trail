@@ -10,20 +10,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Esprit trail — Le trail, il a changé",
+  title: "Ravito — Le trail, il a changé",
   description:
-    "Esprit trail — Le trail, il a changé. L'app trail tout-en-un : UTMB Index, ITRA, Strava, Garmin, Coros, Suunto, coach IA, guildes, défis.",
-  metadataBase: new URL("https://esprit-trail.vercel.app"),
+    "Ravito — Le trail, il a changé. L'app trail tout-en-un : UTMB Index, ITRA, Strava, Garmin, Coros, Suunto, coach IA, guildes, défis.",
+  metadataBase: new URL("https://ravito.vercel.app"),
   openGraph: {
-    title: "Esprit trail — Le trail, il a changé",
+    title: "Ravito — Le trail, il a changé",
     description:
       "Le trail, il a changé. Cumule de l'XP, rejoins une guilde, suis ton plan coach IA. L'app trail pensée par des traileurs pour des traileurs.",
     type: "website",
   },
-  applicationName: "Esprit trail",
+  applicationName: "Ravito",
   appleWebApp: {
     capable: true,
-    title: "Esprit trail",
+    title: "Ravito",
     statusBarStyle: "black-translucent",
   },
 };
