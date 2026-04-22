@@ -68,7 +68,7 @@ export default function SettingsPage() {
                   Mode Aventure
                 </div>
                 <div className="text-xs text-ink-muted">
-                  XP, niveaux, loot, badges — à fond la gamif
+                  XP, niveaux, loot, badges
                 </div>
               </div>
               {mode === "adventure" && (
