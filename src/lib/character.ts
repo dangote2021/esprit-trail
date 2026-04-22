@@ -27,6 +27,23 @@ export type HatBrand =
   | "casquette-verte" // easter egg — clin d'oeil
   | "ravito"; // easter egg — la maison
 
+export interface HydrationPack {
+  enabled: boolean;
+  color: string; // hex — couleur du sac + straps
+  leftFlaskColor?: string; // hex — soft flask gauche
+  rightFlaskColor?: string; // hex — soft flask droite
+}
+
+export interface CompressionSocks {
+  enabled: boolean;
+  color: string; // hex
+}
+
+export interface RunningBelt {
+  enabled: boolean;
+  color: string; // hex
+}
+
 export interface Character {
   skinTone: SkinTone;
   hairColor: string; // hex
@@ -38,6 +55,10 @@ export interface Character {
   shoeBrand: ShoeBrand;
   shoeColor: string;
   accessory?: "none" | "sunglasses" | "headband" | "watch";
+  // Gear trail
+  hydrationPack?: HydrationPack;
+  compressionSocks?: CompressionSocks;
+  runningBelt?: RunningBelt;
 }
 
 // ====== Palettes disponibles ======
@@ -110,6 +131,45 @@ export const SHOE_COLORS: { color: string; label: string }[] = [
   { color: "#a855f7", label: "Violet" },
 ];
 
+// Couleurs pour le sac d'hydratation (camel back / running vest)
+export const HYDRATION_PACK_COLORS: { color: string; label: string }[] = [
+  { color: "#1a1a1a", label: "Noir" },
+  { color: "#6c757d", label: "Gris" },
+  { color: "#3b5a3b", label: "Kaki" },
+  { color: "#c2ff2e", label: "Lime" },
+  { color: "#ff3366", label: "Rose flashy" },
+  { color: "#22d3ee", label: "Cyan" },
+  { color: "#ff7849", label: "Peach" },
+  { color: "#fbbf24", label: "Moutarde" },
+  { color: "#a855f7", label: "Violet" },
+  { color: "#ffffff", label: "Blanc" },
+];
+
+// Couleurs pour les chaussettes de compression
+export const SOCK_COLORS: { color: string; label: string }[] = [
+  { color: "#1a1a1a", label: "Noir" },
+  { color: "#ffffff", label: "Blanc" },
+  { color: "#ff3366", label: "Rose" },
+  { color: "#22d3ee", label: "Cyan" },
+  { color: "#c2ff2e", label: "Lime" },
+  { color: "#ff7849", label: "Peach" },
+  { color: "#fbbf24", label: "Jaune" },
+  { color: "#6c757d", label: "Gris" },
+  { color: "#3b5a3b", label: "Kaki" },
+];
+
+// Couleurs des soft flasks (bidons souples) dans les poches avant du sac
+export const FLASK_COLORS: { color: string; label: string }[] = [
+  { color: "#22d3ee", label: "Cyan" },
+  { color: "#ff3366", label: "Rose" },
+  { color: "#c2ff2e", label: "Lime" },
+  { color: "#ff7849", label: "Peach" },
+  { color: "#fbbf24", label: "Jaune" },
+  { color: "#a855f7", label: "Violet" },
+  { color: "#ffffff", label: "Blanc" },
+  { color: "#1a1a1a", label: "Noir" },
+];
+
 // ====== Marques (avec identité visuelle simple — texte sur le produit) ======
 
 export const SHOE_BRANDS: Record<ShoeBrand, { label: string; textColor: string; short: string }> = {
@@ -160,4 +220,18 @@ export const DEFAULT_CHARACTER: Character = {
   shoeBrand: "hoka",
   shoeColor: "#ff7849",
   accessory: "sunglasses",
+  hydrationPack: {
+    enabled: true,
+    color: "#1a1a1a",
+    leftFlaskColor: "#22d3ee",
+    rightFlaskColor: "#ff3366",
+  },
+  compressionSocks: {
+    enabled: true,
+    color: "#ff3366",
+  },
+  runningBelt: {
+    enabled: false,
+    color: "#1a1a1a",
+  },
 };

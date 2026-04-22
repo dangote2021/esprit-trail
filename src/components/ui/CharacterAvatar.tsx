@@ -34,6 +34,16 @@ export function CharacterAvatar({
   const hatShade = darken(character.hatColor, 0.25);
   const shoeShade = darken(character.shoeColor, 0.3);
   const shortsShade = darken(character.shortsColor, 0.3);
+  const pack = character.hydrationPack?.enabled ? character.hydrationPack.color : null;
+  const packShade = pack ? darken(pack, 0.3) : "#000000";
+  const leftFlask = character.hydrationPack?.leftFlaskColor ?? "#22d3ee";
+  const rightFlask = character.hydrationPack?.rightFlaskColor ?? "#ff3366";
+  const socks = character.compressionSocks?.enabled
+    ? character.compressionSocks.color
+    : null;
+  const socksShade = socks ? darken(socks, 0.35) : "#000000";
+  const belt = character.runningBelt?.enabled ? character.runningBelt.color : null;
+  const beltShade = belt ? darken(belt, 0.3) : "#000000";
 
   return (
     <svg
@@ -82,6 +92,89 @@ export function CharacterAvatar({
           stroke={OUTLINE}
           strokeWidth={STROKE}
         />
+
+        {/* ============ COMPRESSION SOCKS ============ */}
+        {socks && (
+          <g>
+            {/* Back (right) compression sock */}
+            <path
+              d="M 108 210 Q 108 207 112 207 L 128 207 Q 131 207 131 210 L 131 240 Q 131 243 128 243 L 111 243 Q 108 243 108 240 Z"
+              fill={socks}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            {/* Top band */}
+            <path
+              d="M 109 212 L 131 212"
+              stroke={socksShade}
+              strokeWidth="2.5"
+              opacity="0.9"
+            />
+            <path
+              d="M 109 216 L 131 216"
+              stroke={socksShade}
+              strokeWidth="1.2"
+              opacity="0.6"
+            />
+            {/* Pattern stripes */}
+            <line
+              x1="110"
+              y1="225"
+              x2="130"
+              y2="225"
+              stroke={socksShade}
+              strokeWidth="1.2"
+              opacity="0.55"
+            />
+            <line
+              x1="110"
+              y1="232"
+              x2="130"
+              y2="232"
+              stroke={socksShade}
+              strokeWidth="1.2"
+              opacity="0.55"
+            />
+
+            {/* Front (left) compression sock */}
+            <path
+              d="M 69 210 Q 69 207 73 207 L 89 207 Q 92 207 92 210 L 92 240 Q 92 243 89 243 L 72 243 Q 69 243 69 240 Z"
+              fill={socks}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            <path
+              d="M 70 212 L 92 212"
+              stroke={socksShade}
+              strokeWidth="2.5"
+              opacity="0.9"
+            />
+            <path
+              d="M 70 216 L 92 216"
+              stroke={socksShade}
+              strokeWidth="1.2"
+              opacity="0.6"
+            />
+            <line
+              x1="71"
+              y1="225"
+              x2="91"
+              y2="225"
+              stroke={socksShade}
+              strokeWidth="1.2"
+              opacity="0.55"
+            />
+            <line
+              x1="71"
+              y1="232"
+              x2="91"
+              y2="232"
+              stroke={socksShade}
+              strokeWidth="1.2"
+              opacity="0.55"
+            />
+          </g>
+        )}
 
         {/* ============ SHOES (grosses, bulbeuses type Mario) ============ */}
         {/* Back shoe */}
@@ -176,6 +269,35 @@ export function CharacterAvatar({
         />
         <circle cx="92" cy="169" r="1.8" fill={shortsShade} />
         <circle cx="108" cy="169" r="1.8" fill={shortsShade} />
+
+        {/* ============ RUNNING BELT (ceinture trail, optionnelle) ============ */}
+        {belt && (
+          <g>
+            <rect
+              x="60"
+              y="158"
+              width="80"
+              height="10"
+              rx="3"
+              fill={belt}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            <rect x="60" y="158" width="80" height="3" fill={beltShade} opacity="0.8" />
+            {/* Buckle */}
+            <rect
+              x="96"
+              y="160"
+              width="8"
+              height="6"
+              rx="1"
+              fill="#ffffff"
+              stroke={OUTLINE}
+              strokeWidth="1.5"
+            />
+            <rect x="98" y="162" width="4" height="2" fill={OUTLINE} />
+          </g>
+        )}
 
         {/* ============ ARMS (avec manches + gants blancs Mario) ============ */}
         {/* Back arm (right) */}
@@ -286,6 +408,169 @@ export function CharacterAvatar({
           >
             {character.shirtBrand.toUpperCase()}
           </text>
+        )}
+
+        {/* ============ HYDRATION PACK / RUNNING VEST ============ */}
+        {pack && (
+          <g>
+            {/* Top back strip visible above shoulders (peek de la partie dorsale) */}
+            <path
+              d="M 66 104 Q 66 99 72 99 L 128 99 Q 134 99 134 104 L 134 114 L 66 114 Z"
+              fill={pack}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            <path
+              d="M 66 108 L 134 108"
+              stroke={packShade}
+              strokeWidth="1.8"
+              opacity="0.7"
+            />
+
+            {/* Left shoulder strap */}
+            <path
+              d="M 72 108 Q 72 108 74 108 L 94 108 Q 96 108 96 112 L 96 162 Q 96 166 92 166 L 76 166 Q 72 166 72 162 Z"
+              fill={pack}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            {/* Right shoulder strap */}
+            <path
+              d="M 104 108 Q 104 108 106 108 L 126 108 Q 128 108 128 112 L 128 162 Q 128 166 124 166 L 108 166 Q 104 166 104 162 Z"
+              fill={pack}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+
+            {/* LEFT SOFT FLASK (upper pocket) */}
+            <rect
+              x="75"
+              y="119"
+              width="18"
+              height="20"
+              rx="3"
+              fill={leftFlask}
+              stroke={OUTLINE}
+              strokeWidth="2"
+            />
+            {/* Flask cap */}
+            <rect
+              x="80"
+              y="117"
+              width="8"
+              height="4"
+              rx="1"
+              fill={packShade}
+              stroke={OUTLINE}
+              strokeWidth="1.5"
+            />
+            {/* Flask highlight */}
+            <rect
+              x="77"
+              y="122"
+              width="3.5"
+              height="12"
+              rx="1"
+              fill="#ffffff"
+              opacity="0.45"
+            />
+
+            {/* RIGHT SOFT FLASK */}
+            <rect
+              x="107"
+              y="119"
+              width="18"
+              height="20"
+              rx="3"
+              fill={rightFlask}
+              stroke={OUTLINE}
+              strokeWidth="2"
+            />
+            <rect
+              x="112"
+              y="117"
+              width="8"
+              height="4"
+              rx="1"
+              fill={packShade}
+              stroke={OUTLINE}
+              strokeWidth="1.5"
+            />
+            <rect
+              x="109"
+              y="122"
+              width="3.5"
+              height="12"
+              rx="1"
+              fill="#ffffff"
+              opacity="0.45"
+            />
+
+            {/* Chest strap horizontal */}
+            <rect
+              x="72"
+              y="146"
+              width="56"
+              height="4"
+              rx="1"
+              fill={packShade}
+              stroke={OUTLINE}
+              strokeWidth="1.5"
+            />
+            {/* Chest clip buckle */}
+            <rect
+              x="97"
+              y="144"
+              width="6"
+              height="8"
+              rx="1"
+              fill="#ffffff"
+              stroke={OUTLINE}
+              strokeWidth="1.5"
+            />
+
+            {/* Pocket seam lines on lower straps */}
+            <path
+              d="M 74 154 L 94 154"
+              stroke={packShade}
+              strokeWidth="1.3"
+              opacity="0.6"
+            />
+            <path
+              d="M 106 154 L 126 154"
+              stroke={packShade}
+              strokeWidth="1.3"
+              opacity="0.6"
+            />
+
+            {/* HYDRATION TUBE — from back over left shoulder to chest strap */}
+            <path
+              d="M 68 101 Q 60 106 60 118 Q 60 130 72 136 Q 80 140 84 148"
+              stroke={OUTLINE}
+              strokeWidth="4.8"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 68 101 Q 60 106 60 118 Q 60 130 72 136 Q 80 140 84 148"
+              stroke="#22d3ee"
+              strokeWidth="2.6"
+              fill="none"
+              strokeLinecap="round"
+            />
+            {/* Bite valve clipped on strap */}
+            <rect
+              x="81"
+              y="146"
+              width="7"
+              height="5.5"
+              rx="1.5"
+              fill={OUTLINE}
+              stroke={OUTLINE}
+              strokeWidth="1"
+            />
+            <circle cx="84.5" cy="148.8" r="1.1" fill="#22d3ee" />
+          </g>
         )}
 
         {/* ============ NECK ============ */}

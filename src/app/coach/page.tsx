@@ -116,7 +116,7 @@ export default function CoachHubPage() {
           <div className="text-5xl animate-float">🧠</div>
           <div className="flex-1">
             <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
-              Powered by Claude
+              Coach IA · 24/7
             </div>
             <h2 className="mt-1 font-display text-2xl font-black leading-tight">
               Dis-moi ton objectif.

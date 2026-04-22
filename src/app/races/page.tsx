@@ -77,6 +77,33 @@ export default function RacesPage() {
         ))}
       </div>
 
+      {/* OFF Races access — punk feature highlight */}
+      <Link
+        href="/races/off"
+        className="relative block overflow-hidden rounded-2xl border-2 border-peach/60 bg-gradient-to-r from-peach/15 via-violet/10 to-transparent p-4 hover:border-peach transition"
+      >
+        <div className="pointer-events-none absolute -right-2 -top-2 text-6xl opacity-10">
+          🏴‍☠️
+        </div>
+        <div className="relative flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-peach text-bg text-xl">
+            🏴‍☠️
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+              Pas de dossard · pas de cirque
+            </div>
+            <div className="font-display text-base font-black leading-tight">
+              OFF Races · hors circuit
+            </div>
+            <div className="text-[11px] text-ink-muted">
+              FKT, pirates, GR projects, crew runs
+            </div>
+          </div>
+          <div className="text-peach text-xl font-display font-black">→</div>
+        </div>
+      </Link>
+
       <button
         onClick={() => setIconicOnly(!iconicOnly)}
         className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 transition ${

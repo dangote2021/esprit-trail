@@ -1,7 +1,7 @@
 "use client";
 
 // ====== PLAN COACH IA — version LIVE ======
-// Appelle /api/coach/plan (Claude Sonnet 4.6) avec le profil ME et l'objectif
+// Appelle /api/coach/plan avec le profil ME et l'objectif
 // sélectionné sur /coach. Affiche loading + plan généré + semaines switcher.
 
 import { useEffect, useMemo, useState, Suspense } from "react";
@@ -184,7 +184,7 @@ function CoachPlanInner() {
         </Link>
         <div className="text-center">
           <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
-            Plan généré par Claude
+            Coach IA · Plan personnalisé
           </div>
           <h1 className="font-display text-lg font-black leading-none">
             {meta.emoji} {meta.label}
@@ -200,7 +200,7 @@ function CoachPlanInner() {
             <div className="text-5xl animate-float">🧠</div>
             <div className="flex-1">
               <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
-                Claude Sonnet 4.6 · en réflexion
+                Coach IA · en réflexion
               </div>
               <h2 className="mt-1 font-display text-xl font-black leading-tight">
                 Je conçois ton plan sur mesure…

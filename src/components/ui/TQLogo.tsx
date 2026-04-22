@@ -1,12 +1,16 @@
+import Link from "next/link";
+
 export default function TQLogo({
   size = 32,
   showBaseline = false,
+  asLink = true,
 }: {
   size?: number;
   showBaseline?: boolean;
+  asLink?: boolean;
 }) {
-  return (
-    <div className="flex items-center gap-2">
+  const Inner = (
+    <>
       <div
         className="relative flex items-center justify-center rounded-lg bg-lime"
         style={{ width: size, height: size }}
@@ -44,6 +48,20 @@ export default function TQLogo({
           </span>
         )}
       </div>
-    </div>
+    </>
   );
+
+  if (asLink) {
+    return (
+      <Link
+        href="/about"
+        aria-label="À propos de Ravito"
+        className="group flex items-center gap-2 transition hover:scale-[1.02]"
+      >
+        {Inner}
+      </Link>
+    );
+  }
+
+  return <div className="flex items-center gap-2">{Inner}</div>;
 }

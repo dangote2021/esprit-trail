@@ -189,7 +189,7 @@ export default function HomePage() {
           </div>
           <div className="flex-1">
             <div className="text-[11px] font-black uppercase tracking-wider">
-              Coach IA · Claude Sonnet
+              Coach IA · Plan sur mesure
             </div>
             <div className="font-display text-xl font-black leading-tight">
               {isPerformance ? "Génère ton plan" : "Demande conseil"}
@@ -199,6 +199,40 @@ export default function HomePage() {
             </div>
           </div>
           <div className="font-display text-2xl">→</div>
+        </div>
+      </Link>
+
+      {/* OFF RACES — feature phare, mise en avant */}
+      <Link
+        href="/races/off"
+        className="relative block overflow-hidden rounded-3xl border-2 border-peach bg-gradient-to-br from-peach/25 via-violet/15 to-bg p-5 btn-chunky tap-bounce card-shine"
+      >
+        <div className="pointer-events-none absolute -right-6 -top-6 text-[120px] opacity-[0.12] leading-none">
+          🏴‍☠️
+        </div>
+        <div className="relative flex items-center gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-peach text-bg card-chunky wobble">
+            <span className="text-3xl">🏴‍☠️</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="inline-flex items-center gap-1.5 rounded-md bg-peach/20 text-peach px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider">
+              <span className="h-1.5 w-1.5 rounded-full bg-peach animate-pulse" />
+              Nouveau · hors circuit
+            </div>
+            <div className="mt-1 font-display text-xl font-black leading-tight text-peach">
+              OFF Races
+            </div>
+            <div className="text-xs text-ink-muted mt-0.5">
+              FKT, courses pirates, GR projects. Pas de dossard, juste l'âme du trail.
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1 text-[9px] font-mono">
+              <span className="rounded bg-bg-raised/80 px-1.5 py-0.5">⚡ FKT</span>
+              <span className="rounded bg-bg-raised/80 px-1.5 py-0.5">🤫 Confidentielles</span>
+              <span className="rounded bg-bg-raised/80 px-1.5 py-0.5">👥 Crew runs</span>
+              <span className="rounded bg-bg-raised/80 px-1.5 py-0.5">🎒 GR projects</span>
+            </div>
+          </div>
+          <div className="font-display text-2xl text-peach">→</div>
         </div>
       </Link>
 

@@ -15,12 +15,15 @@ import {
   SHOE_COLORS,
   SHOE_BRANDS,
   HAT_BRANDS,
+  HYDRATION_PACK_COLORS,
+  SOCK_COLORS,
+  FLASK_COLORS,
   ShoeBrand,
   HatBrand,
   SkinTone,
 } from "@/lib/character";
 
-type Tab = "tete" | "corps" | "jambes" | "pieds";
+type Tab = "tete" | "corps" | "gear" | "jambes" | "pieds";
 
 export default function CharacterPage() {
   const [c, setC] = useState<Character>(ME.character ?? DEFAULT_CHARACTER);
@@ -70,11 +73,12 @@ export default function CharacterPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-4 grid grid-cols-4 gap-1 px-4">
+      <div className="mt-4 grid grid-cols-5 gap-1 px-4">
         {(
           [
             { id: "tete", label: "Tête", emoji: "🧢" },
             { id: "corps", label: "Corps", emoji: "👕" },
+            { id: "gear", label: "Gear", emoji: "🎒" },
             { id: "jambes", label: "Jambes", emoji: "🩳" },
             { id: "pieds", label: "Pieds", emoji: "👟" },
           ] as { id: Tab; label: string; emoji: string }[]
@@ -224,14 +228,206 @@ export default function CharacterPage() {
           </>
         )}
 
+        {tab === "gear" && (
+          <>
+            <Section title="Sac d'hydratation (camel back)">
+              <div className="grid grid-cols-2 gap-2">
+                <ToggleTile
+                  active={!c.hydrationPack?.enabled}
+                  emoji="🚫"
+                  label="Sans sac"
+                  onClick={() =>
+                    update({
+                      hydrationPack: {
+                        enabled: false,
+                        color: c.hydrationPack?.color ?? "#1a1a1a",
+                        leftFlaskColor: c.hydrationPack?.leftFlaskColor,
+                        rightFlaskColor: c.hydrationPack?.rightFlaskColor,
+                      },
+                    })
+                  }
+                />
+                <ToggleTile
+                  active={!!c.hydrationPack?.enabled}
+                  emoji="🎒"
+                  label="Running vest"
+                  onClick={() =>
+                    update({
+                      hydrationPack: {
+                        enabled: true,
+                        color: c.hydrationPack?.color ?? "#1a1a1a",
+                        leftFlaskColor:
+                          c.hydrationPack?.leftFlaskColor ?? "#22d3ee",
+                        rightFlaskColor:
+                          c.hydrationPack?.rightFlaskColor ?? "#ff3366",
+                      },
+                    })
+                  }
+                />
+              </div>
+              {c.hydrationPack?.enabled && (
+                <>
+                  <div className="mt-4 text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
+                    Couleur du sac
+                  </div>
+                  <div className="mt-2">
+                    <ColorRow
+                      colors={HYDRATION_PACK_COLORS}
+                      value={c.hydrationPack.color}
+                      onChange={(color) =>
+                        update({
+                          hydrationPack: {
+                            ...c.hydrationPack!,
+                            color,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="mt-4 text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
+                    Soft flask gauche
+                  </div>
+                  <div className="mt-2">
+                    <ColorRow
+                      colors={FLASK_COLORS}
+                      value={c.hydrationPack.leftFlaskColor ?? "#22d3ee"}
+                      onChange={(color) =>
+                        update({
+                          hydrationPack: {
+                            ...c.hydrationPack!,
+                            leftFlaskColor: color,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="mt-4 text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
+                    Soft flask droite
+                  </div>
+                  <div className="mt-2">
+                    <ColorRow
+                      colors={FLASK_COLORS}
+                      value={c.hydrationPack.rightFlaskColor ?? "#ff3366"}
+                      onChange={(color) =>
+                        update({
+                          hydrationPack: {
+                            ...c.hydrationPack!,
+                            rightFlaskColor: color,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                </>
+              )}
+            </Section>
+
+            <Section title="Ceinture trail (running belt)">
+              <div className="grid grid-cols-2 gap-2">
+                <ToggleTile
+                  active={!c.runningBelt?.enabled}
+                  emoji="🚫"
+                  label="Sans ceinture"
+                  onClick={() =>
+                    update({
+                      runningBelt: {
+                        enabled: false,
+                        color: c.runningBelt?.color ?? "#1a1a1a",
+                      },
+                    })
+                  }
+                />
+                <ToggleTile
+                  active={!!c.runningBelt?.enabled}
+                  emoji="🎽"
+                  label="Avec ceinture"
+                  onClick={() =>
+                    update({
+                      runningBelt: {
+                        enabled: true,
+                        color: c.runningBelt?.color ?? "#1a1a1a",
+                      },
+                    })
+                  }
+                />
+              </div>
+              {c.runningBelt?.enabled && (
+                <div className="mt-3">
+                  <ColorRow
+                    colors={HYDRATION_PACK_COLORS}
+                    value={c.runningBelt.color}
+                    onChange={(color) =>
+                      update({
+                        runningBelt: {
+                          enabled: true,
+                          color,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </Section>
+          </>
+        )}
+
         {tab === "jambes" && (
-          <Section title="Short — couleur">
-            <ColorRow
-              colors={SHORTS_COLORS}
-              value={c.shortsColor}
-              onChange={(color) => update({ shortsColor: color })}
-            />
-          </Section>
+          <>
+            <Section title="Short — couleur">
+              <ColorRow
+                colors={SHORTS_COLORS}
+                value={c.shortsColor}
+                onChange={(color) => update({ shortsColor: color })}
+              />
+            </Section>
+
+            <Section title="Chaussettes de compression">
+              <div className="grid grid-cols-2 gap-2">
+                <ToggleTile
+                  active={!c.compressionSocks?.enabled}
+                  emoji="🚫"
+                  label="Sans"
+                  onClick={() =>
+                    update({
+                      compressionSocks: {
+                        enabled: false,
+                        color: c.compressionSocks?.color ?? "#ff3366",
+                      },
+                    })
+                  }
+                />
+                <ToggleTile
+                  active={!!c.compressionSocks?.enabled}
+                  emoji="🧦"
+                  label="Avec"
+                  onClick={() =>
+                    update({
+                      compressionSocks: {
+                        enabled: true,
+                        color: c.compressionSocks?.color ?? "#ff3366",
+                      },
+                    })
+                  }
+                />
+              </div>
+              {c.compressionSocks?.enabled && (
+                <div className="mt-3">
+                  <ColorRow
+                    colors={SOCK_COLORS}
+                    value={c.compressionSocks.color}
+                    onChange={(color) =>
+                      update({
+                        compressionSocks: {
+                          enabled: true,
+                          color,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </Section>
+          </>
         )}
 
         {tab === "pieds" && (
@@ -339,6 +535,34 @@ function ColorRow({
         </div>
       ))}
     </div>
+  );
+}
+
+function ToggleTile({
+  active,
+  emoji,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  emoji: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-xl border px-3 py-3 text-center transition ${
+        active
+          ? "border-lime bg-lime/10 text-lime"
+          : "border-ink/15 bg-bg-card/60 text-ink hover:border-lime/40"
+      }`}
+    >
+      <div className="text-2xl">{emoji}</div>
+      <div className="mt-1 text-[11px] font-display font-black uppercase tracking-wider">
+        {label}
+      </div>
+    </button>
   );
 }
 
