@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+html,
+body {
+  background: #0a0f1c;
+  color: #f1f5f9;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Masquer la scrollbar sur mobile pour les carousels horizontaux */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Effet shine sur les cartes premium / légendaires */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+.card-shine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: shine 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Progress bar fluide */
+.progress-glow {
+  box-shadow: 0 0 12px currentColor, 0 0 4px currentColor;
+}
+
+/* Safe area pour iPhone */
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 16px);
+}
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 16px);
+}
+
+/* Font display : big, bold, impactful — proche de l'esthétique YouTube trail FR */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  font-weight: 900;
+}
+
+/* Overlay "HUD" pour effet jeu vidéo */
+.hud-scan {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(194, 255, 46, 0.03) 0px,
+    rgba(194, 255, 46, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Tilted corners pour badges / frames "arcade" */
+.clip-arcade {
+  clip-path: polygon(
+    0 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
