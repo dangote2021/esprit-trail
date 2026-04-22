@@ -3,6 +3,9 @@ import PlayerHUD from "@/components/ui/PlayerHUD";
 import BadgeCard from "@/components/ui/BadgeCard";
 import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { TrailerPaniniCard } from "@/components/ui/TrailerPaniniCard";
+import { FifaStatList } from "@/components/ui/FifaStatList";
+import { computeFormTrend } from "@/components/ui/FormArrow";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
 import { getBadge } from "@/lib/data/badges";
 import { RARITY_STYLES } from "@/lib/types";
@@ -48,6 +51,13 @@ export default function ProfilePage() {
         </Link>
       </header>
 
+      {/* ===== Carte Panini traileur (hero) ===== */}
+      <TrailerPaniniCard user={ME} formTrend={computeFormTrend(MY_RUNS)} />
+
+      {/* ===== Liste FIFA-style des attributs ===== */}
+      <FifaStatList stats={ME.profile!.stats} />
+
+      {/* XP / niveau : on garde PlayerHUD en compact pour la progression */}
       <PlayerHUD user={ME} />
 
       {/* Character customization CTA */}

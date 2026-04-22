@@ -98,3 +98,112 @@ body {
     0 calc(100% - 8px)
   );
 }
+
+/* ====== GAME UI — vibe jeu vidéo, chunky, tactile ====== */
+
+/* Bouton tactile pressable — shadow dur noir qui s'aplati au :active */
+.btn-chunky {
+  position: relative;
+  border: 2.5px solid #0a0f1c;
+  box-shadow: 0 4px 0 0 #0a0f1c;
+  transform: translateY(0);
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+.btn-chunky:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 0 #0a0f1c;
+}
+.btn-chunky:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #0a0f1c;
+}
+
+/* Carte épaisse style jeu vidéo — bordure noire + shadow dure */
+.card-chunky {
+  border: 2.5px solid #0a0f1c;
+  box-shadow: 0 4px 0 0 #0a0f1c;
+}
+
+/* Version colorée : bordure blanche pour contraster sur cards colorées */
+.card-chunky-light {
+  border: 2.5px solid #f1f5f9;
+  box-shadow: 0 4px 0 0 rgba(10, 15, 28, 0.9);
+}
+
+/* Bordure pixelisée arcade */
+.frame-arcade {
+  border: 3px solid #0a0f1c;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.15),
+    0 5px 0 0 #0a0f1c;
+}
+
+/* Badge style "sticker" avec bordure blanche */
+.sticker {
+  border: 3px solid #ffffff;
+  box-shadow: 0 3px 0 0 rgba(10, 15, 28, 0.9);
+  border-radius: 999px;
+}
+
+/* Wobble — petite rotation ludique au survol */
+.wobble:hover {
+  animation: wobble 0.5s ease-in-out;
+}
+@keyframes wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+/* Bounce sur tap pour micro-interaction satisfying */
+.tap-bounce:active {
+  transform: scale(0.94);
+  transition: transform 80ms ease-out;
+}
+
+/* Pop tout le monde — pour featured CTA */
+@keyframes popGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.pop-glow {
+  animation: popGlow 1.6s ease-in-out infinite;
+}
+
+/* Coin qui tourne — pour rewards / XP */
+@keyframes coinSpin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+.coin-spin {
+  display: inline-block;
+  animation: coinSpin 2.2s linear infinite;
+  transform-style: preserve-3d;
+}
+
+/* Texte "game" outline — stroke noir derrière les chiffres */
+.text-stroke {
+  -webkit-text-stroke: 2px #0a0f1c;
+  paint-order: stroke fill;
+}
+
+/* Ribbon — ruban style jeu vidéo pour les titres */
+.ribbon {
+  position: relative;
+  display: inline-block;
+  padding: 4px 14px;
+  background: #c2ff2e;
+  color: #0a0f1c;
+  font-weight: 900;
+  border: 2.5px solid #0a0f1c;
+  box-shadow: 0 3px 0 0 #0a0f1c;
+  transform: rotate(-1.5deg);
+}
+
+/* Effet "press" sur les cartes cliquables */
+.card-pressable {
+  transition: transform 120ms ease-out;
+}
+.card-pressable:active {
+  transform: translateY(2px) scale(0.99);
+}

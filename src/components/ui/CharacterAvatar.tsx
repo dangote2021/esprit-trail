@@ -166,15 +166,16 @@ export function CharacterAvatar({
           strokeWidth="2"
           opacity="0.6"
         />
-        {/* Bouton central */}
-        <circle
-          cx="100"
-          cy="175"
-          r="3"
-          fill="#fbbf24"
-          stroke={OUTLINE}
-          strokeWidth="1.8"
+        {/* Drawcord du short trail */}
+        <path
+          d="M 92 168 Q 100 173 108 168"
+          stroke={shortsShade}
+          strokeWidth="2.2"
+          fill="none"
+          strokeLinecap="round"
         />
+        <circle cx="92" cy="169" r="1.8" fill={shortsShade} />
+        <circle cx="108" cy="169" r="1.8" fill={shortsShade} />
 
         {/* ============ ARMS (avec manches + gants blancs Mario) ============ */}
         {/* Back arm (right) */}

@@ -62,26 +62,26 @@ export default function HomePage() {
       <header className="flex items-center justify-between pt-4">
         <TQLogo showBaseline />
         <div className="flex items-center gap-2">
-          {/* Mode pill */}
+          {/* Mode pill — chunky */}
           <Link
             href="/profile/settings"
-            className={`rounded-lg border px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider transition ${
+            className={`rounded-full px-3 py-1.5 text-[11px] font-black uppercase tracking-wider btn-chunky tap-bounce ${
               isPerformance
-                ? "border-cyan/40 bg-cyan/10 text-cyan"
-                : "border-lime/40 bg-lime/10 text-lime"
+                ? "bg-cyan text-bg"
+                : "bg-lime text-bg"
             }`}
           >
             {isPerformance ? "📊 Perf" : "🎮 Aventure"}
           </Link>
           <Link
             href="/notifications"
-            className="relative rounded-xl border border-ink/10 bg-bg-card/60 p-2 text-ink-muted hover:text-lime transition"
+            className="relative rounded-full bg-bg-card p-2.5 text-ink hover:text-lime transition tap-bounce card-chunky wobble"
             aria-label="Notifications"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-5 w-5">
               <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9ZM10 21a2 2 0 0 0 4 0" />
             </svg>
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-peach text-[9px] font-mono font-black text-bg">
+            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-peach text-[10px] font-display font-black text-bg sticker">
               3
             </span>
           </Link>
@@ -150,59 +150,57 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* CTA — enregistrer une sortie */}
+      {/* CTA — enregistrer une sortie (chunky game style) */}
       <Link
         href="/run/new"
-        className="group relative block overflow-hidden rounded-2xl border border-lime/30 bg-gradient-to-r from-lime/10 via-peach/10 to-cyan/10 p-5 transition hover:scale-[1.01] card-shine"
+        className="group relative block overflow-hidden rounded-3xl bg-lime p-5 text-bg btn-chunky tap-bounce card-shine"
       >
         <div className="relative flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-lime text-bg shadow-glow-lime">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg text-lime card-chunky wobble">
             <svg viewBox="0 0 24 24" fill="currentColor" className="h-8 w-8">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
           <div className="flex-1">
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-lime">
+            <div className="text-[11px] font-black uppercase tracking-wider">
               {isPerformance ? "Nouvelle session" : "Prêt à repartir ?"}
             </div>
-            <div className="font-display text-lg font-black">
+            <div className="font-display text-xl font-black leading-tight">
               {isPerformance ? "Enregistrer une sortie" : "Lance une quête"}
             </div>
-            <div className="text-xs text-ink-muted">
+            <div className="text-xs opacity-80">
               {isPerformance
-                ? "Import auto depuis Strava/Garmin ou saisie manuelle"
-                : "Enregistre ta prochaine sortie et gagne ton XP"}
+                ? "Import auto Strava/Garmin ou saisie manuelle"
+                : "Sors, bouge, ramène ton XP"}
             </div>
           </div>
-          <div className="text-lime transition group-hover:translate-x-1">→</div>
+          <div className="font-display text-2xl transition group-hover:translate-x-1">→</div>
         </div>
       </Link>
 
-      {/* Coach IA — Performance mode */}
-      {isPerformance && (
-        <Link
-          href="/coach"
-          className="block rounded-2xl border border-cyan/30 bg-gradient-to-r from-cyan/10 via-violet/10 to-bg p-5 transition hover:scale-[1.01]"
-        >
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-cyan text-bg shadow-glow-cyan">
-              <span className="text-2xl">🧠</span>
-            </div>
-            <div className="flex-1">
-              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan">
-                Coach IA
-              </div>
-              <div className="font-display text-lg font-black">
-                Génère ton plan d'entraînement
-              </div>
-              <div className="text-xs text-ink-muted">
-                Plan perso selon objectif, niveau actuel, calendrier
-              </div>
-            </div>
-            <div className="text-cyan">→</div>
+      {/* Coach IA (toujours dispo, mise en avant en perf) */}
+      <Link
+        href="/coach"
+        className="block rounded-3xl bg-cyan p-5 text-bg btn-chunky tap-bounce"
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg text-cyan card-chunky wobble">
+            <span className="text-2xl">🧠</span>
           </div>
-        </Link>
-      )}
+          <div className="flex-1">
+            <div className="text-[11px] font-black uppercase tracking-wider">
+              Coach IA · Claude Sonnet
+            </div>
+            <div className="font-display text-xl font-black leading-tight">
+              {isPerformance ? "Génère ton plan" : "Demande conseil"}
+            </div>
+            <div className="text-xs opacity-80">
+              Plan perso selon objectif, niveau, calendrier
+            </div>
+          </div>
+          <div className="font-display text-2xl">→</div>
+        </div>
+      </Link>
 
       {/* Daily quests */}
       <section className="space-y-3">
@@ -242,7 +240,7 @@ export default function HomePage() {
             <Link
               key={run.id}
               href={`/run/${run.id}`}
-              className="flex items-center gap-3 rounded-xl border border-ink/10 bg-bg-card/60 p-3 transition hover:border-lime/30 hover:bg-bg-card"
+              className="flex items-center gap-3 rounded-2xl bg-bg-card p-3 card-chunky card-pressable tap-bounce transition hover:-translate-y-0.5"
             >
               <div className="text-3xl">
                 {run.terrain === "alpine"
@@ -256,28 +254,28 @@ export default function HomePage() {
                   : "➖"}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-bold">{run.title}</div>
-                <div className="flex gap-3 text-[11px] font-mono text-ink-muted">
+                <div className="truncate text-sm font-black">{run.title}</div>
+                <div className="flex gap-2 text-[11px] text-ink-muted">
                   <span>{formatDate(run.date)}</span>
-                  <span>•</span>
+                  <span className="text-ink-dim">·</span>
                   <span>{formatKm(run.distance)} km</span>
-                  <span>•</span>
+                  <span className="text-ink-dim">·</span>
                   <span>{run.elevation} D+</span>
                 </div>
               </div>
               <div className="text-right">
                 {!isPerformance && (
-                  <div className="text-xs font-mono font-bold text-lime">
+                  <div className="inline-flex items-center gap-1 rounded-full bg-lime px-2 py-0.5 text-[11px] font-display font-black text-bg">
                     +{run.xpEarned} XP
                   </div>
                 )}
                 {isPerformance && (
-                  <div className="text-xs font-mono font-bold text-cyan">
+                  <div className="font-display text-sm font-black text-cyan">
                     {run.avgPace}
                   </div>
                 )}
                 {run.badgesUnlocked.length > 0 && !isPerformance && (
-                  <div className="text-[10px] font-mono text-gold">
+                  <div className="mt-0.5 text-[11px] font-display text-gold">
                     🏅 {run.badgesUnlocked.length}
                   </div>
                 )}

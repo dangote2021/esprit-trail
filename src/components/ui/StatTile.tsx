@@ -12,26 +12,24 @@ export default function StatTile({
   sub?: string;
 }) {
   const accents = {
-    lime: "text-lime border-lime/20",
-    peach: "text-peach border-peach/20",
-    cyan: "text-cyan border-cyan/20",
-    violet: "text-violet border-violet/20",
-    gold: "text-gold border-gold/20",
+    lime: "text-lime",
+    peach: "text-peach",
+    cyan: "text-cyan",
+    violet: "text-violet",
+    gold: "text-gold",
   };
 
   return (
-    <div
-      className={`rounded-xl border bg-bg-card/60 p-3 ${accents[accent]}`}
-    >
-      <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+    <div className="rounded-2xl bg-bg-card p-3 card-chunky">
+      <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted">
         {label}
       </div>
       <div className="mt-1 flex items-baseline gap-1">
-        <span className={`font-display text-2xl font-black leading-none ${accents[accent].split(" ")[0]}`}>
+        <span className={`font-display text-2xl font-black leading-none ${accents[accent]}`}>
           {value}
         </span>
         {unit && (
-          <span className="text-xs font-mono text-ink-muted">{unit}</span>
+          <span className="text-xs font-bold text-ink-muted">{unit}</span>
         )}
       </div>
       {sub && <div className="mt-1 text-[11px] text-ink-dim">{sub}</div>}
