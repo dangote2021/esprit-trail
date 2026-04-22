@@ -87,7 +87,7 @@ export default function BottomNav() {
               >
                 <span
                   className={`transition ${
-                    active ? "drop-shadow-[0_0_8px_rgba(194,255,46,0.6)]" : "group-hover:text-ink"
+                    active ? "drop-shadow-[0_0_6px_rgba(45,106,79,0.55)]" : "group-hover:text-ink"
                   }`}
                 >
                   {item.icon}

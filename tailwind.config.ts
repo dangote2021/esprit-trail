@@ -9,45 +9,48 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Trail gaming palette — dark mode first, néon accents
+        // ==== Ravito · Charte ALPINE LIGHT ====
+        // Inspiration : Patagonia, Trail Runner Mag, cartes IGN papier
+        // Crème naturel + vert forêt + orange coucher + terre dorée
         bg: {
-          DEFAULT: "#0a0f1c", // nuit en forêt, bleu nuit profond
-          raised: "#121a2e",
-          card: "#1a2340",
+          DEFAULT: "#f0e6c8", // crème naturel — fond principal
+          raised: "#e8dcb6",  // crème ombrée — surfaces en relief
+          card: "#fff9ea",    // crème très clair — cards
         },
         ink: {
-          DEFAULT: "#f1f5f9",
-          muted: "#94a3b8",
-          dim: "#64748b",
+          DEFAULT: "#1b4332", // vert forêt — texte principal
+          muted: "#52796f",   // vert-gris — texte secondaire
+          dim: "#84a98c",     // vert doux — texte tertiaire
         },
-        // Couleurs trail / jeu vidéo
+        // Les noms lime/peach/cyan/violet/gold sont conservés (compat composants)
+        // mais remappés à la palette Alpine Light.
         lime: {
-          DEFAULT: "#c2ff2e", // Casquette Verte signature
-          glow: "#d4ff5c",
-          dark: "#8fbf1f",
+          DEFAULT: "#2d6a4f", // vert aventure — brand accent principal
+          glow: "#52b788",    // vert frais
+          dark: "#1b4332",    // vert forêt profond
         },
         peach: {
-          DEFAULT: "#ff7849", // orange énergie Clem qui court
-          glow: "#ffa07a",
+          DEFAULT: "#f77f00", // orange coucher de soleil — CTA / énergie
+          glow: "#fb9c3d",    // orange chaud clair
         },
         cyan: {
-          DEFAULT: "#22d3ee",
-          glow: "#67e8f9",
+          DEFAULT: "#0077b6", // ocean deep — data points, secondaires
+          glow: "#00b4d8",
         },
         violet: {
-          DEFAULT: "#a855f7",
-          glow: "#c084fc",
+          DEFAULT: "#7b2cbf", // violet montagne
+          glow: "#c77dff",
         },
         gold: {
-          DEFAULT: "#fbbf24",
-          glow: "#fcd34d",
+          DEFAULT: "#dda15e", // terre dorée — iconique, premium
+          glow: "#e8b87a",
         },
-        // Badge rarity
-        common: "#94a3b8",
-        rare: "#22d3ee",
-        epic: "#a855f7",
-        legendary: "#fbbf24",
-        mythic: "#ff3366",
+        // Badge rarity — palette terre/roche/minerai
+        common: "#84a98c",       // vert doux
+        rare: "#0077b6",         // ocean
+        epic: "#7b2cbf",         // violet
+        legendary: "#dda15e",    // terre dorée
+        mythic: "#bc4749",       // rouge terre cuite
       },
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],
@@ -55,13 +58,14 @@ const config: Config = {
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       boxShadow: {
-        "glow-lime": "0 0 30px rgba(194, 255, 46, 0.35)",
-        "glow-peach": "0 0 30px rgba(255, 120, 73, 0.35)",
-        "glow-cyan": "0 0 30px rgba(34, 211, 238, 0.35)",
-        "glow-violet": "0 0 30px rgba(168, 85, 247, 0.35)",
-        "glow-gold": "0 0 30px rgba(251, 191, 36, 0.45)",
-        "glow-mythic": "0 0 40px rgba(255, 51, 102, 0.55)",
-        "inner-glow": "inset 0 0 20px rgba(194, 255, 46, 0.15)",
+        // Glows adaptés à un fond clair — plus doux, plus halo naturel
+        "glow-lime": "0 0 28px rgba(45, 106, 79, 0.35)",
+        "glow-peach": "0 0 28px rgba(247, 127, 0, 0.35)",
+        "glow-cyan": "0 0 28px rgba(0, 119, 182, 0.3)",
+        "glow-violet": "0 0 28px rgba(123, 44, 191, 0.3)",
+        "glow-gold": "0 0 32px rgba(221, 161, 94, 0.45)",
+        "glow-mythic": "0 0 36px rgba(188, 71, 73, 0.5)",
+        "inner-glow": "inset 0 0 20px rgba(45, 106, 79, 0.12)",
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
@@ -83,7 +87,7 @@ const config: Config = {
         },
         glow: {
           from: { filter: "brightness(1) drop-shadow(0 0 4px currentColor)" },
-          to: { filter: "brightness(1.2) drop-shadow(0 0 12px currentColor)" },
+          to: { filter: "brightness(1.1) drop-shadow(0 0 10px currentColor)" },
         },
         popIn: {
           "0%": { transform: "scale(0.8)", opacity: "0" },
@@ -95,13 +99,19 @@ const config: Config = {
         },
       },
       backgroundImage: {
+        // Grille subtile couleur vert forêt sur fond crème
         "grid-pattern":
-          "linear-gradient(to right, rgba(194,255,46,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(194,255,46,0.04) 1px, transparent 1px)",
+          "linear-gradient(to right, rgba(27,67,50,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(27,67,50,0.05) 1px, transparent 1px)",
+        // Halo chaud en haut de page — soleil qui se lève
         "radial-glow":
-          "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(194,255,46,0.15), transparent)",
+          "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(247,127,0,0.12), transparent)",
+        // Papier kraft subtil pour un touch magazine outdoor
+        "paper-grain":
+          "radial-gradient(rgba(27,67,50,0.05) 1px, transparent 1px)",
       },
       backgroundSize: {
         grid: "40px 40px",
+        "paper-grain": "3px 3px",
       },
     },
   },

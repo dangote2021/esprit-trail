@@ -61,8 +61,8 @@ export default function RunDetailPage({ params }: { params: { id: string } }) {
         >
           <defs>
             <pattern id="topo" patternUnits="userSpaceOnUse" width="40" height="40">
-              <circle cx="20" cy="20" r="12" fill="none" stroke="rgba(194,255,46,0.08)" />
-              <circle cx="20" cy="20" r="6" fill="none" stroke="rgba(194,255,46,0.08)" />
+              <circle cx="20" cy="20" r="12" fill="none" stroke="rgba(45,106,79,0.12)" />
+              <circle cx="20" cy="20" r="6" fill="none" stroke="rgba(45,106,79,0.12)" />
             </pattern>
           </defs>
           <rect width="400" height="200" fill="url(#topo)" />

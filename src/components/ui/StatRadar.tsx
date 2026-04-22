@@ -33,13 +33,14 @@ export function overallRating(stats: TrailerStats): number {
   return Math.max(40, Math.min(99, Math.round(avg * 0.99)));
 }
 
+// Ravito Alpine Light — palette cohérente avec tailwind.config.ts
 const ACCENT_HEX: Record<string, string> = {
-  lime: "#c2ff2e",
-  peach: "#ff7849",
-  cyan: "#22d3ee",
-  violet: "#a855f7",
-  gold: "#fbbf24",
-  mythic: "#ff3366",
+  lime: "#2d6a4f",   // vert aventure
+  peach: "#f77f00",  // orange soleil
+  cyan: "#0077b6",   // ocean deep
+  violet: "#7b2cbf", // violet montagne
+  gold: "#dda15e",   // terre dorée
+  mythic: "#bc4749", // rouge terre cuite
 };
 
 export function StatRadar({
@@ -82,8 +83,8 @@ export function StatRadar({
       xmlns="http://www.w3.org/2000/svg"
       className="block"
     >
-      {/* Cercle de fond */}
-      <circle cx={cx} cy={cy} r={r + 6} fill="#1a2340" opacity={0.6} />
+      {/* Cercle de fond — crème clair Alpine Light */}
+      <circle cx={cx} cy={cy} r={r + 6} fill="#fff9ea" opacity={0.9} />
 
       {/* Anneaux concentriques subtils */}
       {[0.33, 0.66, 1].map((ring, idx) => {
@@ -100,7 +101,7 @@ export function StatRadar({
             key={idx}
             d={path}
             fill="none"
-            stroke="#64748b"
+            stroke="#52796f"
             strokeOpacity={idx === 2 ? 0.3 : 0.12}
             strokeWidth={1}
           />
@@ -119,7 +120,7 @@ export function StatRadar({
             y1={cy}
             x2={x}
             y2={y}
-            stroke="#64748b"
+            stroke="#52796f"
             strokeOpacity={0.12}
             strokeWidth={1}
           />
@@ -156,7 +157,7 @@ export function StatRadar({
             textAnchor={anchor}
             fontSize="11"
             fontWeight="900"
-            fill="#94a3b8"
+            fill="#52796f"
             fontFamily="system-ui, sans-serif"
             letterSpacing="0.04em"
           >

@@ -24,12 +24,13 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Ravito",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0f1c",
+  // Ravito — Alpine Light : crème naturel
+  themeColor: "#f0e6c8",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

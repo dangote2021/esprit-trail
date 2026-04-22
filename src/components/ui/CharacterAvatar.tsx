@@ -9,7 +9,8 @@ import {
   SKIN_TONES,
 } from "@/lib/character";
 
-const OUTLINE = "#0a0f1c";
+// Alpine Light : contour "noir forêt" — quasi noir à l'œil mais harmonisé palette
+const OUTLINE = "#0a1f15";
 const STROKE = 3.2;
 
 export function CharacterAvatar({

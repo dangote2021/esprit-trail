@@ -10,10 +10,28 @@
 
 html,
 body {
-  background: #0a0f1c;
-  color: #f1f5f9;
+  /* Ravito — Alpine Light : crème naturel + texte vert forêt */
+  background: #f0e6c8;
+  color: #1b4332;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Texture papier kraft très subtile sur le fond — vibe magazine outdoor */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(rgba(27, 67, 50, 0.04) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.7;
+  mix-blend-mode: multiply;
+}
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Masquer la scrollbar sur mobile pour les carousels horizontaux */
@@ -25,7 +43,7 @@ body {
   scrollbar-width: none;
 }
 
-/* Effet shine sur les cartes premium / légendaires */
+/* Effet shine sur les cartes premium / légendaires — or sur fond crème */
 .card-shine {
   position: relative;
   overflow: hidden;
@@ -37,7 +55,7 @@ body {
   background: linear-gradient(
     110deg,
     transparent 40%,
-    rgba(255, 255, 255, 0.08) 50%,
+    rgba(247, 127, 0, 0.12) 50%,
     transparent 60%
   );
   background-size: 200% 100%;
@@ -74,12 +92,12 @@ body {
   font-weight: 900;
 }
 
-/* Overlay "HUD" pour effet jeu vidéo */
+/* Overlay "HUD" pour effet jeu vidéo — lignes vert forêt sur crème */
 .hud-scan {
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(194, 255, 46, 0.03) 0px,
-    rgba(194, 255, 46, 0.03) 1px,
+    rgba(27, 67, 50, 0.04) 0px,
+    rgba(27, 67, 50, 0.04) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -100,48 +118,49 @@ body {
 }
 
 /* ====== GAME UI — vibe jeu vidéo, chunky, tactile ====== */
+/* Le noir dur devient vert forêt pour rester cohérent Alpine Light */
 
-/* Bouton tactile pressable — shadow dur noir qui s'aplati au :active */
+/* Bouton tactile pressable — shadow dur vert forêt qui s'aplati au :active */
 .btn-chunky {
   position: relative;
-  border: 2.5px solid #0a0f1c;
-  box-shadow: 0 4px 0 0 #0a0f1c;
+  border: 2.5px solid #1b4332;
+  box-shadow: 0 4px 0 0 #1b4332;
   transform: translateY(0);
   transition: transform 90ms ease-out, box-shadow 90ms ease-out;
 }
 .btn-chunky:hover {
   transform: translateY(-1px);
-  box-shadow: 0 5px 0 0 #0a0f1c;
+  box-shadow: 0 5px 0 0 #1b4332;
 }
 .btn-chunky:active {
   transform: translateY(4px);
-  box-shadow: 0 0 0 0 #0a0f1c;
+  box-shadow: 0 0 0 0 #1b4332;
 }
 
-/* Carte épaisse style jeu vidéo — bordure noire + shadow dure */
+/* Carte épaisse style jeu vidéo — bordure vert forêt + shadow dure */
 .card-chunky {
-  border: 2.5px solid #0a0f1c;
-  box-shadow: 0 4px 0 0 #0a0f1c;
+  border: 2.5px solid #1b4332;
+  box-shadow: 0 4px 0 0 #1b4332;
 }
 
-/* Version colorée : bordure blanche pour contraster sur cards colorées */
+/* Version claire : bordure crème pour contraster sur cards sombres/colorées */
 .card-chunky-light {
-  border: 2.5px solid #f1f5f9;
-  box-shadow: 0 4px 0 0 rgba(10, 15, 28, 0.9);
+  border: 2.5px solid #f0e6c8;
+  box-shadow: 0 4px 0 0 rgba(27, 67, 50, 0.9);
 }
 
-/* Bordure pixelisée arcade */
+/* Bordure pixelisée arcade — vert forêt avec inset crème subtil */
 .frame-arcade {
-  border: 3px solid #0a0f1c;
+  border: 3px solid #1b4332;
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.15),
-    0 5px 0 0 #0a0f1c;
+    inset 0 0 0 2px rgba(240, 230, 200, 0.3),
+    0 5px 0 0 #1b4332;
 }
 
-/* Badge style "sticker" avec bordure blanche */
+/* Badge style "sticker" avec bordure crème */
 .sticker {
-  border: 3px solid #ffffff;
-  box-shadow: 0 3px 0 0 rgba(10, 15, 28, 0.9);
+  border: 3px solid #fff9ea;
+  box-shadow: 0 3px 0 0 rgba(27, 67, 50, 0.9);
   border-radius: 999px;
 }
 
@@ -181,22 +200,22 @@ body {
   transform-style: preserve-3d;
 }
 
-/* Texte "game" outline — stroke noir derrière les chiffres */
+/* Texte "game" outline — stroke vert forêt derrière les chiffres */
 .text-stroke {
-  -webkit-text-stroke: 2px #0a0f1c;
+  -webkit-text-stroke: 2px #1b4332;
   paint-order: stroke fill;
 }
 
-/* Ribbon — ruban style jeu vidéo pour les titres */
+/* Ribbon — ruban style jeu vidéo pour les titres — orange soleil */
 .ribbon {
   position: relative;
   display: inline-block;
   padding: 4px 14px;
-  background: #c2ff2e;
-  color: #0a0f1c;
+  background: #f77f00;
+  color: #fff9ea;
   font-weight: 900;
-  border: 2.5px solid #0a0f1c;
-  box-shadow: 0 3px 0 0 #0a0f1c;
+  border: 2.5px solid #1b4332;
+  box-shadow: 0 3px 0 0 #1b4332;
   transform: rotate(-1.5deg);
 }
 

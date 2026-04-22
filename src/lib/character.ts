@@ -195,13 +195,13 @@ export const HAT_BRANDS: Record<HatBrand, { label: string; textColor: string; sh
   buff: { label: "Buff", textColor: "#ffffff", short: "BUFF" },
   "casquette-verte": {
     label: "Casquette Verte 🧢",
-    textColor: "#0a0f1c",
+    textColor: "#1b4332",
     short: "CV",
     easterEgg: true,
   },
   ravito: {
     label: "Ravito 🏠",
-    textColor: "#0a0f1c",
+    textColor: "#1b4332",
     short: "RAVITO",
     easterEgg: true,
   },
