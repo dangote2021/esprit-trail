@@ -71,7 +71,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-bg/90 backdrop-blur-lg safe-bottom"
+      className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink/20 bg-bg-card/95 backdrop-blur-lg shadow-[0_-4px_20px_rgba(27,67,50,0.1)] safe-bottom md:hidden"
       aria-label="Navigation principale"
     >
       <ul className="mx-auto flex max-w-lg items-center justify-around px-2 pt-2">

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/layout/BottomNav";
+import DesktopNav from "@/components/layout/DesktopNav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,7 +46,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable}`}>
       <body className="min-h-screen bg-bg text-ink antialiased font-sans">
-        <div className="relative min-h-screen pb-24">
+        <DesktopNav />
+        <div className="relative min-h-screen pb-24 md:pt-20 md:pb-8">
           {/* Grid pattern background, subtil, effet "HUD" */}
           <div
             aria-hidden
