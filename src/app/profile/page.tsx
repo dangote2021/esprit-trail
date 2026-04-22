@@ -50,6 +50,28 @@ export default function ProfilePage() {
 
       <PlayerHUD user={ME} />
 
+      {/* Character customization CTA */}
+      <Link
+        href="/profile/character"
+        className="block rounded-2xl border border-lime/25 bg-gradient-to-r from-lime/10 via-bg-card to-bg-card p-4 transition hover:border-lime/50"
+      >
+        <div className="flex items-center gap-3">
+          <div className="text-3xl">🎨</div>
+          <div className="flex-1">
+            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-lime">
+              Mode SIMS
+            </div>
+            <div className="font-display text-sm font-black">
+              Personnalise ton traileur
+            </div>
+            <div className="text-xs text-ink-muted">
+              Casquette, t-shirt, chaussures — choisis ta marque
+            </div>
+          </div>
+          <div className="text-ink-muted">→</div>
+        </div>
+      </Link>
+
       {/* UTMB + ITRA */}
       <section className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-bg-card p-4">

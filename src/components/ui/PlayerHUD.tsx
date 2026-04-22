@@ -1,4 +1,5 @@
 import XpBar from "./XpBar";
+import { CharacterAvatar } from "./CharacterAvatar";
 import type { User } from "@/lib/types";
 import { xpToNextLevel, titleForLevel } from "@/lib/types";
 
@@ -19,10 +20,18 @@ export default function PlayerHUD({ user }: { user: User }) {
       <div className="absolute inset-0 hud-scan opacity-30" aria-hidden />
 
       <div className="relative flex items-center gap-4">
-        {/* Avatar + niveau badge */}
+        {/* Avatar SIMS + niveau badge */}
         <div className="relative shrink-0">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-lime/30 bg-bg-card text-5xl shadow-glow-lime">
-            {user.avatar}
+          <div className="flex h-24 w-20 items-center justify-center rounded-2xl border border-lime/30 bg-gradient-to-b from-bg-card to-bg-raised overflow-hidden shadow-glow-lime">
+            {user.character ? (
+              <CharacterAvatar
+                character={user.character}
+                size={78}
+                showGround={false}
+              />
+            ) : (
+              <span className="text-5xl">{user.avatar}</span>
+            )}
           </div>
           <div className="absolute -bottom-2 -right-2 flex min-w-[2.5rem] items-center justify-center rounded-lg bg-lime px-2 py-0.5 text-xs font-mono font-black text-bg shadow-glow-lime">
             LV {currentLevel}

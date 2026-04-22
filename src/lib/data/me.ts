@@ -1,5 +1,6 @@
 import type { User, Run, LootItem } from "@/lib/types";
 import { titleForLevel, levelFromXp } from "@/lib/types";
+import { DEFAULT_CHARACTER } from "@/lib/character";
 
 // ====== USER MOCK — pour le MVP, on simule "moi" ======
 
@@ -40,6 +41,20 @@ export const ME: User = {
     highestElevation: 2924,
     biggestDrop: 2850,
   },
+  profile: {
+    trailerClass: "alpiniste",
+    yearsExperience: 4,
+    habitualDistance: 18,
+    biggestRace: "MaXi-Race Annecy 58km",
+    stats: {
+      endurance: 72,
+      vitesse: 58,
+      technique: 68,
+      mental: 75,
+      grimpe: 82,
+    },
+  },
+  character: DEFAULT_CHARACTER,
 };
 
 // ====== RUNS HISTORIQUE (7 dernières) ======

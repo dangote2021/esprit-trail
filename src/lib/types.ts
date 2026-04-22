@@ -20,11 +20,23 @@ export type RaceCategory =
 
 export type AppMode = "adventure" | "performance";
 
+// Classe RPG du traileur — détermine stats initiales + feel
+export type TrailerClass = "sprinter" | "ultra" | "alpiniste" | "flâneur" | "technicien";
+
+// Stats RPG (0-100) calibrées depuis la classe + années d'expérience
+export interface TrailerStats {
+  endurance: number; // 0-100
+  vitesse: number;
+  technique: number; // terrain accidenté
+  mental: number; // capacité à encaisser
+  grimpe: number; // efficacité D+
+}
+
 export interface User {
   id: string;
   username: string;
   displayName: string;
-  avatar: string; // emoji ou URL
+  avatar: string; // emoji ou URL (fallback si pas de character)
   title: string; // titre gamifié débloqué (ex: "Chasseur de cols")
   level: number; // niveau calculé à partir de l'XP
   xp: number; // XP total cumulé
@@ -34,6 +46,16 @@ export interface User {
   streak: number; // semaines consécutives où target atteinte
   mode: AppMode; // "adventure" = full gamification, "performance" = data pro
   joined: string; // ISO date
+  // Profil pratique trail (déclaré à l'onboarding)
+  profile?: {
+    trailerClass: TrailerClass;
+    yearsExperience: number; // années de pratique trail
+    habitualDistance: number; // km moyen d'une sortie
+    biggestRace?: string; // nom de la plus grosse course faite
+    stats: TrailerStats;
+  };
+  // Character SIMS (casquette + tshirt + chaussures etc.)
+  character?: import("@/lib/character").Character;
   // Connexions
   connections: {
     utmb?: { runnerIndex: number; categoryIndex: Record<RaceCategory, number> };

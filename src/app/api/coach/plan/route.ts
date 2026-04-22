@@ -1,30 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// ====== COACH IA — GÉNÉRATION DE PLAN ======
+// ====== COACH IA CLAUDE — GÉNÉRATION DE PLAN D'ENTRAÎNEMENT TRAIL ======
 //
 // Endpoint POST /api/coach/plan
-// Génère un plan d'entraînement personnalisé.
+// Si ANTHROPIC_API_KEY est présent → appel Claude pour plan sur mesure.
+// Sinon → fallback générateur local déterministe (pour preview/dev).
 //
 // Body attendu :
 // {
 //   goal: "first-10k" | "first-trail" | "improve-marathon" | "first-ultra" |
 //         "utmb-qualif" | "lose-weight" | "rebuild" | "custom",
-//   targetDate?: string,       // ISO date de la course objectif
+//   targetDate?: string,          // ISO date de la course objectif
 //   currentLevel: {
-//     weeklyKm: number,         // km actuels par semaine
-//     longestRun: number,       // km de la sortie la + longue récente
-//     weeklyElevation?: number, // D+ par semaine
+//     weeklyKm: number,
+//     longestRun: number,
+//     weeklyElevation?: number,
 //   },
 //   constraints?: {
-//     weeklyAvailability: number,  // sorties dispo/semaine
+//     weeklyAvailability: number,
 //     injuries?: string[],
 //     terrain?: "flat" | "hilly" | "mountain",
 //   },
-//   freeText?: string,          // description libre (pour goal=custom)
+//   freeText?: string,
 // }
-//
-// Pour le MVP, on retourne un plan mocké déterministe calqué sur le cas "first-ultra".
-// Plus tard, on enverra ce payload à l'API Claude pour une vraie génération.
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
 type Goal =
   | "first-10k"
@@ -53,9 +54,9 @@ type Phase = "foundation" | "build" | "peak" | "taper" | "race";
 interface PlanSession {
   type: SessionType;
   title: string;
-  duration: number; // minutes
-  distance?: number; // km
-  elevation?: number; // m
+  duration: number;
+  distance?: number;
+  elevation?: number;
   intensity: "low" | "moderate" | "high";
   notes?: string;
 }
@@ -70,6 +71,150 @@ interface PlanWeek {
   sessions: PlanSession[];
   coachTip: string;
 }
+
+// ====== CLAUDE API — Coach IA sur mesure ======
+
+const CLAUDE_SYSTEM_PROMPT = `Tu es un coach expert en trail running et ultra-trail. Tu as formé des centaines de traileurs, du premier 10K au finisher UTMB.
+
+Ta spécialité : concevoir des plans d'entraînement personnalisés, progressifs, réalistes, qui tiennent compte du profil du coureur (volume actuel, dispo, terrain, contraintes).
+
+RÈGLES DE PÉRIODISATION :
+- Foundation (premiers 35%) : volume bas-modéré, intensité low, endurance fondamentale Z2
+- Build (35-70%) : montée en charge progressive, introduction de fractionné/côtes
+- Peak (70-90%) : grosses séances spécifiques — sortie longue simulant le Jour J
+- Taper (90-98%) : affûtage, volume -40%, intensité maintenue courte
+- Race (100%) : jour J, séance "course"
+
+RÈGLES DE SÉCURITÉ :
+- Progression max +10% de volume par semaine
+- Semaine de décharge toutes les 3-4 semaines (-25 à -30%)
+- 1 à 2 séances qualité / semaine, pas plus
+- Toujours 1 jour de repos complet minimum
+
+TON STYLE :
+- Direct, terre-à-terre, motivant sans être gnangnan
+- Le tutoiement, jamais le vouvoiement
+- Les conseils sont concrets, actionnables
+- Tu cites des détails terrain (ravito, textile, altitude, dénivelé)
+
+Tu réponds UNIQUEMENT avec du JSON valide, aucun texte avant ou après. Pas de backticks. Pas de \\\`\\\`\\\`json.`;
+
+function buildUserPrompt(opts: {
+  goal: Goal;
+  targetDate?: string;
+  weeklyKm: number;
+  longestRun: number;
+  weeklyElevation?: number;
+  weeklyAvailability: number;
+  injuries?: string[];
+  terrain?: string;
+  freeText?: string;
+  totalWeeks: number;
+}): string {
+  const {
+    goal,
+    targetDate,
+    weeklyKm,
+    longestRun,
+    weeklyElevation,
+    weeklyAvailability,
+    injuries,
+    terrain,
+    freeText,
+    totalWeeks,
+  } = opts;
+
+  return `PROFIL DU COUREUR :
+- Objectif : ${goal}
+${targetDate ? `- Date cible : ${targetDate}` : ""}
+- Volume actuel : ${weeklyKm} km/semaine
+- Sortie la plus longue récente : ${longestRun} km
+${weeklyElevation ? `- D+ hebdo actuel : ${weeklyElevation} m` : ""}
+- Disponibilité : ${weeklyAvailability} sorties/semaine
+${terrain ? `- Terrain dispo : ${terrain}` : ""}
+${injuries && injuries.length ? `- Blessures à gérer : ${injuries.join(", ")}` : ""}
+${freeText ? `- Précisions : ${freeText}` : ""}
+
+Génère un plan d'entraînement de ${totalWeeks} semaines. Retourne STRICTEMENT ce JSON (aucun texte autour) :
+
+{
+  "summary": "Résumé en 2-3 phrases du plan et de la stratégie",
+  "plan": [
+    {
+      "week": 1,
+      "phase": "foundation|build|peak|taper|race",
+      "label": "Semaine X ou Semaine décharge",
+      "focus": "Focus de la semaine en 1 phrase",
+      "weeklyKm": 30,
+      "weeklyElevation": 800,
+      "sessions": [
+        {
+          "type": "easy|long|interval|hill|rest|race",
+          "title": "Titre court percutant",
+          "duration": 45,
+          "distance": 10,
+          "elevation": 200,
+          "intensity": "low|moderate|high",
+          "notes": "Consigne précise et actionnable"
+        }
+      ],
+      "coachTip": "Conseil du coach pour cette semaine, ton direct et terre-à-terre"
+    }
+  ]
+}
+
+Contraintes :
+- Exactement ${totalWeeks} semaines
+- Chaque semaine a entre 3 et 5 sessions
+- Au moins 1 session "rest" par semaine
+- "duration" en minutes, "distance" en km, "elevation" en mètres
+- Si pas de distance/elevation pertinente, mets 0`;
+}
+
+interface ClaudeResponse {
+  summary?: string;
+  plan?: PlanWeek[];
+}
+
+async function callClaude(prompt: string): Promise<ClaudeResponse | null> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 8000,
+        system: CLAUDE_SYSTEM_PROMPT,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Claude API error:", response.status, await response.text());
+      return null;
+    }
+
+    const data = await response.json();
+    const text: string = data?.content?.[0]?.text ?? "";
+
+    // Parse le JSON renvoyé par Claude
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    return JSON.parse(jsonMatch[0]) as ClaudeResponse;
+  } catch (err) {
+    console.error("Claude call failed:", err);
+    return null;
+  }
+}
+
+// ====== FALLBACK LOCAL — Générateur déterministe ======
 
 function phaseForWeek(week: number, totalWeeks: number): Phase {
   const pct = week / totalWeeks;
@@ -89,13 +234,12 @@ function generatePlan(opts: {
   const totalWeeks = WEEKS_BY_GOAL[goal];
   const weeks: PlanWeek[] = [];
 
-  // Progression linéaire simple : +10%/sem sauf semaine de décharge (toutes les 4 sem)
-  // Puis taper sur les 2-3 dernières semaines
   for (let w = 1; w <= totalWeeks; w++) {
     const phase = phaseForWeek(w, totalWeeks);
     const isDeload = w % 4 === 0 && phase !== "taper" && phase !== "race";
     const progressFactor = isDeload ? 0.7 : 1 + (w - 1) * 0.08;
-    const cappedFactor = phase === "taper" ? 0.6 - (w - totalWeeks + 2) * 0.2 : progressFactor;
+    const cappedFactor =
+      phase === "taper" ? 0.6 - (w - totalWeeks + 2) * 0.2 : progressFactor;
 
     const targetKm = Math.round(weeklyKm * Math.max(0.5, cappedFactor));
     const targetD = Math.round(targetKm * (goal === "first-ultra" ? 35 : 25));
@@ -103,7 +247,6 @@ function generatePlan(opts: {
     const sessions: PlanSession[] = [];
     const avail = Math.min(5, Math.max(2, weeklyAvailability));
 
-    // Easy run
     sessions.push({
       type: "easy",
       title: "Footing souple Z2",
@@ -113,7 +256,6 @@ function generatePlan(opts: {
       notes: "Zone 2 — tu peux parler sans forcer",
     });
 
-    // Interval / quality session (phase build/peak)
     if ((phase === "build" || phase === "peak") && avail >= 3) {
       sessions.push({
         type: "interval",
@@ -125,9 +267,10 @@ function generatePlan(opts: {
       });
     }
 
-    // Hill repeats (trail goals)
     if (
-      (goal === "first-trail" || goal === "first-ultra" || goal === "utmb-qualif") &&
+      (goal === "first-trail" ||
+        goal === "first-ultra" ||
+        goal === "utmb-qualif") &&
       phase !== "taper" &&
       avail >= 3
     ) {
@@ -142,7 +285,6 @@ function generatePlan(opts: {
       });
     }
 
-    // Long run
     sessions.push({
       type: "long",
       title: phase === "peak" ? "Sortie longue terrain" : "Sortie longue",
@@ -156,7 +298,6 @@ function generatePlan(opts: {
           : "Allure aisance — endurance fondamentale",
     });
 
-    // Race week
     if (phase === "race") {
       sessions.push({
         type: "race",
@@ -167,7 +308,6 @@ function generatePlan(opts: {
       });
     }
 
-    // Rest
     sessions.push({
       type: "rest",
       title: "Repos ou récup active",
@@ -233,13 +373,51 @@ function coachTipForPhase(phase: Phase, week: number, goal: Goal): string {
   return pool[week % pool.length];
 }
 
+// ====== HANDLERS ======
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const goal = (body.goal as Goal) || "first-ultra";
     const weeklyKm = body.currentLevel?.weeklyKm ?? 30;
+    const longestRun = body.currentLevel?.longestRun ?? weeklyKm / 2;
+    const weeklyElevation = body.currentLevel?.weeklyElevation;
     const weeklyAvailability = body.constraints?.weeklyAvailability ?? 4;
+    const injuries = body.constraints?.injuries;
+    const terrain = body.constraints?.terrain;
+    const freeText = body.freeText;
+    const targetDate = body.targetDate;
+    const totalWeeks = WEEKS_BY_GOAL[goal];
 
+    // 1. Tentative Claude IA
+    const prompt = buildUserPrompt({
+      goal,
+      targetDate,
+      weeklyKm,
+      longestRun,
+      weeklyElevation,
+      weeklyAvailability,
+      injuries,
+      terrain,
+      freeText,
+      totalWeeks,
+    });
+
+    const claudeResult = await callClaude(prompt);
+
+    if (claudeResult?.plan && Array.isArray(claudeResult.plan)) {
+      return NextResponse.json({
+        ok: true,
+        goal,
+        totalWeeks: claudeResult.plan.length,
+        generatedAt: new Date().toISOString(),
+        source: "claude-sonnet-4.6",
+        summary: claudeResult.summary,
+        plan: claudeResult.plan,
+      });
+    }
+
+    // 2. Fallback local déterministe
     const plan = generatePlan({ goal, weeklyKm, weeklyAvailability });
 
     return NextResponse.json({
@@ -247,7 +425,7 @@ export async function POST(req: NextRequest) {
       goal,
       totalWeeks: plan.length,
       generatedAt: new Date().toISOString(),
-      source: "mock-mvp",
+      source: process.env.ANTHROPIC_API_KEY ? "local-fallback" : "local-no-key",
       plan,
     });
   } catch (err: unknown) {
@@ -256,7 +434,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET = endpoint de démo — renvoie un plan "first-ultra" par défaut
 export async function GET() {
   const plan = generatePlan({
     goal: "first-ultra",
@@ -268,7 +445,7 @@ export async function GET() {
     goal: "first-ultra",
     totalWeeks: plan.length,
     generatedAt: new Date().toISOString(),
-    source: "mock-mvp-demo",
+    source: "local-demo",
     plan,
   });
 }
