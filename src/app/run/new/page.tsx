@@ -46,7 +46,7 @@ export default function NewRunPage() {
               Importer depuis Strava
             </div>
             <div className="text-xs text-ink-muted">
-              Sortie taguée à postériori, importe les FIT de ta Garmin/Coros/Suunto
+              Tes sorties remontent automatiquement depuis Strava (qui se connecte à ta montre)
             </div>
           </div>
         </button>

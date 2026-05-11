@@ -60,6 +60,14 @@ export default function StatRadarEditable({
     const next: TrailerStats = { ...stats, [key]: value };
     setStats(next);
     saveOverride(next);
+    // Petit feedback haptique sur mobile à chaque cran de slider
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(5);
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   const axes: RadarAxis[] = statsToRadar(stats);

@@ -6,6 +6,7 @@
 // puis "Site officiel" + "Partager" en duo discret en dessous.
 
 import { useEffect, useState } from "react";
+import { showToast } from "@/components/ui/Toast";
 
 const KEY = "esprit_wishlist_races";
 
@@ -49,11 +50,22 @@ export default function RaceActions({
 
   const toggleWishlist = () => {
     const list = loadWishlist();
-    const next = list.includes(raceId)
-      ? list.filter((id) => id !== raceId)
-      : [...list, raceId];
+    const added = !list.includes(raceId);
+    const next = added
+      ? [...list, raceId]
+      : list.filter((id) => id !== raceId);
     saveWishlist(next);
-    setInWishlist(next.includes(raceId));
+    setInWishlist(added);
+    // Feedback haptique mobile (no-op desktop)
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(added ? [10, 50, 10] : 15);
+    }
+    // Toast
+    if (added) {
+      showToast(`✓ ${raceName || "Course"} ajoutée à ta wishlist`, "success");
+    } else {
+      showToast("Retirée de ta wishlist", "info");
+    }
   };
 
   async function handleShare() {
