@@ -173,8 +173,8 @@ export default function BestResults() {
         {results.length === 0 && !editing && (
           <p className="text-[11px] italic text-ink-dim leading-relaxed mt-2">
             Tes 3 courses mythiques. Ex : « Diagonale des Fous 2022 · 167 km ·
-            35h (33ème) ». Trail, ultra, FKT, peu importe — celles dont tu es
-            fier.
+            35h (33ème) ». Les courses dont tu es le plus fier et qui brillent
+            dans ton CV de traileur 🔥
           </p>
         )}
       </div>
