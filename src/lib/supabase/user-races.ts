@@ -203,22 +203,22 @@ export async function submitUserRace(
   const uid = await getUserId();
   if (!uid) return null;
   const sb = getSupabaseBrowserClient();
-  const { data, error } = await sb
-    .from("user_races")
-    .insert({
-      submitter_id: uid,
-      name: draft.name,
-      tagline: draft.tagline,
-      location: draft.location,
-      country: draft.country || "France",
-      date: new Date(draft.date).toISOString(),
-      distance: draft.distance,
-      elevation: draft.elevation,
-      category: draft.category,
-      itra_points: draft.itraPoints || 0,
-      difficulty: draft.difficulty,
-      official_url: draft.officialUrl || null,
-    })
+  const payload = {
+    submitter_id: uid,
+    name: draft.name,
+    tagline: draft.tagline,
+    location: draft.location,
+    country: draft.country || "France",
+    date: new Date(draft.date).toISOString(),
+    distance: draft.distance,
+    elevation: draft.elevation,
+    category: draft.category,
+    itra_points: draft.itraPoints || 0,
+    difficulty: draft.difficulty,
+    official_url: draft.officialUrl || null,
+  };
+  const { data, error } = await (sb.from("user_races") as any)
+    .insert(payload)
     .select(
       `*, submitter:profiles!user_races_submitter_id_fkey(username, display_name, avatar)`,
     )
@@ -238,22 +238,22 @@ export async function submitUserOffRace(
   const uid = await getUserId();
   if (!uid) return null;
   const sb = getSupabaseBrowserClient();
-  const { data, error } = await sb
-    .from("user_off_races")
-    .insert({
-      submitter_id: uid,
-      name: draft.name,
-      tagline: draft.tagline,
-      location: draft.location,
-      country: draft.country || "🇫🇷",
-      distance: draft.distance,
-      elevation: draft.elevation,
-      category: draft.category,
-      vibe: draft.vibe,
-      soul: draft.soul || draft.vibe,
-      record_holder: draft.recordHolder || null,
-      record_time: draft.recordTime || null,
-    })
+  const payload = {
+    submitter_id: uid,
+    name: draft.name,
+    tagline: draft.tagline,
+    location: draft.location,
+    country: draft.country || "🇫🇷",
+    distance: draft.distance,
+    elevation: draft.elevation,
+    category: draft.category,
+    vibe: draft.vibe,
+    soul: draft.soul || draft.vibe,
+    record_holder: draft.recordHolder || null,
+    record_time: draft.recordTime || null,
+  };
+  const { data, error } = await (sb.from("user_off_races") as any)
+    .insert(payload)
     .select(
       `*, submitter:profiles!user_off_races_submitter_id_fkey(username, display_name, avatar)`,
     )
@@ -290,9 +290,10 @@ export async function toggleServerWishlist(
   if (!uid) return false;
   const sb = getSupabaseBrowserClient();
   if (add) {
-    const { error } = await sb
-      .from("user_wishlist_races")
-      .upsert({ user_id: uid, race_id: raceId });
+    const { error } = await (sb.from("user_wishlist_races") as any).upsert({
+      user_id: uid,
+      race_id: raceId,
+    });
     if (error) return false;
   } else {
     const { error } = await sb

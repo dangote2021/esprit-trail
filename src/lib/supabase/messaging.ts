@@ -235,14 +235,20 @@ export async function sendMessage(
     };
   }
   const sb = getSupabaseBrowserClient();
-  const { data, error } = await sb
-    .from("messages")
-    .insert({
-      conversation_id: conversationId,
-      author_id: uid,
-      text,
-      attachment: attachment ?? null,
-    })
+  // Cast pour bypasser une limite d'inférence TS sur le typage généré.
+  const insertPayload: {
+    conversation_id: string;
+    author_id: string;
+    text: string;
+    attachment: unknown;
+  } = {
+    conversation_id: conversationId,
+    author_id: uid,
+    text,
+    attachment: attachment ?? null,
+  };
+  const { data, error } = await (sb.from("messages") as any)
+    .insert(insertPayload)
     .select("*")
     .single();
 
