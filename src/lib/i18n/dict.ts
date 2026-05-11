@@ -169,7 +169,7 @@ const fr: Dict = {
 
   // Profile
   "profile.title": "Ton cockpit",
-  "profile.best_results": "Best results",
+  "profile.best_results": "Tes courses mythiques · TOP 3",
   "profile.best_results.add": "+ Ajouter une course mythique",
   "profile.best_results.placeholder_help": "Tes 3 courses mythiques. Ex : « Diagonale des Fous 2022 · 167 km · 35h (33ème) ». Trail, ultra, FKT, peu importe — celles dont tu es fier.",
   "profile.stats.title": "Forces & faiblesses",
@@ -418,7 +418,7 @@ const en: Dict = {
 
   // Profile
   "profile.title": "Your cockpit",
-  "profile.best_results": "Best results",
+  "profile.best_results": "Your mythic races · TOP 3",
   "profile.best_results.add": "+ Add a mythic race",
   "profile.best_results.placeholder_help": "Your 3 mythic races. E.g.: \"Diagonale des Fous 2022 · 167 km · 35h (33rd)\". Trail, ultra, FKT, whatever — the ones you're proud of.",
   "profile.stats.title": "Strengths & weaknesses",

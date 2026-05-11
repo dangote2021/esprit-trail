@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MESSAGE_USERS, ME_ID } from "@/lib/data/messages";
+import { createConversation } from "@/lib/supabase/messaging";
 
 export default function NewConversationButton() {
   const [open, setOpen] = useState(false);
@@ -29,12 +30,21 @@ export default function NewConversationButton() {
     }
   }
 
-  function create() {
+  async function create() {
     if (selected.length === 0) return;
-    // En l'absence de backend, on route vers une conversation existante
-    // pour la démo. En prod : POST /api/conversations → /messages/<id>.
+    // 1. Tente la création serveur (RPC Supabase)
+    const convId = await createConversation({
+      type: mode,
+      name: mode === "group" ? groupName.trim() || "Crew run" : undefined,
+      memberIds: selected,
+    });
+    if (convId) {
+      router.push(`/messages/${convId}`);
+      setOpen(false);
+      return;
+    }
+    // 2. Fallback démo (pas authentifié) : route vers une conv mock existante
     if (mode === "dm") {
-      // Mappe simplement le 1er user vers une conversation existante par convention
       const userToConv: Record<string, string> = {
         "u-clem": "c-clem",
         "u-casquette": "c-casquette",

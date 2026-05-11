@@ -8,8 +8,20 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Message } from "@/lib/types";
-import { getUser, ME_ID } from "@/lib/data/messages";
+import type { Conversation, Message } from "@/lib/types";
+import {
+  conversationDisplayAvatar,
+  conversationDisplayName,
+  getUser,
+  ME_ID,
+} from "@/lib/data/messages";
+import {
+  getConversation as fetchConversation,
+  listMessages,
+  sendMessage as sbSendMessage,
+  subscribeToMessages,
+  markRead,
+} from "@/lib/supabase/messaging";
 
 function loadDraftMessages(conversationId: string): Message[] {
   if (typeof window === "undefined") return [];
@@ -56,30 +68,54 @@ function dayLabel(iso: string): string {
 
 export default function ConversationThread({
   conversationId,
-  conversationName,
-  conversationAvatar,
-  type,
-  memberCount,
-  description,
-  initialMessages,
 }: {
   conversationId: string;
-  conversationName: string;
-  conversationAvatar: string;
-  type: "dm" | "group";
-  memberCount: number;
-  description?: string;
-  initialMessages: Message[];
 }) {
   const [hydrated, setHydrated] = useState(false);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [extraMessages, setExtraMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const scrollerRef = useRef<HTMLDivElement>(null);
 
+  // Charge la conversation + ses messages depuis Supabase (avec fallback mock)
   useEffect(() => {
     setHydrated(true);
     setExtraMessages(loadDraftMessages(conversationId));
+    let cancelled = false;
+    (async () => {
+      const [conv, msgs] = await Promise.all([
+        fetchConversation(conversationId),
+        listMessages(conversationId),
+      ]);
+      if (cancelled) return;
+      setConversation(conv);
+      setInitialMessages(msgs);
+    })();
+    // Marque la conversation comme lue dès qu'on l'ouvre (no-op si pas authentifié)
+    markRead(conversationId).catch(() => {});
+    // Subscribe au Realtime — nouveaux messages live (no-op si pas authentifié)
+    const unsub = subscribeToMessages(conversationId, (msg) => {
+      setExtraMessages((prev) => {
+        if (prev.find((m) => m.id === msg.id)) return prev;
+        return [...prev, msg];
+      });
+    });
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, [conversationId]);
+
+  const conversationName = conversation
+    ? conversationDisplayName(conversation)
+    : "…";
+  const conversationAvatar = conversation
+    ? conversationDisplayAvatar(conversation)
+    : "💬";
+  const type = conversation?.type ?? "dm";
+  const memberCount = conversation?.members.length ?? 0;
+  const description = conversation?.description;
 
   const allMessages = useMemo(() => {
     return [...initialMessages, ...extraMessages].sort(
@@ -95,21 +131,29 @@ export default function ConversationThread({
     }
   }, [allMessages.length]);
 
-  function send() {
+  async function send() {
     const text = draft.trim();
     if (!text) return;
-    const msg: Message = {
-      id: `m-${Date.now()}`,
+    // 1. Optimistic UI : on affiche le msg immédiatement
+    const optimistic: Message = {
+      id: `local-${Date.now()}`,
       conversationId,
       authorId: ME_ID,
       text,
       createdAt: new Date().toISOString(),
-      status: "delivered",
+      status: "sending",
     };
-    const next = [...extraMessages, msg];
+    const next = [...extraMessages, optimistic];
     setExtraMessages(next);
     saveDraftMessages(conversationId, next);
     setDraft("");
+    // 2. Push Supabase (no-op si pas authentifié → optimistic seul)
+    const saved = await sbSendMessage(conversationId, text);
+    if (saved) {
+      setExtraMessages((prev) =>
+        prev.map((m) => (m.id === optimistic.id ? saved : m)),
+      );
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {

@@ -18,6 +18,10 @@ import {
   type UserRaceDraft,
   type UserOffRaceDraft,
 } from "@/lib/data/user-races";
+import {
+  submitUserRace as submitToServer,
+  submitUserOffRace as submitOffToServer,
+} from "@/lib/supabase/user-races";
 
 type Mode = "on" | "off";
 
@@ -90,7 +94,7 @@ export default function AddRaceForm({
     return null;
   }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSubmitting(true);
@@ -115,7 +119,17 @@ export default function AddRaceForm({
           tagline,
           officialUrl: officialUrl.trim() || undefined,
         };
+        // 1. Tente le push Supabase (visible par toute la communauté).
+        const fromServer = await submitToServer(draft);
+        // 2. Toujours persister en localStorage en plus (works offline + fallback non-logged).
         addUserRace(draft);
+        if (!fromServer) {
+          // Pas connecté → l'écriture serveur a échoué, mais le local fonctionne.
+          // On affiche un message informatif mais on continue.
+          console.info(
+            "[AddRaceForm] saved locally only — sign in to share publicly",
+          );
+        }
       } else {
         const err = validateOff();
         if (err) {
@@ -136,7 +150,13 @@ export default function AddRaceForm({
           recordHolder: recordHolder.trim() || undefined,
           recordTime: recordTime.trim() || undefined,
         };
+        const fromServer = await submitOffToServer(draft);
         addUserOffRace(draft);
+        if (!fromServer) {
+          console.info(
+            "[AddRaceForm] saved locally only — sign in to share publicly",
+          );
+        }
       }
       onSubmitted?.();
       onClose();

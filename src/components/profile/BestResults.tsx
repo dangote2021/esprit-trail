@@ -114,7 +114,7 @@ export default function BestResults() {
     return (
       <section className="rounded-2xl border border-ink/10 bg-bg-card/60 p-4">
         <div className="text-[11px] font-black uppercase tracking-widest text-ink-muted">
-          Best results
+          Tes courses mythiques · TOP 3
         </div>
         <div className="mt-2 text-xs text-ink-dim italic">Chargement...</div>
       </section>
@@ -125,7 +125,7 @@ export default function BestResults() {
     <section className="rounded-2xl border border-ink/10 bg-bg-card/60 p-4">
       <div className="mb-3 flex items-center justify-between">
         <div className="text-[11px] font-black uppercase tracking-widest text-ink-muted">
-          Best results
+          Tes courses mythiques · TOP 3
         </div>
         <div className="text-[9px] font-mono text-ink-dim">
           {results.length}/{MAX_RESULTS}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { totalUnread } from "@/lib/data/messages";
+import { getTotalUnread } from "@/lib/supabase/messaging";
 import { useT } from "@/lib/i18n/LangProvider";
 
 type NavItem = {
@@ -175,8 +176,25 @@ export default function BottomNav() {
   // (hydratation en cours), on évite le flash en cachant.
   if (isPublicDiscovery && isLogged === null) return null;
 
-  // Calcul du badge unread pour Messages (mock data en attendant Supabase)
-  const unread = totalUnread();
+  // Calcul du badge unread pour Messages — Supabase si authentifié, sinon mock
+  const [unread, setUnread] = useState(totalUnread());
+  useEffect(() => {
+    let cancelled = false;
+    getTotalUnread()
+      .then((n) => {
+        if (!cancelled) setUnread(n);
+      })
+      .catch(() => {});
+    // Refresh toutes les 60s pour ne pas spammer l'API
+    const id = window.setInterval(async () => {
+      const n = await getTotalUnread();
+      if (!cancelled) setUnread(n);
+    }, 60_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [pathname]); // recalc à chaque navigation
 
   return (
     <nav

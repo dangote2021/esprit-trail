@@ -12,6 +12,10 @@ import RaceShareButton from "@/components/race/RaceShareButton";
 import AddRaceForm from "@/components/race/AddRaceForm";
 import SubmittedByBadge from "@/components/race/SubmittedByBadge";
 import { loadUserRaces, loadUserOffRaces } from "@/lib/data/user-races";
+import {
+  listUserRaces as fetchServerUserRaces,
+  listUserOffRaces as fetchServerUserOffRaces,
+} from "@/lib/supabase/user-races";
 import { useT, useLang } from "@/lib/i18n/LangProvider";
 
 const CATS: { id: RaceCategory | "all"; labelKey: string; range: string }[] = [
@@ -58,17 +62,51 @@ export default function RacesPage() {
     setIsLogged(hasAuth);
   }, []);
 
-  // Charger les courses user-submitted depuis localStorage et écouter les updates
+  // Charger les courses user-submitted depuis Supabase (avec fallback localStorage)
+  // et écouter les updates pour rafraîchir la liste à chaque nouvelle soumission.
   useEffect(() => {
-    const refresh = () => {
-      setUserRaces(loadUserRaces());
-      setUserOffRaces(loadUserOffRaces());
-    };
+    let cancelled = false;
+    async function refresh() {
+      // 1. Local first pour l'instant — puis enrichi par les courses serveur.
+      const local = loadUserRaces();
+      const localOff = loadUserOffRaces();
+      if (!cancelled) {
+        setUserRaces(local);
+        setUserOffRaces(localOff);
+      }
+      // 2. Serveur (publiquement visible)
+      try {
+        const [serverOn, serverOff] = await Promise.all([
+          fetchServerUserRaces(),
+          fetchServerUserOffRaces(),
+        ]);
+        if (cancelled) return;
+        // Merge avec dedupe par id (local id "user-…" diffère du UUID serveur)
+        const seen = new Set<string>();
+        const mergedOn = [...serverOn, ...local].filter((r) => {
+          if (seen.has(r.id)) return false;
+          seen.add(r.id);
+          return true;
+        });
+        const seenOff = new Set<string>();
+        const mergedOff = [...serverOff, ...localOff].filter((r) => {
+          if (seenOff.has(r.id)) return false;
+          seenOff.add(r.id);
+          return true;
+        });
+        setUserRaces(mergedOn);
+        setUserOffRaces(mergedOff);
+      } catch (e) {
+        // Pas de réseau ou pas authentifié → on garde le local
+        console.warn("[races] server fetch failed, using local only", e);
+      }
+    }
     refresh();
     window.addEventListener("esprit-user-races-update", refresh);
     window.addEventListener("esprit-user-off-races-update", refresh);
     window.addEventListener("storage", refresh);
     return () => {
+      cancelled = true;
       window.removeEventListener("esprit-user-races-update", refresh);
       window.removeEventListener("esprit-user-off-races-update", refresh);
       window.removeEventListener("storage", refresh);

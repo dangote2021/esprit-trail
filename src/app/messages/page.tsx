@@ -1,26 +1,43 @@
+"use client";
+
+// ====== /messages — liste des conversations ======
+// Lit les conversations depuis Supabase via le service messaging. Fallback
+// sur les mock data quand l'user n'est pas authentifié (mode démo).
+
 import Link from "next/link";
-import type { Metadata } from "next";
+import { useEffect, useState } from "react";
 import {
-  CONVERSATIONS,
   conversationDisplayAvatar,
   conversationDisplayName,
   formatRelativeTime,
   ME_ID,
 } from "@/lib/data/messages";
+import type { Conversation } from "@/lib/types";
 import NewConversationButton from "@/components/messages/NewConversationButton";
-
-export const metadata: Metadata = {
-  title: "Messages",
-  description:
-    "Discute avec tes potes de trail. Échange spots, plans nutri et conseils en DM ou en groupe.",
-};
+import { listConversations } from "@/lib/supabase/messaging";
 
 export default function MessagesListPage() {
-  // Trier par updatedAt desc (les conversations actives en haut)
-  const sorted = [...CONVERSATIONS].sort(
-    (a, b) =>
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-  );
+  const [convs, setConvs] = useState<Conversation[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const list = await listConversations();
+      if (cancelled) return;
+      // Trier par updatedAt desc
+      const sorted = [...list].sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      );
+      setConvs(sorted);
+      setLoading(false);
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-4">
@@ -50,9 +67,27 @@ export default function MessagesListPage() {
         </div>
       </div>
 
+      {loading && (
+        <div className="text-center py-8 text-xs font-mono text-ink-dim">
+          Chargement…
+        </div>
+      )}
+
       {/* Liste de conversations */}
+      {!loading && convs.length === 0 && (
+        <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-bg-card/40 p-6 text-center space-y-2">
+          <div className="text-3xl">💬</div>
+          <div className="font-display text-sm font-black text-ink">
+            Aucune conversation
+          </div>
+          <div className="text-xs text-ink-muted">
+            Démarre un DM avec un pote ou crée un groupe pour ta team trail.
+          </div>
+        </div>
+      )}
+
       <ul className="space-y-1.5">
-        {sorted.map((conv) => {
+        {convs.map((conv) => {
           const name = conversationDisplayName(conv);
           const avatar = conversationDisplayAvatar(conv);
           const lastMsg = conv.lastMessage;
@@ -140,11 +175,6 @@ export default function MessagesListPage() {
           );
         })}
       </ul>
-
-      {/* Note backend Phase 2 */}
-      <p className="text-[10px] text-ink-dim font-mono text-center pt-2">
-        ⚡ Realtime Supabase en cours de branchement
-      </p>
     </main>
   );
 }
