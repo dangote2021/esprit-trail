@@ -78,6 +78,10 @@ export default function BottomNav() {
   const pathname = usePathname() || "/";
   const t = useT();
   const [isLogged, setIsLogged] = useState<boolean | null>(null);
+  // BUG-fix : tous les hooks DOIVENT être appelés inconditionnellement au top
+  // du composant — sinon erreur "Rendered fewer hooks than expected" qui casse
+  // l'app entière (le BottomNav est dans le layout racine).
+  const [unread, setUnread] = useState(totalUnread());
 
   // Détection présence cookie auth Supabase côté client (indicatif).
   useEffect(() => {
@@ -87,6 +91,28 @@ export default function BottomNav() {
       .some((c) => c.trim().match(/^sb-[a-z0-9]+-auth-token/));
     setIsLogged(hasAuth);
   }, []);
+
+  // Calcul du badge unread pour Messages — Supabase si authentifié, sinon mock
+  useEffect(() => {
+    let cancelled = false;
+    getTotalUnread()
+      .then((n) => {
+        if (!cancelled) setUnread(n);
+      })
+      .catch(() => {});
+    const id = window.setInterval(async () => {
+      try {
+        const n = await getTotalUnread();
+        if (!cancelled) setUnread(n);
+      } catch {
+        // ignore
+      }
+    }, 60_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [pathname]);
 
   // Hide on onboarding, auth, legal, and PUBLIC marketing pages
   // (sinon affiche des liens auth-required à un visiteur non connecté).
@@ -175,26 +201,6 @@ export default function BottomNav() {
   // Si on est sur une page publique mais qu'on n'a pas encore détecté l'auth
   // (hydratation en cours), on évite le flash en cachant.
   if (isPublicDiscovery && isLogged === null) return null;
-
-  // Calcul du badge unread pour Messages — Supabase si authentifié, sinon mock
-  const [unread, setUnread] = useState(totalUnread());
-  useEffect(() => {
-    let cancelled = false;
-    getTotalUnread()
-      .then((n) => {
-        if (!cancelled) setUnread(n);
-      })
-      .catch(() => {});
-    // Refresh toutes les 60s pour ne pas spammer l'API
-    const id = window.setInterval(async () => {
-      const n = await getTotalUnread();
-      if (!cancelled) setUnread(n);
-    }, 60_000);
-    return () => {
-      cancelled = true;
-      window.clearInterval(id);
-    };
-  }, [pathname]); // recalc à chaque navigation
 
   return (
     <nav
