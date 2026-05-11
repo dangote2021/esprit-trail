@@ -1,70 +1,12 @@
-// ====== TQLogo — Logo Esprit Trail officiel (variante K) ======
-// Direction K choisie le 2 mai 2026 : 3 pics étagés + sentier sinueux orange,
-// soleil orange en arrière-plan. Pas de R en filigrane. Wordmark "ESPRIT TRAIL" en
-// dessous pour le BrandLogoFull.
+// ====== TQLogo — Logo Esprit Trail officiel (runner-sunset) ======
+// Logo V8 : silhouette runner noire + soleil orange brossé + montagnes
+// enneigées noir/blanc/gris + éclaboussures. Style stencil / sérigraphie.
+// Image PNG haute résolution servie depuis /icon-1024.png (Vercel cache CDN).
 
 import Link from "next/link";
-
-const COLORS = {
-  ink: "#0B1D0E",
-  forest: "#1B4332",
-  sage: "#2D6A4F",
-  cream: "#F0E6C8",
-  orange: "#F77F00",
-};
-
-// ============================================================================
-// SVG icône — single source of truth pour les pics + sentier (paths fidèles K)
-// ============================================================================
-function PicsTrailSvg({
-  withBackground = true,
-  size = 64,
-}: {
-  withBackground?: boolean;
-  size?: number;
-}) {
-  const radius = withBackground ? Math.round(size * 0.176) : 0;
-  return (
-    <svg
-      viewBox="0 0 1024 1024"
-      width={size}
-      height={size}
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      {withBackground && (
-        <rect width="1024" height="1024" rx={radius * (1024 / size)} fill={COLORS.forest} />
-      )}
-      {/* Soleil */}
-      <circle cx="780" cy="280" r="90" fill={COLORS.orange} opacity="0.9" />
-      {/* 3 pics étagés */}
-      <g stroke={COLORS.ink} strokeWidth="7" strokeLinejoin="round">
-        <path d="M 100 720 L 250 460 L 380 580 L 380 720 Z" fill={COLORS.sage} />
-        <path
-          d="M 280 720 L 540 250 L 720 480 L 800 380 L 920 720 Z"
-          fill={withBackground ? COLORS.cream : COLORS.forest}
-        />
-        <path d="M 700 720 L 820 540 L 924 720 Z" fill={COLORS.sage} opacity="0.85" />
-      </g>
-      {/* Sentier sinueux orange */}
-      <path
-        d="M 80 820 Q 250 780 400 820 T 700 800 T 944 830"
-        fill="none"
-        stroke={COLORS.orange}
-        strokeWidth="14"
-        strokeLinecap="round"
-      />
-      {/* Points de marche */}
-      <g fill={COLORS.orange}>
-        <circle cx="160" cy="800" r="6" />
-        <circle cx="320" cy="810" r="6" />
-        <circle cx="500" cy="810" r="6" />
-        <circle cx="660" cy="800" r="6" />
-        <circle cx="820" cy="820" r="6" />
-      </g>
-    </svg>
-  );
-}
+// eslint-disable-next-line @next/next/no-img-element
+// On utilise <img> natif (pas next/image) pour éviter les configs domains et
+// parce que l'icône est déjà optimisée + cachée sur le CDN Vercel.
 
 // ============================================================================
 // Icône seule — utile en favicon, badges, hors lockup
@@ -78,11 +20,19 @@ export function BrandLogoIcon({
 }) {
   return (
     <span
-      className={`inline-block leading-none ${className}`}
+      className={`inline-block leading-none overflow-hidden rounded-2xl ${className}`}
       style={{ width: size, height: size }}
       aria-label="Esprit Trail"
     >
-      <PicsTrailSvg withBackground size={size} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/icon-512.png"
+        alt="Esprit Trail"
+        width={size}
+        height={size}
+        style={{ width: size, height: size, objectFit: "cover" }}
+        loading="eager"
+      />
     </span>
   );
 }

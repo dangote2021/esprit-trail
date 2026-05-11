@@ -1,14 +1,14 @@
 import Link from "next/link";
-import PlayerHUD from "@/components/ui/PlayerHUD";
 import BadgeCard from "@/components/ui/BadgeCard";
 import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
-import { FifaStatList } from "@/components/ui/FifaStatList";
+import { StatStarsList } from "@/components/ui/StatStarsList";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
 import { getBadge } from "@/lib/data/badges";
 import { RARITY_STYLES, TITLES, levelFromXp } from "@/lib/types";
 import WishlistRaces from "@/components/profile/WishlistRaces";
+import BestResults from "@/components/profile/BestResults";
 
 function formatKm(n: number) {
   return n.toLocaleString("fr", { maximumFractionDigits: 1 });
@@ -100,8 +100,11 @@ export default function ProfilePage() {
         ]}
       />
 
-      {/* ===== Liste FIFA-style des attributs ===== */}
-      <FifaStatList stats={ME.profile!.stats} />
+      {/* ===== Best Results — 3 courses mythiques user-editable ===== */}
+      <BestResults />
+
+      {/* ===== Forces & faiblesses en étoiles ===== */}
+      <StatStarsList stats={ME.profile!.stats} />
 
       {/* Auto-évaluation des attributs (sondage radar configurable) */}
       <Link
@@ -116,9 +119,7 @@ export default function ProfilePage() {
         </span>
       </Link>
 
-      {/* XP / niveau : on garde PlayerHUD en compact pour la progression */}
-      <PlayerHUD user={ME} />
-
+      {/* Bloc PlayerHUD supprimé — la carte Hero suffit pour identifier le profil */}
       {/* Bloc Character customization retiré — on garde le profil propre, photo perso */}
 
       {/* UTMB + ITRA */}

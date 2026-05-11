@@ -61,8 +61,8 @@ export default function PublicLanding({
         </h1>
         <p className="text-base text-ink-muted leading-relaxed">
           {isNovice
-            ? "Spots GPX près de chez toi, Coach IA qui adapte ton plan à ton niveau, plans nutrition pour ne pas exploser au km 20. Sans payer, sans pub."
-            : "Plans nutrition par course, spots GPX près de chez toi, OFF Races confidentielles, Coach IA pour préparer ton ultra. Sans payer, sans pub."}
+            ? "Spots GPX près de chez toi, Coach IA qui adapte ton plan à ton niveau, plans nutrition pour ne pas exploser au km 20."
+            : "Plans nutrition par course, spots GPX près de chez toi, OFF Races confidentielles, Coach IA pour préparer ton prochain ultra."}
         </p>
       </section>
 
@@ -488,7 +488,7 @@ export default function PublicLanding({
           >
             /organisateurs
           </Link>
-          ). Toi tu cours, c&apos;est gratuit à vie.
+          ).
         </p>
       </section>
 
