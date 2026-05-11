@@ -1,9 +1,13 @@
 import type { MetadataRoute } from "next";
 
+// Build tag pour cache-bust PWA (changer pour forcer la mise à jour côté client)
+const BUILD_TAG = "2026-05-11-v2";
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Esprit Trail · Coach Trail",
     short_name: "Esprit Trail",
+    id: `/?v=${BUILD_TAG}`,
     description:
       "Coach IA pour ton ultra. Plans nutrition, spots GPX, dossards à gagner.",
     // Param utm pour tracker les ouvertures PWA standalone vs web
