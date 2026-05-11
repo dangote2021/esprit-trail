@@ -108,7 +108,7 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
     tagline: "65 km, 6000 D+, 100% montagne",
     isIconic: true,
-    officialUrl: "https://6000d.com",
+    officialUrl: "https://www.google.com/search?q=6000D+La+Plagne+inscription",
     formats: [
       { name: "6000D — La Plagne", distance: 65, elevation: 6000 },
       { name: "3000D — La Plagne", distance: 32, elevation: 3000 },
@@ -198,7 +198,7 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
     tagline: "Falaises, plages et caps du Nord",
     isIconic: false,
-    officialUrl: "https://trail-cotedopale.com",
+    officialUrl: "https://www.google.com/search?q=Trail+de+la+C%C3%B4te+d%27Opale+inscription",
     formats: [
       { name: "Grand Trail", distance: 55, elevation: 1200 },
       { name: "Trail", distance: 32, elevation: 700 },
@@ -220,7 +220,7 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
     tagline: "160 km dans les Pyrénées sauvages",
     isIconic: true,
-    officialUrl: "https://grandraidpyrenees.com",
+    officialUrl: "https://www.google.com/search?q=Grand+Raid+des+Pyr%C3%A9n%C3%A9es+inscription",
     formats: [
       { name: "Ultra-Tour 160", distance: 160, elevation: 10000 },
       { name: "Tour des Cirques (120 km)", distance: 120, elevation: 7400 },
@@ -243,7 +243,7 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
     tagline: "Plateau du Vercors, grande rando en version fast",
     isIconic: false,
-    officialUrl: "https://trail-vercors.com",
+    officialUrl: "https://www.google.com/search?q=Trail+du+Vercors+Villard-de-Lans+inscription",
     formats: [
       { name: "Trail des Crêtes", distance: 42, elevation: 2400 },
       { name: "Trail des Hauts-Plateaux", distance: 28, elevation: 1500 },
