@@ -48,14 +48,19 @@ export function LangProvider({
   }, [lang]);
 
   const setLang = useCallback((l: Lang) => {
+    // 1. Mise à jour immédiate du state — re-render instantané de tous les
+    //    client components qui utilisent useT(). Pas de full-page reload qui
+    //    casserait l'UX et serait inefficace sur les pages SSG.
     setLangState(l);
+    // 2. Persistance dans le cookie (pour la prochaine visite + server components
+    //    qui lisent getServerLang()).
     if (typeof document !== "undefined") {
       document.cookie = `${COOKIE_NAME}=${l}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
     }
-    // Force un refresh server-side pour que les metadata + server components s'alignent
+    // 3. Émet un événement custom pour permettre à d'autres parties de l'app
+    //    de réagir au changement (ex: refetch d'un endpoint, etc.).
     if (typeof window !== "undefined") {
-      // Reload de la page courante — propre pour récupérer les chaînes server-rendered
-      window.location.reload();
+      window.dispatchEvent(new CustomEvent("esprit-lang-change", { detail: l }));
     }
   }, []);
 

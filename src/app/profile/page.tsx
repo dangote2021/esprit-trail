@@ -169,6 +169,28 @@ export default function ProfilePage() {
         </div>
       </section>
 
+      {/* Accès Ranking — apparaît juste sous les onglets UTMB et ITRA */}
+      <Link
+        href="/leaderboard"
+        className="flex items-center gap-3 rounded-2xl border-2 border-gold/30 bg-gradient-to-r from-gold/10 via-bg-card to-peach/5 p-4 hover:border-gold/60 transition"
+      >
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gold/15">
+          <span className="text-2xl">🏆</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[10px] font-mono font-black uppercase tracking-widest text-gold">
+            Ranking
+          </div>
+          <div className="font-display text-base font-black text-ink">
+            Ta position dans le classement
+          </div>
+          <div className="text-[11px] text-ink-muted">
+            ITRA · UTMB · saison en cours
+          </div>
+        </div>
+        <span className="font-display text-xl text-gold shrink-0">→</span>
+      </Link>
+
       {/* Sync Strava */}
       <section className="space-y-3">
         <SectionHeader eyebrow="Sync" title="Plateforme connectée" />
