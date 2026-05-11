@@ -90,7 +90,10 @@ export default function StatRadarEditable({
         <StatRadar axes={axes} size={240} accent="cyan" />
 
         {/* Note globale FIFA-style au centre */}
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+        <div
+          className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
+          title="Moyenne pondérée de tes 6 attributs trail"
+        >
           <div className="text-[9px] font-mono uppercase tracking-widest text-ink-muted">
             Note
           </div>
@@ -100,6 +103,25 @@ export default function StatRadarEditable({
           <div className="text-[9px] font-mono text-ink-dim mt-0.5">/ 100</div>
         </div>
       </div>
+
+      {/* Sous-titre explicatif sous le radar (F3 panel test) */}
+      <p className="mt-2 text-center text-[10px] font-mono text-ink-dim leading-relaxed">
+        Note moyenne pondérée sur tes 6 attributs trail.
+        {hydrated && (
+          <span className="block">
+            Catégorie :{" "}
+            <strong className="text-ink-muted">
+              {overall >= 85
+                ? "🥇 Élite"
+                : overall >= 70
+                  ? "🏔️ Confirmé"
+                  : overall >= 55
+                    ? "🥾 Intermédiaire"
+                    : "🌱 Débutant"}
+            </strong>
+          </span>
+        )}
+      </p>
 
       {/* Légende des 6 axes en grille */}
       <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] font-mono">

@@ -72,6 +72,9 @@ export async function updateSession(request: NextRequest) {
     // Mode "Découverte" — accès en lecture sans login pour tester l'app
     pathname.startsWith("/spots") ||
     pathname.startsWith("/race/") ||
+    pathname === "/races" ||
+    pathname.startsWith("/races") ||
+    pathname.startsWith("/u/") || // Profil public communautaire
     pathname.startsWith("/api/oauth") ||
     pathname.startsWith("/api/gpx") ||
     pathname.startsWith("/.well-known") ||
