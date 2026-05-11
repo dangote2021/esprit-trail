@@ -56,7 +56,7 @@ export default function DemoPage() {
           Découvre Esprit Trail sans t&apos;inscrire.
         </h2>
         <p className="text-sm text-ink-muted leading-relaxed">
-          Voici ce que tu trouveras dans l&apos;app : 3 captures avec une data
+          Voici ce que tu trouveras dans l&apos;app : 3 aperçus avec une data
           fictive mais réaliste. À la fin, tu décides si tu crées ton compte.
         </p>
         <div className="flex items-center justify-center gap-1.5 pt-2">

@@ -284,7 +284,7 @@ export default function PublicLanding({
       {/* Capture #1 — Plan nutrition (localisé selon ville visiteur) */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach flex items-center gap-2 flex-wrap">
-          <span>⚡ Capture 1 · Plan nutrition par course</span>
+          <span>⚡ Plan nutrition par course</span>
           {example.matchLabel && (
             <span className="rounded-md bg-peach/20 px-1.5 py-0.5 text-[9px] font-black text-peach normal-case tracking-normal">
               📍 vu pour les {example.matchLabel}
@@ -334,7 +334,7 @@ export default function PublicLanding({
       {/* Capture #2 — Spots */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
-          🗺️ Capture 2 · Spots d&apos;entraînement GPX
+          🗺️ Spots d&apos;entraînement GPX
         </div>
         <div className="rounded-3xl border-2 border-cyan/30 bg-gradient-to-br from-cyan/10 via-bg-card to-bg p-4 shadow-lg">
           <div className="flex items-baseline justify-between">
@@ -406,7 +406,7 @@ export default function PublicLanding({
       {/* Capture #3 — Dossards en jeu */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
-          🎫 Capture 3 · Dossards en jeu
+          🎫 Dossards en jeu
         </div>
         <div className="rounded-3xl border-2 border-lime/30 bg-gradient-to-br from-lime/10 via-bg-card to-bg p-4 shadow-lg">
           <div className="flex items-baseline justify-between">
