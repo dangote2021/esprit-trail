@@ -186,8 +186,8 @@ export interface Race {
   location: string;
   country: string;
   date: string; // ISO
-  distance: number; // km
-  elevation: number; // m D+
+  distance: number; // km — format principal (le plus long en général)
+  elevation: number; // m D+ — format principal
   category: RaceCategory;
   utmbIndexRequired?: number;
   itraPoints: number;
@@ -195,6 +195,15 @@ export interface Race {
   heroImage: string;
   tagline: string;
   isIconic: boolean; // UTMB, Diagonale des Fous, Hardrock, etc.
+  /** Lien vers le site officiel de la course (inscription, infos organisateur) */
+  officialUrl?: string;
+  /** Toutes les formats proposés par l'organisateur (km, D+) — le format principal
+   *  est répété ici pour cohérence. Permet à l'utilisateur de choisir sa distance. */
+  formats?: Array<{
+    name: string; // ex: "MaXi-Race", "Marathon", "Trail Découverte"
+    distance: number; // km
+    elevation: number; // m D+
+  }>;
 }
 
 // ====== LEADERBOARD ======

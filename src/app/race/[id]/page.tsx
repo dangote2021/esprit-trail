@@ -99,94 +99,176 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Hero */}
+      {/* Hero — overlay dégradé renforcé pour garantir la lisibilité du titre */}
       <div
-        className="relative h-56 bg-gradient-to-b"
+        className="relative h-56"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(10,15,28,0.4) 0%, rgba(10,15,28,0.95) 100%), url(${race.heroImage}?w=800&auto=format&fit=crop)`,
+          backgroundImage: `url(${race.heroImage}?w=800&auto=format&fit=crop)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <div className="safe-top absolute inset-x-0 top-0 flex items-center justify-between px-4 py-3">
+        {/* Overlay sombre top→bottom pour assurer contraste */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/90" />
+
+        <div className="safe-top absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3">
           <Link
             href="/races"
-            className="rounded-lg bg-black/50 backdrop-blur p-2 text-ink hover:text-lime transition"
+            className="rounded-lg bg-black/55 backdrop-blur p-2 text-white hover:text-lime transition"
+            aria-label="Retour"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </Link>
-          <button className="rounded-lg bg-black/50 backdrop-blur p-2 text-ink hover:text-lime transition">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
-              <path d="M12 21s-7-4.5-7-10a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 5.5-7 10-7 10z" />
-            </svg>
-          </button>
         </div>
-        <div className="absolute inset-x-0 bottom-0 p-5">
+
+        <div className="absolute inset-x-0 bottom-0 z-10 p-5">
           <div className="flex gap-2">
-            <span className="rounded-md bg-black/60 backdrop-blur px-2 py-0.5 text-[10px] font-mono font-bold">
+            <span className="rounded-md bg-black/65 backdrop-blur px-2 py-0.5 text-[10px] font-mono font-bold text-white">
               {race.category}
             </span>
             {race.isIconic && (
-              <span className="rounded-md bg-gold/90 px-2 py-0.5 text-[10px] font-mono font-black text-bg">
+              <span className="rounded-md bg-gold/95 px-2 py-0.5 text-[10px] font-mono font-black text-bg">
                 ⭐ ICONIC
               </span>
             )}
+            <span className="rounded-md bg-black/65 backdrop-blur px-2 py-0.5 text-[10px] font-mono font-bold text-white">
+              📅 {formatDate(race.date)}
+            </span>
           </div>
-          <h1 className="mt-2 font-display text-4xl font-black leading-none">
+          <h1
+            className="mt-2 font-display text-4xl font-black leading-none text-white"
+            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.7)" }}
+          >
             {race.name}
           </h1>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p
+            className="mt-1 text-sm text-white/90"
+            style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
+          >
             {race.location} · {race.country}
           </p>
         </div>
       </div>
 
       <div className="px-4 space-y-5 pt-5">
-        <p className="text-base italic text-ink-muted">"{race.tagline}"</p>
+        <p className="text-base italic text-ink-muted">&ldquo;{race.tagline}&rdquo;</p>
 
-        {/* Countdown */}
-        <div className="rounded-2xl border border-peach/30 bg-gradient-to-r from-peach/10 to-bg-card p-5 text-center">
-          <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach">
-            Départ dans
+        {/* Bouton wishlist + Site officiel — déplacés en position centrale haute */}
+        <RaceActions raceId={race.id} officialUrl={race.officialUrl} />
+
+        {/* Bandeau D+ + countdown compact (D+ central, date discrète) */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="col-span-2 rounded-2xl border-2 border-peach/40 bg-gradient-to-br from-peach/15 via-bg-card to-bg p-4 flex items-center gap-3">
+            <div className="text-5xl">⛰️</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+                Dénivelé positif
+              </div>
+              <div className="font-display text-3xl font-black text-peach leading-none mt-1">
+                {race.elevation.toLocaleString("fr")}
+                <span className="ml-1 text-base align-baseline">m D+</span>
+              </div>
+              <div className="text-[11px] font-mono text-ink-muted mt-1">
+                {race.elevation >= 8000
+                  ? "🏔️ Format extrême"
+                  : race.elevation >= 5000
+                    ? "🥾 Format alpin"
+                    : race.elevation >= 2000
+                      ? "🌲 Trail montagne"
+                      : "🏞️ Trail roulant"}
+              </div>
+            </div>
           </div>
-          <div className="mt-1 font-display text-5xl font-black text-peach">
-            {daysUntil}
-          </div>
-          <div className="text-xs font-mono text-ink-muted">
-            jours · {formatDate(race.date)}
+          {/* Encart date — discret, secondaire */}
+          <div className="rounded-2xl border border-ink/15 bg-bg-card/60 p-3 text-center flex flex-col items-center justify-center">
+            <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+              J-
+            </div>
+            <div className="font-display text-2xl font-black text-ink leading-none mt-0.5">
+              {daysUntil}
+            </div>
+            <div className="text-[9px] font-mono text-ink-dim mt-1">
+              {new Date(race.date).toLocaleDateString("fr", {
+                day: "numeric",
+                month: "short",
+                timeZone: "UTC",
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Key stats grid */}
-        <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-xl border border-lime/20 bg-bg-card/60 p-3 text-center">
-            <div className="text-[10px] font-mono text-ink-muted uppercase">
-              Distance
+        {/* Formats proposés — l'utilisateur choisit sa distance */}
+        {race.formats && race.formats.length > 1 && (
+          <section className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
+                {race.formats.length} formats au choix
+              </div>
+              <div className="text-[10px] font-mono text-ink-dim">
+                choisis ta distance
+              </div>
             </div>
-            <div className="mt-1 font-display text-2xl font-black text-lime">
-              {race.distance}
+            <div className="space-y-1.5">
+              {race.formats.map((f) => {
+                const isPrimary = f.distance === race.distance;
+                return (
+                  <div
+                    key={f.name}
+                    className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
+                      isPrimary
+                        ? "border-lime/40 bg-lime/8"
+                        : "border-ink/15 bg-bg-card/50"
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-display text-sm font-black text-ink truncate">
+                          {f.name}
+                        </span>
+                        {isPrimary && (
+                          <span className="rounded bg-lime/20 px-1.5 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider text-lime">
+                            principal
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <div className="font-display text-base font-black text-lime leading-none">
+                          {f.distance}
+                        </div>
+                        <div className="text-[9px] font-mono text-ink-dim">km</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-display text-base font-black text-peach leading-none">
+                          {f.elevation.toLocaleString("fr")}
+                        </div>
+                        <div className="text-[9px] font-mono text-ink-dim">m D+</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="text-[10px] font-mono text-ink-dim">km</div>
-          </div>
-          <div className="rounded-xl border border-peach/20 bg-bg-card/60 p-3 text-center">
-            <div className="text-[10px] font-mono text-ink-muted uppercase">
-              D+
+          </section>
+        )}
+
+        {/* Tuile ITRA standalone (les distance + D+ sont déjà bien valorisés au-dessus) */}
+        <div className="grid grid-cols-1 gap-2">
+          <div className="rounded-xl border border-violet/25 bg-violet/5 p-3 flex items-center justify-between">
+            <div>
+              <div className="text-[10px] font-mono text-ink-muted uppercase tracking-wider">
+                Points ITRA
+              </div>
+              <div className="text-xs text-ink-muted mt-0.5">
+                Comptés pour l&apos;éligibilité ultra-trails
+              </div>
             </div>
-            <div className="mt-1 font-display text-2xl font-black text-peach">
-              {race.elevation.toLocaleString("fr")}
-            </div>
-            <div className="text-[10px] font-mono text-ink-dim">mètres</div>
-          </div>
-          <div className="rounded-xl border border-violet/20 bg-bg-card/60 p-3 text-center">
-            <div className="text-[10px] font-mono text-ink-muted uppercase">
-              ITRA
-            </div>
-            <div className="mt-1 font-display text-2xl font-black text-violet">
+            <div className="font-display text-3xl font-black text-violet">
               {race.itraPoints}
             </div>
-            <div className="text-[10px] font-mono text-ink-dim">points</div>
           </div>
         </div>
 

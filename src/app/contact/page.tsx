@@ -3,6 +3,7 @@
 // + référencée depuis le footer.
 
 import Link from "next/link";
+import FeedbackForm from "@/components/contact/FeedbackForm";
 
 export const metadata = {
   title: "Contact & Support",
@@ -32,6 +33,9 @@ export default function ContactPage() {
           les 48h.
         </p>
       </header>
+
+      {/* Formulaire feedback — la "vraie" façon d'envoyer une idée */}
+      <FeedbackForm />
 
       <section className="rounded-3xl border-2 border-lime/40 bg-bg-card/80 p-6 space-y-5">
         <div>

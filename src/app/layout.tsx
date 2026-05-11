@@ -6,6 +6,8 @@ import Footer from "@/components/layout/Footer";
 import CookieBanner from "@/components/layout/CookieBanner";
 import IOSInstallBanner from "@/components/pwa/IOSInstallBanner";
 import StorageMigrationGate from "@/components/layout/StorageMigrationGate";
+import { LangProvider } from "@/lib/i18n/LangProvider";
+import { getServerLang } from "@/lib/i18n/server";
 import { SITE_URL } from "@/lib/site";
 
 const inter = Inter({
@@ -131,26 +133,29 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const lang = getServerLang();
   return (
-    <html lang="fr" className={`${inter.variable}`}>
+    <html lang={lang} className={`${inter.variable}`}>
       <body className="min-h-screen bg-bg text-ink antialiased font-sans">
-        <div className="relative min-h-screen pb-24">
-          {/* Grid pattern background, subtil, effet "HUD" */}
-          <div
-            aria-hidden
-            className="pointer-events-none fixed inset-0 bg-grid-pattern bg-grid opacity-30"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none fixed inset-0 bg-radial-glow"
-          />
-          <div className="relative z-10">{children}</div>
-          <Footer />
-        </div>
-        <BottomNav />
-        <CookieBanner />
-        <IOSInstallBanner />
-        <StorageMigrationGate />
+        <LangProvider initialLang={lang}>
+          <div className="relative min-h-screen pb-24">
+            {/* Grid pattern background, subtil, effet "HUD" */}
+            <div
+              aria-hidden
+              className="pointer-events-none fixed inset-0 bg-grid-pattern bg-grid opacity-30"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none fixed inset-0 bg-radial-glow"
+            />
+            <div className="relative z-10">{children}</div>
+            <Footer />
+          </div>
+          <BottomNav />
+          <CookieBanner />
+          <IOSInstallBanner />
+          <StorageMigrationGate />
+        </LangProvider>
       </body>
     </html>
   );

@@ -9,7 +9,7 @@ export default function Loading() {
         <div className="absolute inset-2 rounded-full bg-lime shadow-[0_0_18px_rgba(45,106,79,0.5)]" />
       </div>
       <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.25em] text-ink-muted">
-        on relace les pompes…
+        petit détour par le ravito…
       </p>
     </div>
   );

@@ -1,6 +1,8 @@
 import type { Race } from "@/lib/types";
 
 // Calendrier des courses trail iconiques + classiques FR/monde
+// Chaque course référence le site officiel de l'organisateur + tous les
+// formats proposés (l'utilisateur choisit sa distance).
 export const RACES: Race[] = [
   {
     id: "utmb-2026",
@@ -17,6 +19,16 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
     tagline: "Le tour du Mont-Blanc, la course ultime",
     isIconic: true,
+    officialUrl: "https://utmbmontblanc.com",
+    formats: [
+      { name: "UTMB", distance: 171, elevation: 10000 },
+      { name: "CCC", distance: 101, elevation: 6100 },
+      { name: "TDS", distance: 145, elevation: 9100 },
+      { name: "OCC", distance: 56, elevation: 3500 },
+      { name: "PTL", distance: 300, elevation: 25000 },
+      { name: "MCC", distance: 40, elevation: 2300 },
+      { name: "YCC", distance: 15, elevation: 1200 },
+    ],
   },
   {
     id: "ccc-2026",
@@ -33,6 +45,10 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
     tagline: "100 km par les balcons du Mont-Blanc",
     isIconic: true,
+    officialUrl: "https://utmbmontblanc.com/fr/page/348/ccc.html",
+    formats: [
+      { name: "CCC", distance: 101, elevation: 6100 },
+    ],
   },
   {
     id: "diag-des-fous-2026",
@@ -49,6 +65,13 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1520962910799-8a0b1a4b8be1",
     tagline: "Du sud au nord de l'île, sur sentiers volcaniques",
     isIconic: true,
+    officialUrl: "https://grandraid-reunion.com",
+    formats: [
+      { name: "Diagonale des Fous", distance: 165, elevation: 9917 },
+      { name: "Trail de Bourbon", distance: 111, elevation: 6500 },
+      { name: "Mascareignes", distance: 75, elevation: 4000 },
+      { name: "Zembrocal Trail", distance: 53, elevation: 2300 },
+    ],
   },
   {
     id: "hardrock-2026",
@@ -65,6 +88,10 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1533240332313-0db49b459ad6",
     tagline: "Le plus dur 100-miles du monde",
     isIconic: true,
+    officialUrl: "https://hardrock100.com",
+    formats: [
+      { name: "Hardrock Hundred", distance: 161, elevation: 10160 },
+    ],
   },
   {
     id: "6000d-2026",
@@ -81,6 +108,12 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
     tagline: "65 km, 6000 D+, 100% montagne",
     isIconic: true,
+    officialUrl: "https://6000d.com",
+    formats: [
+      { name: "6000D — La Plagne", distance: 65, elevation: 6000 },
+      { name: "3000D — La Plagne", distance: 32, elevation: 3000 },
+      { name: "1000D — La Plagne", distance: 13, elevation: 1000 },
+    ],
   },
   {
     id: "maxirace-annecy-2026",
@@ -97,6 +130,15 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
     tagline: "Tour du lac d'Annecy par les crêtes",
     isIconic: false,
+    officialUrl: "https://maxi-race.org",
+    formats: [
+      { name: "MaXi-Race", distance: 86, elevation: 5600 },
+      { name: "Maxi-Trail", distance: 56, elevation: 3300 },
+      { name: "Marathon Race", distance: 42, elevation: 2400 },
+      { name: "Short Race", distance: 30, elevation: 1700 },
+      { name: "Run", distance: 16, elevation: 800 },
+      { name: "Découverte", distance: 8, elevation: 350 },
+    ],
   },
   {
     id: "ecotrail-paris-2026",
@@ -112,6 +154,13 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
     tagline: "Le trail urbain, arrivée sous la Tour Eiffel",
     isIconic: false,
+    officialUrl: "https://ecotrailparis.com",
+    formats: [
+      { name: "80 km", distance: 80, elevation: 1000 },
+      { name: "45 km", distance: 45, elevation: 600 },
+      { name: "30 km", distance: 30, elevation: 350 },
+      { name: "18 km", distance: 18, elevation: 200 },
+    ],
   },
   {
     id: "saintelyon-2026",
@@ -127,6 +176,13 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1506452305024-9d3f02d1c9b5",
     tagline: "De nuit, en hiver, la course légendaire",
     isIconic: false,
+    officialUrl: "https://saintelyon.com",
+    formats: [
+      { name: "SaintéLyon (78 km)", distance: 78, elevation: 2000 },
+      { name: "SaintExpress (44 km)", distance: 44, elevation: 1200 },
+      { name: "SaintéSprint (24 km)", distance: 24, elevation: 700 },
+      { name: "LyonUrbainTrail (13 km)", distance: 13, elevation: 350 },
+    ],
   },
   {
     id: "trail-cote-opale-2026",
@@ -142,6 +198,12 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
     tagline: "Falaises, plages et caps du Nord",
     isIconic: false,
+    officialUrl: "https://trail-cotedopale.com",
+    formats: [
+      { name: "Grand Trail", distance: 55, elevation: 1200 },
+      { name: "Trail", distance: 32, elevation: 700 },
+      { name: "Découverte", distance: 14, elevation: 250 },
+    ],
   },
   {
     id: "grand-raid-2026",
@@ -158,6 +220,14 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
     tagline: "160 km dans les Pyrénées sauvages",
     isIconic: true,
+    officialUrl: "https://grandraidpyrenees.com",
+    formats: [
+      { name: "Ultra-Tour 160", distance: 160, elevation: 10000 },
+      { name: "Tour des Cirques (120 km)", distance: 120, elevation: 7400 },
+      { name: "GRP 80", distance: 80, elevation: 5000 },
+      { name: "GRP 40", distance: 40, elevation: 2500 },
+      { name: "GRP 25", distance: 25, elevation: 1400 },
+    ],
   },
   {
     id: "trail-vercors-2026",
@@ -173,6 +243,12 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
     tagline: "Plateau du Vercors, grande rando en version fast",
     isIconic: false,
+    officialUrl: "https://trail-vercors.com",
+    formats: [
+      { name: "Trail des Crêtes", distance: 42, elevation: 2400 },
+      { name: "Trail des Hauts-Plateaux", distance: 28, elevation: 1500 },
+      { name: "Trail Découverte", distance: 14, elevation: 600 },
+    ],
   },
   {
     id: "transju-trail-2026",
@@ -188,5 +264,11 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
     tagline: "76 km de crêtes jurassiennes",
     isIconic: false,
+    officialUrl: "https://latransju.com",
+    formats: [
+      { name: "TransJuTrail 76", distance: 76, elevation: 2500 },
+      { name: "TransJuTrail 38", distance: 38, elevation: 1300 },
+      { name: "TransJuTrail 22", distance: 22, elevation: 700 },
+    ],
   },
 ];

@@ -7,6 +7,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { BrandLogoFull } from "@/components/ui/TQLogo";
+import LangToggle from "@/components/i18n/LangToggle";
 import { pickRaceExample } from "@/lib/data/race-examples";
 
 export type UserProfile = "novice" | "competitor" | "adventurer" | undefined;
@@ -34,17 +35,20 @@ export default function PublicLanding({
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-10 space-y-8">
-      {/* Header logo + login CTA */}
+      {/* Header logo + lang toggle + login CTA */}
       <header className="flex items-center justify-between pt-4">
         <div className="flex items-center gap-2">
           <BrandLogoFull width={48} />
         </div>
-        <Link
-          href="/login"
-          className="rounded-lg border border-ink/15 bg-bg-card/60 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-ink-muted hover:text-ink transition"
-        >
-          Connexion
-        </Link>
+        <div className="flex items-center gap-2">
+          <LangToggle />
+          <Link
+            href="/login"
+            className="rounded-lg border border-ink/15 bg-bg-card/60 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-ink-muted hover:text-ink transition"
+          >
+            Connexion
+          </Link>
+        </div>
       </header>
 
       {/* Hero accroche */}

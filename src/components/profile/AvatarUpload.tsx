@@ -9,6 +9,7 @@
 // - Sinon : affiche placeholder (avatar character SIMS ou emoji ME.avatar) + bouton "Ajouter une photo"
 
 import { useEffect, useRef, useState } from "react";
+import TrailerDefaultAvatar from "./TrailerDefaultAvatar";
 
 const KEY = "esprit_avatar_dataurl";
 const MAX_SIZE = 800; // resize max 800x800 pour éviter d'exploser le localStorage
@@ -56,7 +57,9 @@ async function resizeImageToDataUrl(file: File): Promise<string> {
 }
 
 export default function AvatarUpload({
-  fallbackEmoji = "🦊",
+  // fallbackEmoji conservé en prop pour compat back, mais on utilise désormais
+  // un SVG TrailerDefaultAvatar (traileur casquette verte) à la place.
+  fallbackEmoji: _fallbackEmoji = "🦊",
   size = 96,
 }: {
   fallbackEmoji?: string;
@@ -136,10 +139,10 @@ export default function AvatarUpload({
           </div>
         ) : (
           <div
-            className="flex items-center justify-center rounded-full border-4 border-dashed border-ink/20 bg-bg-card text-4xl"
+            className="flex items-center justify-center rounded-full border-4 border-dashed border-ink/20 bg-bg-card overflow-hidden"
             style={{ width: size, height: size }}
           >
-            {fallbackEmoji}
+            <TrailerDefaultAvatar size={size - 8} />
           </div>
         )}
         <button

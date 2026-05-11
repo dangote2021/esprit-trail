@@ -397,6 +397,27 @@ export default async function HomePage({
           </div>
         </section>
       )}
+
+      {/* Encart feedback discret — la team écoute la communauté */}
+      <Link
+        href="/contact"
+        className="block rounded-2xl border border-lime/30 bg-gradient-to-br from-lime/8 via-bg-card to-peach/8 p-4 hover:border-lime/50 transition"
+      >
+        <div className="flex items-center gap-3">
+          <div className="text-2xl">💡</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
+              On t&apos;écoute
+            </div>
+            <div className="text-sm font-bold text-ink">
+              Une idée pour améliorer Esprit Trail ?
+            </div>
+            <div className="text-[11px] text-ink-muted">
+              Balance ton retour, on lit tout →
+            </div>
+          </div>
+        </div>
+      </Link>
     </main>
   );
 }

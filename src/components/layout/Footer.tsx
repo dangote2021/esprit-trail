@@ -6,6 +6,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LangToggle from "@/components/i18n/LangToggle";
 
 export default function Footer() {
   const pathname = usePathname() || "/";
@@ -40,6 +41,9 @@ export default function Footer() {
           <p className="mt-3 text-[10px] text-ink-dim">
             Esprit Trail · Fait avec les pieds boueux.
           </p>
+          <div className="mt-3 flex justify-center">
+            <LangToggle />
+          </div>
         </div>
       </footer>
     );
@@ -60,6 +64,9 @@ export default function Footer() {
         <p className="mt-3 text-[10px] text-ink-dim">
           Esprit Trail · Fait avec les pieds boueux.
         </p>
+        <div className="mt-3 flex justify-center">
+          <LangToggle />
+        </div>
       </div>
     </footer>
   );
