@@ -522,33 +522,7 @@ export default function PublicLanding({
         </div>
       </section>
 
-      {/* Encart Installe l'app — conversion vers Play Store / iOS PWA */}
-      <section className="rounded-3xl border-2 border-cyan/40 bg-gradient-to-br from-cyan/15 via-bg-card to-bg p-5 space-y-3">
-        <div className="flex items-start gap-3">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan/20 text-3xl">
-            📲
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
-              Installe Esprit Trail
-            </div>
-            <h3 className="mt-0.5 font-display text-lg font-black leading-tight text-ink">
-              Direct sur ton tel, plein écran, hors-ligne ready
-            </h3>
-            <p className="mt-1 text-xs text-ink-muted leading-relaxed">
-              Android (Play Store) ou iOS (Ajouter à l&apos;écran d&apos;accueil).
-              L&apos;app charge tes spots GPX, tes plans nutri et tes courses
-              même sans réseau en pleine forêt.
-            </p>
-          </div>
-        </div>
-        <Link
-          href="/install"
-          className="block w-full rounded-xl bg-cyan py-3 text-center font-mono text-xs font-black uppercase tracking-wider text-bg shadow-md hover:scale-[1.02] transition"
-        >
-          📲 Installer l&apos;app →
-        </Link>
-      </section>
+      {/* Encart "Installe l'app" supprimé (l'app est déjà publiée sur le Store) */}
 
       {/* Comment on finance — transparence punchy */}
       <section className="rounded-2xl border border-ink/10 bg-bg-card/40 p-4 space-y-2">
