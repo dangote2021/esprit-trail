@@ -116,7 +116,7 @@ export default function BibIcon({
         strokeWidth="1.4"
       />
 
-      {/* Bande supérieure (sponsor / fédération) */}
+      {/* Bande supérieure (sponsor / fédération) avec "BOUZIN" */}
       <rect
         x="18"
         y="24"
@@ -125,14 +125,41 @@ export default function BibIcon({
         fill={pinColor}
         opacity="0.9"
       />
+      <text
+        x="32"
+        y="28"
+        textAnchor="middle"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+        fontSize="3.5"
+        fontWeight="900"
+        fill={bibColor}
+        letterSpacing="0.18em"
+      >
+        BOUZIN
+      </text>
+
+      {/* Tagline "BOUZIN" stylisée au-dessus du numéro, sur le dossard */}
+      <text
+        x="32"
+        y="38"
+        textAnchor="middle"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+        fontSize="4.5"
+        fontWeight="900"
+        fill={numberColor}
+        letterSpacing="0.12em"
+        opacity="0.95"
+      >
+        BOUZIN
+      </text>
 
       {/* Numéro central */}
       <text
         x="32"
-        y="44"
+        y="48"
         textAnchor="middle"
         fontFamily="ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
-        fontSize="11"
+        fontSize="10"
         fontWeight="900"
         fill={numberColor}
         letterSpacing="0.04em"
