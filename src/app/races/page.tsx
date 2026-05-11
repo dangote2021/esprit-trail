@@ -8,20 +8,21 @@ import { ME } from "@/lib/data/me";
 import { OFF_RACES, OFF_CAT_META, type OffCategory } from "@/lib/data/off-races";
 import type { RaceCategory } from "@/lib/types";
 import RaceShareButton from "@/components/race/RaceShareButton";
+import { useT, useLang } from "@/lib/i18n/LangProvider";
 
-const CATS: { id: RaceCategory | "all"; label: string; range: string }[] = [
-  { id: "all", label: "Toutes", range: "" },
-  { id: "XS", label: "XS", range: "<25 km" },
-  { id: "S", label: "S", range: "25-44" },
-  { id: "M", label: "M", range: "45-74" },
-  { id: "L", label: "L", range: "75-114" },
-  { id: "XL", label: "XL", range: "115+" },
+const CATS: { id: RaceCategory | "all"; labelKey: string; range: string }[] = [
+  { id: "all", labelKey: "races.cat.all", range: "" },
+  { id: "XS", labelKey: "XS", range: "<25 km" },
+  { id: "S", labelKey: "S", range: "25-44" },
+  { id: "M", labelKey: "M", range: "45-74" },
+  { id: "L", labelKey: "L", range: "75-114" },
+  { id: "XL", labelKey: "XL", range: "115+" },
 ];
 
 type Tab = "on" | "off";
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr", {
+function formatDate(iso: string, lang: string) {
+  return new Date(iso).toLocaleDateString(lang === "en" ? "en-GB" : "fr", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -29,6 +30,8 @@ function formatDate(iso: string) {
 }
 
 export default function RacesPage() {
+  const t = useT();
+  const { lang } = useLang();
   // Support ?tab=off pour deep-linking depuis la home (encart "OFF Races")
   const params = useSearchParams();
   const initialTab: Tab = params?.get("tab") === "off" ? "off" : "on";
@@ -71,9 +74,11 @@ export default function RacesPage() {
         </Link>
         <div className="text-center">
           <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach">
-            Calendrier
+            {t("races.header.eyebrow")}
           </div>
-          <h1 className="font-display text-lg font-black leading-none">Courses</h1>
+          <h1 className="font-display text-lg font-black leading-none">
+            {t("races.header.title")}
+          </h1>
         </div>
         <div className="w-9" />
       </header>
@@ -89,10 +94,10 @@ export default function RacesPage() {
           }`}
         >
           <div className="font-display text-sm font-black leading-tight">
-            🏃 Courses ON
+            {t("races.tab.on.title")}
           </div>
           <div className={`text-[10px] font-mono ${tab === "on" ? "opacity-80" : "opacity-60"}`}>
-            UTMB · ITRA · circuit officiel
+            {t("races.tab.on.subtitle")}
           </div>
         </button>
         <button
@@ -104,10 +109,10 @@ export default function RacesPage() {
           }`}
         >
           <div className="font-display text-sm font-black leading-tight">
-            🏴‍☠️ Courses OFF
+            {t("races.tab.off.title")}
           </div>
           <div className={`text-[10px] font-mono ${tab === "off" ? "opacity-80" : "opacity-60"}`}>
-            FKT · pirate · hors circuit
+            {t("races.tab.off.subtitle")}
           </div>
         </button>
       </div>
@@ -127,7 +132,7 @@ export default function RacesPage() {
                 }`}
               >
                 <div className="font-display text-sm font-black leading-none">
-                  {c.label}
+                  {c.labelKey === "races.cat.all" ? t(c.labelKey) : c.labelKey}
                 </div>
                 {c.range && (
                   <div className="text-[10px] font-mono opacity-70">{c.range}</div>
@@ -145,10 +150,10 @@ export default function RacesPage() {
             }`}
           >
             <span className="flex items-center gap-2 text-sm font-bold">
-              <span>🇫🇷</span> En France uniquement
+              <span>🇫🇷</span> {t("races.filter.france")}
             </span>
             <span className="text-[10px] font-mono uppercase tracking-wider">
-              {franceOnly ? "ON" : "OFF"}
+              {franceOnly ? t("races.filter.on") : t("races.filter.off")}
             </span>
           </button>
         </>
@@ -354,7 +359,7 @@ export default function RacesPage() {
                     {race.itraPoints} pts ITRA
                   </span>
                   <span className="rounded-md bg-bg-raised px-2 py-1">
-                    📅 {formatDate(race.date)}
+                    📅 {formatDate(race.date, lang)}
                   </span>
                 </div>
 

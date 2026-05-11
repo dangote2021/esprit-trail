@@ -4,7 +4,6 @@ import { RACES } from "@/lib/data/races";
 import { ME } from "@/lib/data/me";
 import RaceActions from "./RaceActions";
 import RaceNutritionPlan from "@/components/race/RaceNutritionPlan";
-import RaceShareButton from "@/components/race/RaceShareButton";
 import DiscoveryBanner from "@/components/layout/DiscoveryBanner";
 import { getSupabaseUser } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site";
@@ -155,8 +154,13 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
       <div className="px-4 space-y-5 pt-5">
         <p className="text-base italic text-ink-muted">&ldquo;{race.tagline}&rdquo;</p>
 
-        {/* Bouton wishlist + Site officiel — déplacés en position centrale haute */}
-        <RaceActions raceId={race.id} officialUrl={race.officialUrl} />
+        {/* Bouton wishlist gros et prioritaire + Site officiel + Partager en dessous */}
+        <RaceActions
+          raceId={race.id}
+          raceName={race.name}
+          tagline={race.tagline}
+          officialUrl={race.officialUrl}
+        />
 
         {/* Bandeau D+ + countdown compact (D+ central, date discrète) */}
         <div className="grid grid-cols-3 gap-2">
@@ -371,17 +375,6 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
         </div>
 
         <DiscoveryBanner />
-
-        {/* Partage WhatsApp */}
-        <RaceShareButton
-          raceId={race.id}
-          raceName={race.name}
-          tagline={race.tagline}
-          variant="full"
-        />
-
-        {/* Actions */}
-        <RaceActions raceId={race.id} />
 
         {/* Plan nutrition jour J — preview pour visiteurs non-loggés */}
         <RaceNutritionPlan

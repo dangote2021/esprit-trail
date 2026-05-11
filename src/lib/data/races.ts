@@ -19,7 +19,7 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
     tagline: "Le tour du Mont-Blanc, la course ultime",
     isIconic: true,
-    officialUrl: "https://utmbmontblanc.com",
+    officialUrl: "https://utmbmontblanc.com/fr",
     formats: [
       { name: "UTMB", distance: 171, elevation: 10000 },
       { name: "CCC", distance: 101, elevation: 6100 },
@@ -45,7 +45,7 @@ export const RACES: Race[] = [
     heroImage: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
     tagline: "100 km par les balcons du Mont-Blanc",
     isIconic: true,
-    officialUrl: "https://utmbmontblanc.com/fr/page/348/ccc.html",
+    officialUrl: "https://utmbmontblanc.com/fr/page/348/ccc",
     formats: [
       { name: "CCC", distance: 101, elevation: 6100 },
     ],

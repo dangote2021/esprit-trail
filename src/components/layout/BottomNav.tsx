@@ -3,18 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { totalUnread } from "@/lib/data/messages";
+import { useT } from "@/lib/i18n/LangProvider";
 
 type NavItem = {
   href: string;
-  label: string;
+  labelKey: string; // i18n key, résolu dans le composant via useT()
   icon: React.ReactNode;
   activeWhen: (path: string) => boolean;
+  badge?: number;
 };
 
 const NAV: NavItem[] = [
   {
     href: "/",
-    label: "Home",
+    labelKey: "nav.home",
     activeWhen: (p) => p === "/",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6">
@@ -24,7 +27,7 @@ const NAV: NavItem[] = [
   },
   {
     href: "/spots",
-    label: "Spots",
+    labelKey: "nav.spots",
     activeWhen: (p) => p.startsWith("/spot") || p.startsWith("/quest"),
     icon: (
       // Pin de localisation (compass-like)
@@ -36,7 +39,7 @@ const NAV: NavItem[] = [
   },
   {
     href: "/races",
-    label: "Courses",
+    labelKey: "nav.races",
     activeWhen: (p) => p.startsWith("/race"),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6">
@@ -45,19 +48,22 @@ const NAV: NavItem[] = [
     ),
   },
   {
-    href: "/leaderboard",
-    label: "Ranking",
-    activeWhen: (p) => p.startsWith("/leaderboard"),
+    href: "/messages",
+    labelKey: "nav.chat",
+    activeWhen: (p) => p.startsWith("/messages"),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6">
-        <path d="M4 20h4V10H4v10ZM10 20h4V4h-4v16ZM16 20h4v-8h-4v8Z" />
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
       </svg>
     ),
   },
   {
     href: "/profile",
-    label: "Profil",
-    activeWhen: (p) => p.startsWith("/profile") || p.startsWith("/badges"),
+    labelKey: "nav.profile",
+    activeWhen: (p) =>
+      p.startsWith("/profile") ||
+      p.startsWith("/badges") ||
+      p.startsWith("/leaderboard"),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6">
         <circle cx="12" cy="8" r="4" />
@@ -69,6 +75,7 @@ const NAV: NavItem[] = [
 
 export default function BottomNav() {
   const pathname = usePathname() || "/";
+  const t = useT();
   const [isLogged, setIsLogged] = useState<boolean | null>(null);
 
   // Détection présence cookie auth Supabase côté client (indicatif).
@@ -168,6 +175,9 @@ export default function BottomNav() {
   // (hydratation en cours), on évite le flash en cachant.
   if (isPublicDiscovery && isLogged === null) return null;
 
+  // Calcul du badge unread pour Messages (mock data en attendant Supabase)
+  const unread = totalUnread();
+
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink/20 bg-bg-card/95 backdrop-blur-lg shadow-[0_-4px_20px_rgba(27,67,50,0.1)] safe-bottom"
@@ -176,6 +186,7 @@ export default function BottomNav() {
       <ul className="mx-auto flex max-w-lg items-center justify-around px-2 pt-2">
         {NAV.map((item) => {
           const active = item.activeWhen(pathname);
+          const showUnread = item.href === "/messages" && unread > 0;
           return (
             <li key={item.href} className="flex-1">
               <Link
@@ -185,14 +196,19 @@ export default function BottomNav() {
                 }`}
               >
                 <span
-                  className={`transition ${
+                  className={`relative transition ${
                     active ? "drop-shadow-[0_0_6px_rgba(45,106,79,0.55)]" : "group-hover:text-ink"
                   }`}
                 >
                   {item.icon}
+                  {showUnread && (
+                    <span className="absolute -top-1 -right-2 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-peach px-1 text-[10px] font-mono font-black text-bg ring-2 ring-bg-card">
+                      {unread > 99 ? "99+" : unread}
+                    </span>
+                  )}
                 </span>
                 <span className="text-[10px] font-semibold uppercase tracking-wider">
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
               </Link>
             </li>

@@ -206,6 +206,58 @@ export interface Race {
   }>;
 }
 
+// ====== MESSAGERIE ======
+
+export interface MessageUser {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar: string; // emoji ou URL
+  level?: number;
+  online?: boolean;
+}
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  authorId: string;
+  text: string;
+  createdAt: string; // ISO
+  /** "delivered" : sent, pas encore vu | "read" : lu par tous */
+  status?: "sending" | "delivered" | "read";
+  /** Si présent, message contient un partage attaché (spot, course, plan) */
+  attachment?: {
+    type: "spot" | "race" | "nutri-plan" | "run";
+    refId: string;
+    title: string;
+    subtitle?: string;
+    href: string;
+  };
+}
+
+export interface Conversation {
+  id: string;
+  /** "dm" = 1-1 (2 membres), "group" = 3+ membres */
+  type: "dm" | "group";
+  /** Nom du groupe (uniquement pour type=group). Pour dm, prend le nom de l'autre user. */
+  name?: string;
+  /** Emoji ou URL — pour groupes. Pour dm, prend l'avatar de l'autre user. */
+  avatar?: string;
+  members: MessageUser[];
+  /** Dernier message envoyé (résumé pour la liste). */
+  lastMessage?: {
+    text: string;
+    authorId: string;
+    createdAt: string;
+  };
+  /** Nombre de messages non-lus par l'utilisateur courant */
+  unreadCount: number;
+  /** ISO — utilisé pour trier la liste de conversations */
+  updatedAt: string;
+  /** Pour les groupes : description du but du groupe */
+  description?: string;
+}
+
 // ====== LEADERBOARD ======
 
 export interface LeaderboardEntry {
