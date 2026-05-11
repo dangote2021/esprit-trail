@@ -3,7 +3,8 @@
 
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { Database } from "./types";
+// Note : pas de générique <Database> ici pour éviter les régressions
+// d'inférence TS strict sur insert/update (cf. client.ts).
 
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
@@ -18,7 +19,7 @@ export async function getSupabaseServerClient() {
 
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(url, key, {
+  return createServerClient(url, key, {
     cookies: {
       getAll() {
         return cookieStore.getAll();

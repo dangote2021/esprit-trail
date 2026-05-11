@@ -1,10 +1,15 @@
 // ====== SUPABASE CLIENT (browser) ======
 // À utiliser dans les Client Components ("use client").
+//
+// Note technique : on n'utilise PAS le générique <Database> pour le typage
+// strict. C'est volontaire — TypeScript v4.x a du mal avec les inférences
+// complexes de @supabase/ssr sur les insert/update/upsert (regression GitHub
+// issue #1262). Les queries retournent donc des objets typés à la main dans
+// les couches user-races.ts / messaging.ts (cf. rowToRace, rowToMessage…).
 
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "./types";
 
-let client: ReturnType<typeof createBrowserClient<Database>> | null = null;
+let client: ReturnType<typeof createBrowserClient> | null = null;
 
 export function getSupabaseBrowserClient() {
   if (client) return client;
@@ -17,6 +22,6 @@ export function getSupabaseBrowserClient() {
     );
   }
 
-  client = createBrowserClient<Database>(url, key);
+  client = createBrowserClient(url, key);
   return client;
 }

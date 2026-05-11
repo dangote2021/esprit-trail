@@ -263,8 +263,7 @@ export async function markRead(conversationId: string): Promise<void> {
   const uid = await getUserId();
   if (!uid) return;
   const sb = getSupabaseBrowserClient();
-  await sb
-    .from("conversation_members")
+  await (sb.from("conversation_members") as any)
     .update({ last_read_at: new Date().toISOString() })
     .eq("conversation_id", conversationId)
     .eq("user_id", uid);
