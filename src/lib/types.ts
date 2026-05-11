@@ -5,6 +5,29 @@ export type BadgeRarity = "common" | "rare" | "epic" | "legendary" | "mythic";
 
 export type QuestPeriod = "daily" | "weekly" | "seasonal" | "epic";
 
+// ====== PÉRIODISATION TRAIL (issue du user testing Léo + Théo B.) ======
+// Un cycle d'entraînement trail suit une périodisation réelle, pas un daily streak.
+// On calque la structure classique : base → spécifique → affûtage → récup.
+export type TrainingBlockPhase =
+  | "base" // Aérobie fondamentale, gros volume, intensité basse
+  | "specific" // Spécifique : VO2, seuil, côtes — forme l'objectif
+  | "taper" // Affûtage : volume ↘, intensité conservée, fraîcheur ↗
+  | "recovery"; // Récup : post-course, régénération, mobilité
+
+export interface TrainingBlock {
+  id: string;
+  phase: TrainingBlockPhase;
+  label: string; // "Bloc aérobie", "Spécifique UTMB", etc.
+  icon: string;
+  description: string; // Explication physiologique
+  startDate: string; // ISO
+  endDate: string; // ISO
+  weeksTotal: number;
+  weeksDone: number;
+  targetRace?: string; // Course cible (si applicable)
+  questIds: string[]; // Quêtes de ce bloc
+}
+
 export type WatchBrand = "strava" | "garmin" | "coros" | "suunto";
 
 export type TerrainType = "flat" | "hilly" | "mountain" | "alpine" | "technical";
@@ -30,6 +53,22 @@ export interface TrailerStats {
   technique: number; // terrain accidenté
   mental: number; // capacité à encaisser
   grimpe: number; // efficacité D+
+}
+
+// ====== STATS PHYSIO (issue du user testing Mira + Théo B.) ======
+// Données physiologiques remontées via Strava (qui agrège les FIT de ta montre)
+// et d'algos de charge maison. Calibrés 0-100, lisibles au radar Forme physio.
+export interface PhysioStats {
+  // Récup & nerveux
+  hrv: number; // Variabilité cardiaque (plus c'est haut, mieux c'est)
+  sleep: number; // Score sommeil 7 derniers jours
+  // Charge (méthode Banister / Polar Load / Garmin Training Load)
+  acuteLoad: number; // Charge aiguë (7 jours) — ce que tu as fait
+  chronicLoad: number; // Charge chronique (28 jours) — ta fitness
+  // TSB (Training Stress Balance) = chronic - acute ; positif = frais, négatif = fatigué
+  freshness: number; // 0-100, centré sur 50 (équilibre)
+  // Régularité (demandée par Mira : la longévité, c'est 80% du sujet)
+  regularity: number; // % de semaines respectées sur 12 dernières
 }
 
 export interface User {
@@ -62,6 +101,8 @@ export interface User {
     itra: { performanceIndex: number; level: number }; // level 100-1000
     watches: WatchBrand[]; // montres connectées
   };
+  // Stats physio (calculées depuis la montre)
+  physio?: PhysioStats;
   // Stats agrégées (sur toute la saison courante)
   stats: {
     totalDistance: number; // km

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import NutritionPlan from "@/components/coach/NutritionPlan";
 
 type Goal =
   | "first-10k"
@@ -189,7 +190,7 @@ export default function CoachHubPage() {
             {
               n: 2,
               title: "Le coach IA analyse ton historique",
-              desc: "Tes sorties Strava/Garmin, ton UTMB Index, ta charge actuelle.",
+              desc: "Tes sorties Strava, ton UTMB Index, ta charge actuelle.",
             },
             {
               n: 3,
@@ -227,12 +228,9 @@ export default function CoachHubPage() {
             </div>
             <div className="font-display text-lg font-black">Coachs certifiés trail</div>
           </div>
-          <Link
-            href="/coach/humans"
-            className="text-[10px] font-mono font-bold uppercase tracking-wider text-violet hover:text-violet-glow"
-          >
-            Voir tous →
-          </Link>
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-violet/50">
+            Bientôt
+          </span>
         </div>
         <div className="space-y-2">
           {[
@@ -275,6 +273,9 @@ export default function CoachHubPage() {
           ))}
         </div>
       </section>
+
+      {/* Nutrition & gut training */}
+      <NutritionPlan />
     </main>
   );
 }

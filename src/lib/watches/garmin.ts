@@ -1,66 +1,13 @@
-// ====== GARMIN CONNECT API — adaptateur ======
+// ====== GARMIN — désactivé au lancement ======
 //
-// Garmin utilise OAuth 1.0a (legacy) pour son Health API / Activity API.
-// Doc : https://developer.garmin.com/gc-developer-program/activity-api/
+// Décision MVP (28/04/26) : pas d'intégration Garmin native.
+// Les utilisateurs Garmin connectent leur montre à Strava (sync native du
+// device), et Esprit Trail récupère les sorties via Strava. C'est le chemin le plus
+// court vers la valeur, sans dépendance au programme partenaire Garmin Health
+// qui demande une validation manuelle longue.
 //
-// Le programme partenaire nécessite une validation manuelle de Garmin.
-// Pendant l'attente, alternative :
-//   - Intégration via Strava (les Garmin poussent auto vers Strava)
-//   - Import de fichiers .fit/.gpx manuels
-//
-// Ce fichier est un scaffold — l'implémentation complète arrive une fois le
-// programme partenaire validé.
+// On rouvrira l'intégration native plus tard si la base utilisateurs le
+// justifie. Le scaffold OAuth 1.0a + activity mapper a été retiré pour ne
+// pas laisser de code mort dans le bundle.
 
-export interface GarminActivity {
-  activityId: number;
-  activityType: { typeKey: string }; // "trail_running", "running", "hiking"…
-  startTimeLocal: string;
-  durationInSeconds: number;
-  distanceInMeters: number;
-  totalElevationGainInMeters: number;
-  averagePaceInMinutesPerKilometer?: number;
-  locationName?: string;
-}
-
-export function buildAuthorizeUrl(): string {
-  throw new Error(
-    "Garmin OAuth 1.0a — implémentation bloquée tant que le programme partenaire n'est pas validé. En attendant, suggère à l'utilisateur de connecter son Garmin à Strava, puis Ravito via Strava."
-  );
-}
-
-export function garminToRun(a: GarminActivity, userId: string) {
-  const distanceKm = a.distanceInMeters / 1000;
-  const avgPace = a.averagePaceInMinutesPerKilometer
-    ? `${Math.floor(a.averagePaceInMinutesPerKilometer)}:${Math.floor(
-        (a.averagePaceInMinutesPerKilometer % 1) * 60
-      )
-        .toString()
-        .padStart(2, "0")}/km`
-    : null;
-
-  const dPlusPerKm = distanceKm > 0 ? a.totalElevationGainInMeters / distanceKm : 0;
-  let terrain: "flat" | "hilly" | "mountain" | "alpine" | "technical" = "flat";
-  if (dPlusPerKm > 80) terrain = "alpine";
-  else if (dPlusPerKm > 50) terrain = "mountain";
-  else if (dPlusPerKm > 20) terrain = "hilly";
-
-  return {
-    user_id: userId,
-    external_id: a.activityId.toString(),
-    source: "garmin" as const,
-    date: a.startTimeLocal,
-    title:
-      a.activityType.typeKey === "trail_running"
-        ? "Trail run"
-        : a.activityType.typeKey === "running"
-        ? "Run"
-        : "Outdoor",
-    location: a.locationName || null,
-    distance: Number(distanceKm.toFixed(2)),
-    elevation: Math.round(a.totalElevationGainInMeters),
-    duration: a.durationInSeconds,
-    avg_pace: avgPace,
-    terrain,
-    polyline: null,
-  };
-}
+export {};

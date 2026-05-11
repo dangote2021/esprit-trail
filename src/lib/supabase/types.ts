@@ -121,6 +121,44 @@ export type Database = {
         > & { id?: string; created_at?: string; updated_at?: string };
         Update: Partial<Database["public"]["Tables"]["coach_plans"]["Insert"]>;
       };
+      user_integrations: {
+        Row: {
+          user_id: string;
+          provider: "strava" | "garmin" | "coros" | "suunto";
+          external_user_id: string | null;
+          access_token: string;
+          refresh_token: string | null;
+          expires_at: string | null;
+          scope: string | null;
+          connected_at: string;
+          last_sync_at: string | null;
+          raw: Record<string, unknown> | null;
+        };
+        Insert: {
+          user_id: string;
+          provider: "strava" | "garmin" | "coros" | "suunto";
+          external_user_id?: string | null;
+          access_token: string;
+          refresh_token?: string | null;
+          expires_at?: string | null;
+          scope?: string | null;
+          connected_at?: string;
+          last_sync_at?: string | null;
+          raw?: Record<string, unknown> | null;
+        };
+        Update: {
+          user_id?: string;
+          provider?: "strava" | "garmin" | "coros" | "suunto";
+          external_user_id?: string | null;
+          access_token?: string;
+          refresh_token?: string | null;
+          expires_at?: string | null;
+          scope?: string | null;
+          connected_at?: string;
+          last_sync_at?: string | null;
+          raw?: Record<string, unknown> | null;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

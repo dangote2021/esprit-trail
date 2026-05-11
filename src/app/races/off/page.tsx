@@ -312,13 +312,13 @@ export default function OffRacesPage() {
         </div>
         <div className="flex-1">
           <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
-            Tu connais une course punk ?
+            Tu veux proposer un OFF à la communauté ?
           </div>
           <div className="font-display text-sm font-black">
-            Propose-la à la communauté
+            Envoie ta course
           </div>
           <div className="text-[11px] text-ink-muted">
-            FKT, pirate, confidentielle, crew run… tout ce qui a de l'âme.
+            Back yard des familles, Ultra du village du coin, Barkley du bled… qui est chaud ?
           </div>
         </div>
         <div className="text-peach text-xl">→</div>
@@ -439,13 +439,12 @@ export default function OffRacesPage() {
       <section className="rounded-2xl border-2 border-peach/20 bg-bg-card/40 p-5 text-center space-y-2">
         <div className="text-3xl">🏴‍☠️</div>
         <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
-          Ravito x OFF
+          Esprit Trail x OFF
         </div>
         <p className="text-xs text-ink-muted leading-relaxed">
-          Le trail il a changé. Ravito remet l'âme au centre. Les OFF races,
-          c'est le cœur qui bat en dehors du circuit officiel. Pas pour être
-          anti-UTMB — juste pour exister à côté, pour célébrer ce qui ne se
-          monnaie pas.
+          Le trail il a changé. Esprit Trail remet l&apos;âme au centre. Les OFF races,
+          c&apos;est le cœur qui bat en dehors du circuit officiel, pour célébrer
+          ce qui ne se monnaie pas.
         </p>
       </section>
     </main>

@@ -9,6 +9,13 @@ import {
   SKIN_TONES,
 } from "@/lib/character";
 
+// Silhouette féminine — indices subtils (pas de caricature) :
+// - legère courbe poitrine sur le tshirt
+// - taille un peu plus marquée
+// - cils sur les yeux
+// - lèvres légèrement colorées
+// Pas de genre imposé : c'est une morphologie qu'on peut choisir.
+
 // Alpine Light : contour "noir forêt" — quasi noir à l'œil mais harmonisé palette
 const OUTLINE = "#0a1f15";
 const STROKE = 3.2;
@@ -28,6 +35,9 @@ export function CharacterAvatar({
   const shoeBrand = SHOE_BRANDS[character.shoeBrand];
   const hatBrand = HAT_BRANDS[character.hatBrand];
   const hasHat = character.hatBrand !== "none";
+  const isFeminine = character.silhouette === "feminine";
+  const hairstyle = character.hairstyle ?? "short";
+  const hairShade = darken(character.hairColor, 0.35);
 
   // Darker shade of shirt for tshirt shadow
   const shirt = character.shirtColor;
@@ -78,6 +88,103 @@ export function CharacterAvatar({
         strokeLinecap="round"
         filter="url(#char-drop)"
       >
+        {/* ============ BACK HAIR (long, ponytail, bun) ============ */}
+        {/* Rendu en premier pour passer DERRIÈRE le corps et la nuque */}
+        {hairstyle === "long" && (
+          <path
+            d="M 60 62 Q 58 100 64 145 Q 72 152 82 148 Q 86 110 88 80 Q 82 60 60 62 Z
+               M 140 62 Q 142 100 136 145 Q 128 152 118 148 Q 114 110 112 80 Q 118 60 140 62 Z"
+            fill={character.hairColor}
+            stroke={OUTLINE}
+            strokeWidth={STROKE}
+          />
+        )}
+        {hairstyle === "medium" && (
+          <path
+            d="M 62 60 Q 60 88 66 108 Q 76 115 88 110 Q 90 88 88 72 Q 80 58 62 60 Z
+               M 138 60 Q 140 88 134 108 Q 124 115 112 110 Q 110 88 112 72 Q 120 58 138 60 Z"
+            fill={character.hairColor}
+            stroke={OUTLINE}
+            strokeWidth={STROKE}
+          />
+        )}
+        {hairstyle === "ponytail" && (
+          <g>
+            {/* La queue-de-cheval qui sort par l'arrière */}
+            <path
+              d="M 140 58 Q 158 70 162 105 Q 164 140 154 172 Q 148 180 142 172 Q 144 144 140 114 Q 132 86 130 70 Z"
+              fill={character.hairColor}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            {/* Élastique rose */}
+            <ellipse
+              cx="145"
+              cy="68"
+              rx="5"
+              ry="3"
+              fill="#ff3366"
+              stroke={OUTLINE}
+              strokeWidth="1.5"
+            />
+          </g>
+        )}
+        {hairstyle === "bun" && (
+          <g>
+            {/* Chignon sphérique à l'arrière du crâne (visible au-dessus de la tête) */}
+            <circle
+              cx="100"
+              cy="22"
+              r="18"
+              fill={character.hairColor}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            {/* Swirl du chignon */}
+            <path
+              d="M 95 15 Q 100 10 108 14 Q 110 22 103 28 Q 92 26 95 15 Z"
+              fill={hairShade}
+              stroke={OUTLINE}
+              strokeWidth="1.5"
+              opacity="0.7"
+            />
+          </g>
+        )}
+        {hairstyle === "mulet" && (
+          <g>
+            {/* Cape arrière du mulet : large à la nuque, qui s'effile vers le bas
+                "Business in the front, party in the back" — easter egg trail vintage */}
+            <path
+              d="M 70 60 Q 64 90 72 130 Q 80 148 92 152 L 100 144 L 108 152 Q 120 148 128 130 Q 136 90 130 60 Q 110 64 100 64 Q 90 64 70 60 Z"
+              fill={character.hairColor}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            {/* Mèches qui marquent le tombé du mulet */}
+            <path
+              d="M 84 80 Q 82 110 88 138"
+              stroke={hairShade}
+              strokeWidth="1.6"
+              fill="none"
+              opacity="0.55"
+            />
+            <path
+              d="M 116 80 Q 118 110 112 138"
+              stroke={hairShade}
+              strokeWidth="1.6"
+              fill="none"
+              opacity="0.55"
+            />
+            <path
+              d="M 100 78 Q 100 110 100 144"
+              stroke={hairShade}
+              strokeWidth="1.4"
+              fill="none"
+              opacity="0.45"
+            />
+          </g>
+        )}
+
         {/* ============ LEGS (trapues) ============ */}
         {/* Back leg (right) — derrière pour profondeur */}
         <path
@@ -381,34 +488,62 @@ export function CharacterAvatar({
         </g>
 
         {/* ============ TORSO / TSHIRT (trapu chibi) ============ */}
+        {/* Silhouette féminine : légère courbe buste + taille marquée */}
         <path
-          d="M 62 115 Q 62 108 72 108 L 128 108 Q 138 108 138 115 L 140 168 Q 140 172 135 172 L 65 172 Q 60 172 60 168 Z"
+          d={
+            isFeminine
+              ? // Taille rentrée légèrement au milieu, poitrine légèrement bombée
+                "M 62 115 Q 62 108 72 108 L 128 108 Q 138 108 138 115 Q 142 130 140 142 Q 136 150 142 160 L 140 168 Q 140 172 135 172 L 65 172 Q 60 172 60 168 L 58 160 Q 64 150 60 142 Q 58 130 62 115 Z"
+              : "M 62 115 Q 62 108 72 108 L 128 108 Q 138 108 138 115 L 140 168 Q 140 172 135 172 L 65 172 Q 60 172 60 168 Z"
+          }
           fill={character.shirtColor}
           stroke={OUTLINE}
           strokeWidth={STROKE}
         />
+        {/* Légère courbe buste féminine — deux arrondis subtils */}
+        {isFeminine && !pack && (
+          <path
+            d="M 78 128 Q 86 136 94 128 M 106 128 Q 114 136 122 128"
+            stroke={shirtShade}
+            strokeWidth="1.8"
+            fill="none"
+            opacity="0.55"
+          />
+        )}
         {/* Tshirt shading bottom */}
         <path
           d="M 62 160 L 138 160 L 140 168 L 60 168 Z"
           fill={shirtShade}
           opacity="0.45"
         />
-        {/* Brand chest text */}
+        {/* Brand chest text — version "bouzin" en plus gros + petit cœur en dessous */}
         {character.shirtBrand && character.shirtBrand !== "none" && (
-          <text
-            x="100"
-            y="143"
-            fontSize="11"
-            fontWeight="900"
-            fontFamily="monospace"
-            fill="#ffffff"
-            textAnchor="middle"
-            stroke={OUTLINE}
-            strokeWidth="0.6"
-            paintOrder="stroke"
-          >
-            {character.shirtBrand.toUpperCase()}
-          </text>
+          <g>
+            <text
+              x="100"
+              y={character.shirtBrand === "bouzin" ? "140" : "143"}
+              fontSize={character.shirtBrand === "bouzin" ? "14" : "11"}
+              fontWeight="900"
+              fontFamily="monospace"
+              fill="#ffffff"
+              textAnchor="middle"
+              stroke={OUTLINE}
+              strokeWidth="0.7"
+              paintOrder="stroke"
+              letterSpacing={character.shirtBrand === "bouzin" ? "1" : "0"}
+            >
+              {character.shirtBrand.toUpperCase()}
+            </text>
+            {character.shirtBrand === "bouzin" && (
+              // Petit cœur sous le mot — symbole de l'easter egg
+              <path
+                d="M 100 148 l -3 -2.6 a 1.6 1.6 0 0 1 3 -2.2 a 1.6 1.6 0 0 1 3 2.2 z"
+                fill="#ffffff"
+                stroke={OUTLINE}
+                strokeWidth="0.7"
+              />
+            )}
+          </g>
         )}
 
         {/* ============ HYDRATION PACK / RUNNING VEST ============ */}
@@ -614,17 +749,52 @@ export function CharacterAvatar({
           strokeWidth={STROKE}
         />
 
-        {/* ============ HAIR ============ */}
+        {/* ============ FRONT HAIR (crâne + mèches) ============ */}
         {!hasHat ? (
-          // Full hair — volume cartoon
-          <path
-            d="M 66 50 Q 68 28 100 26 Q 132 28 134 50 Q 134 56 130 58 L 70 58 Q 66 56 66 50 Z"
-            fill={character.hairColor}
-            stroke={OUTLINE}
-            strokeWidth={STROKE}
-          />
+          <>
+            {/* Couverture crâne — commune à tous les hairstyles sans casquette */}
+            <path
+              d={
+                hairstyle === "short" || hairstyle === "mulet"
+                  ? // Court devant — le mulet a la même calotte courte sur le dessus
+                    "M 66 50 Q 68 28 100 26 Q 132 28 134 50 Q 134 56 130 58 L 70 58 Q 66 56 66 50 Z"
+                  : // Coiffure plus volumineuse pour medium/long/ponytail/bun
+                    "M 62 52 Q 62 22 100 20 Q 138 22 138 52 Q 138 60 132 62 L 68 62 Q 62 60 62 52 Z"
+              }
+              fill={character.hairColor}
+              stroke={OUTLINE}
+              strokeWidth={STROKE}
+            />
+            {/* Frange / détail sur le front */}
+            {(hairstyle === "medium" || hairstyle === "long" || hairstyle === "bun") && (
+              <path
+                d="M 78 40 Q 90 50 104 44 Q 118 50 128 42 L 128 56 L 78 56 Z"
+                fill={hairShade}
+                opacity="0.55"
+                stroke={OUTLINE}
+                strokeWidth="1.2"
+              />
+            )}
+            {/* Pour ponytail : deux petites mèches qui encadrent le visage */}
+            {hairstyle === "ponytail" && (
+              <>
+                <path
+                  d="M 62 52 Q 58 70 64 90 L 70 88 Q 68 70 70 54 Z"
+                  fill={character.hairColor}
+                  stroke={OUTLINE}
+                  strokeWidth="2"
+                />
+                <path
+                  d="M 138 52 Q 142 70 136 90 L 130 88 Q 132 70 130 54 Z"
+                  fill={character.hairColor}
+                  stroke={OUTLINE}
+                  strokeWidth="2"
+                />
+              </>
+            )}
+          </>
         ) : (
-          // Mèches qui dépassent sous la casquette (côtés + nuque)
+          // Mèches qui dépassent sous la casquette
           <>
             <path
               d="M 64 62 Q 66 56 72 55 L 75 65 Z"
@@ -638,6 +808,23 @@ export function CharacterAvatar({
               stroke={OUTLINE}
               strokeWidth="2"
             />
+            {/* Avec casquette + coiffure longue : on voit les mèches plus longues */}
+            {(hairstyle === "medium" || hairstyle === "long" || hairstyle === "ponytail") && (
+              <>
+                <path
+                  d="M 60 62 Q 56 82 62 100 L 70 98 Q 68 80 68 64 Z"
+                  fill={character.hairColor}
+                  stroke={OUTLINE}
+                  strokeWidth="2"
+                />
+                <path
+                  d="M 140 62 Q 144 82 138 100 L 130 98 Q 132 80 132 64 Z"
+                  fill={character.hairColor}
+                  stroke={OUTLINE}
+                  strokeWidth="2"
+                />
+              </>
+            )}
           </>
         )}
 
@@ -724,6 +911,15 @@ export function CharacterAvatar({
               />
               <circle cx="87" cy="70" r="3.2" fill={OUTLINE} />
               <circle cx="88.2" cy="68.2" r="1.2" fill="#ffffff" />
+              {/* Cils féminins */}
+              {isFeminine && (
+                <g stroke={OUTLINE} strokeWidth="1.6" strokeLinecap="round" fill="none">
+                  <path d="M 80 61 L 79 58" />
+                  <path d="M 84 59.5 L 83.5 56.5" />
+                  <path d="M 88 59.3 L 88 56" />
+                  <path d="M 92 60 L 92.5 57" />
+                </g>
+              )}
             </g>
             <g>
               <ellipse
@@ -737,6 +933,14 @@ export function CharacterAvatar({
               />
               <circle cx="115" cy="70" r="3.2" fill={OUTLINE} />
               <circle cx="116.2" cy="68.2" r="1.2" fill="#ffffff" />
+              {isFeminine && (
+                <g stroke={OUTLINE} strokeWidth="1.6" strokeLinecap="round" fill="none">
+                  <path d="M 108 60 L 107.5 57" />
+                  <path d="M 112 59.3 L 112 56" />
+                  <path d="M 116 59.5 L 116.5 56.5" />
+                  <path d="M 120 61 L 121 58" />
+                </g>
+              )}
             </g>
           </>
         ) : (
@@ -795,20 +999,43 @@ export function CharacterAvatar({
         />
 
         {/* Bouche / sourire cartoon */}
-        <path
-          d="M 90 86 Q 100 94 110 86"
-          stroke={OUTLINE}
-          strokeWidth="2.8"
-          fill="none"
-          strokeLinecap="round"
-        />
-        {/* Dent qui dépasse — détail Mario */}
-        <path
-          d="M 97 88 L 97 91 L 100 91 L 100 88"
-          fill="#ffffff"
-          stroke={OUTLINE}
-          strokeWidth="1.3"
-        />
+        {isFeminine ? (
+          <>
+            {/* Sourire féminin — lèvres légèrement colorées */}
+            <path
+              d="M 88 86 Q 100 94 112 86"
+              stroke={OUTLINE}
+              strokeWidth="2.6"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 90 88 Q 100 92 110 88"
+              stroke="#ff4466"
+              strokeWidth="1.4"
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.8"
+            />
+          </>
+        ) : (
+          <>
+            <path
+              d="M 90 86 Q 100 94 110 86"
+              stroke={OUTLINE}
+              strokeWidth="2.8"
+              fill="none"
+              strokeLinecap="round"
+            />
+            {/* Dent qui dépasse — détail Mario */}
+            <path
+              d="M 97 88 L 97 91 L 100 91 L 100 88"
+              fill="#ffffff"
+              stroke={OUTLINE}
+              strokeWidth="1.3"
+            />
+          </>
+        )}
 
         {/* ============ HEADBAND (si pas de casquette) ============ */}
         {character.accessory === "headband" && !hasHat && (

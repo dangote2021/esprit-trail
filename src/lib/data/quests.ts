@@ -24,7 +24,7 @@ export const QUESTS: Quest[] = [
   // === DAILY ===
   {
     id: "daily-5k",
-    title: "Dépoussiérage",
+    title: "Récup active",
     description: "Couvre 5 km aujourd'hui",
     icon: "👟",
     period: "daily",

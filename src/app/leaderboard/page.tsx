@@ -6,9 +6,12 @@ import {
   LEADERBOARD_FRIENDS_WEEKLY_KM,
   LEADERBOARD_REGION_WEEKLY_DPLUS,
   LEADERBOARD_WORLD_SEASON_XP,
+  LEADERBOARD_ITRA,
+  LEADERBOARD_UTMB,
 } from "@/lib/data/leaderboard";
 import type { LeaderboardEntry } from "@/lib/types";
 
+type Tier = "community" | "itra" | "utmb";
 type Scope = "friends" | "region" | "world";
 
 const SCOPES: {
@@ -45,9 +48,30 @@ const SCOPES: {
   },
 ];
 
+const OFFICIAL: Record<"itra" | "utmb", { label: string; metric: string; unit: string; color: string; data: LeaderboardEntry[]; tagline: string }> = {
+  itra: {
+    label: "ITRA",
+    metric: "Performance Index",
+    unit: "pts",
+    color: "violet",
+    data: LEADERBOARD_ITRA,
+    tagline: "International Trail Running Association — l'index officiel mondial",
+  },
+  utmb: {
+    label: "UTMB",
+    metric: "UTMB Index",
+    unit: "pts",
+    color: "peach",
+    data: LEADERBOARD_UTMB,
+    tagline: "UTMB Index — qualifications World Series Mont-Blanc",
+  },
+};
+
 export default function LeaderboardPage() {
+  const [tier, setTier] = useState<Tier>("community");
   const [scope, setScope] = useState<Scope>("friends");
   const active = SCOPES.find((s) => s.id === scope)!;
+  const officialActive = tier === "itra" ? OFFICIAL.itra : tier === "utmb" ? OFFICIAL.utmb : null;
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-5">
@@ -64,11 +88,171 @@ export default function LeaderboardPage() {
           <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-violet">
             Classement
           </div>
-          <h1 className="font-display text-lg font-black leading-none">Ladder</h1>
+          <h1 className="font-display text-lg font-black leading-none">Ranking</h1>
         </div>
         <div className="w-9" />
       </header>
 
+      {/* Tier tabs (top level) — Communauté / ITRA / UTMB */}
+      <div className="grid grid-cols-3 gap-1.5 rounded-2xl border-2 border-ink/10 bg-bg-card/40 p-1.5">
+        <button
+          onClick={() => setTier("community")}
+          className={`rounded-xl py-2.5 text-center transition ${
+            tier === "community"
+              ? "bg-lime text-bg shadow-glow-lime"
+              : "text-ink-muted hover:text-ink"
+          }`}
+        >
+          <div className="text-xs font-display font-black leading-none">
+            👥 Communauté
+          </div>
+          <div className={`text-[9px] font-mono mt-0.5 ${tier === "community" ? "opacity-80" : "opacity-60"}`}>
+            Esprit Trail
+          </div>
+        </button>
+        <button
+          onClick={() => setTier("itra")}
+          className={`rounded-xl py-2.5 text-center transition ${
+            tier === "itra"
+              ? "bg-violet text-bg shadow-glow-violet"
+              : "text-ink-muted hover:text-ink"
+          }`}
+        >
+          <div className="text-xs font-display font-black leading-none">
+            🌍 ITRA
+          </div>
+          <div className={`text-[9px] font-mono mt-0.5 ${tier === "itra" ? "opacity-80" : "opacity-60"}`}>
+            Mondial
+          </div>
+        </button>
+        <button
+          onClick={() => setTier("utmb")}
+          className={`rounded-xl py-2.5 text-center transition ${
+            tier === "utmb"
+              ? "bg-peach text-bg shadow-glow-peach"
+              : "text-ink-muted hover:text-ink"
+          }`}
+        >
+          <div className="text-xs font-display font-black leading-none">
+            🏔️ UTMB
+          </div>
+          <div className={`text-[9px] font-mono mt-0.5 ${tier === "utmb" ? "opacity-80" : "opacity-60"}`}>
+            World Series
+          </div>
+        </button>
+      </div>
+
+      {/* Vue OFFICIELLE — ITRA ou UTMB */}
+      {officialActive && (
+        <>
+          <section className={`rounded-2xl border-2 ${officialActive.color === "violet" ? "border-violet/40 bg-violet/10" : "border-peach/40 bg-peach/10"} p-4 space-y-2`}>
+            <div className={`text-[10px] font-mono font-black uppercase tracking-widest ${officialActive.color === "violet" ? "text-violet" : "text-peach"}`}>
+              Classement {officialActive.label} · {officialActive.metric}
+            </div>
+            <p className="text-xs text-ink-muted leading-relaxed">{officialActive.tagline}</p>
+            {(() => {
+              const me = officialActive.data.find((e) => e.isYou);
+              const top = officialActive.data[0]?.value || 0;
+              if (!me) return null;
+              return (
+                <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-lg bg-bg-card/70 p-2">
+                    <div className="text-[9px] font-mono uppercase tracking-wider text-ink-muted">Ton rang</div>
+                    <div className={`font-display text-base font-black ${officialActive.color === "violet" ? "text-violet" : "text-peach"}`}>
+                      #{me.rank.toLocaleString("fr-FR")}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-bg-card/70 p-2">
+                    <div className="text-[9px] font-mono uppercase tracking-wider text-ink-muted">Ton score</div>
+                    <div className="font-display text-base font-black text-ink">{me.value}</div>
+                  </div>
+                  <div className="rounded-lg bg-bg-card/70 p-2">
+                    <div className="text-[9px] font-mono uppercase tracking-wider text-ink-muted">vs leader</div>
+                    <div className="font-display text-base font-black text-ink-muted">−{top - me.value}</div>
+                  </div>
+                </div>
+              );
+            })()}
+          </section>
+
+          {/* Plan de prépa — toujours visible pour pousser vers Coach IA */}
+          <Link
+            href="/coach"
+            className="block rounded-2xl bg-gradient-to-r from-cyan/20 via-cyan/10 to-bg border-2 border-cyan/40 p-4 hover:border-cyan transition"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cyan text-bg text-xl card-chunky">
+                🧠
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
+                  Plan de préparation
+                </div>
+                <div className="font-display text-base font-black text-ink leading-tight">
+                  Gagne des places au ranking {officialActive.label}
+                </div>
+                <div className="text-[11px] text-ink-muted mt-0.5">
+                  Le Coach IA te dessine le plan pour grimper
+                </div>
+              </div>
+              <div className="font-display text-xl text-cyan">→</div>
+            </div>
+          </Link>
+
+          {/* Liste classement officiel */}
+          <ol className="space-y-2">
+            {officialActive.data.map((entry, idx) => {
+              const prev = officialActive.data[idx - 1];
+              const showGap = prev && entry.rank > prev.rank + 1;
+              return (
+                <div key={entry.user.id}>
+                  {showGap && (
+                    <li className="flex items-center justify-center py-2 text-[10px] font-mono text-ink-dim">
+                      ··· {entry.rank - prev.rank - 1} traileurs entre les deux ···
+                    </li>
+                  )}
+                  <li
+                    className={`flex items-center gap-3 rounded-xl border p-3 transition ${
+                      entry.isYou
+                        ? officialActive.color === "violet"
+                          ? "border-violet bg-violet/10 shadow-glow-violet"
+                          : "border-peach bg-peach/10 shadow-glow-peach"
+                        : "border-ink/10 bg-bg-card/60"
+                    }`}
+                  >
+                    <div className={`w-12 text-center font-display text-sm font-black leading-none ${entry.rank <= 3 ? "text-gold" : "text-ink-muted"}`}>
+                      #{entry.rank.toLocaleString("fr-FR")}
+                    </div>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-bg-raised text-xl">
+                      {entry.user.avatar}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate font-bold text-sm">
+                        {entry.isYou ? "Toi" : entry.user.username}
+                      </div>
+                      <div className="text-[10px] font-mono text-ink-muted truncate">
+                        {entry.user.title}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-display text-base font-black text-ink">
+                        {entry.value}
+                      </div>
+                      <div className={`text-[10px] font-mono ${entry.change > 0 ? "text-lime" : entry.change < 0 ? "text-mythic" : "text-ink-dim"}`}>
+                        {entry.change > 0 ? `+${entry.change}` : entry.change}
+                      </div>
+                    </div>
+                  </li>
+                </div>
+              );
+            })}
+          </ol>
+        </>
+      )}
+
+      {/* Vue COMMUNAUTÉ — sous-onglets Friends/Region/World */}
+      {tier === "community" && (
+      <>
       {/* Scope tabs */}
       <div className="grid grid-cols-3 gap-2 rounded-xl border border-ink/10 bg-bg-card/40 p-1">
         {SCOPES.map((s) => (
@@ -174,6 +358,8 @@ export default function LeaderboardPage() {
           </li>
         ))}
       </ol>
+      </>
+      )}
     </main>
   );
 }

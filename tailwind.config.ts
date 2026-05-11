@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ==== Ravito · Charte ALPINE LIGHT ====
+        // ==== Esprit Trail · Charte ALPINE LIGHT ====
         // Inspiration : Patagonia, Trail Runner Mag, cartes IGN papier
         // Crème naturel + vert forêt + orange coucher + terre dorée
         bg: {

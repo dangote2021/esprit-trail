@@ -3,21 +3,25 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ME } from "@/lib/data/me";
-import type { AppMode } from "@/lib/types";
-
-type LootStyle = "gamer" | "real" | "hidden";
 
 export default function SettingsPage() {
   // Simulé — pas de persistence pour le MVP
-  const [mode, setMode] = useState<AppMode>(ME.mode);
   const [weeklyTarget, setWeeklyTarget] = useState<number>(ME.weeklyTarget);
-  const [lootStyle, setLootStyle] = useState<LootStyle>("gamer");
+  const [displayName, setDisplayName] = useState<string>(ME.displayName);
+  const [handle, setHandle] = useState<string>(ME.username);
   const [notifications, setNotifications] = useState({
     weekly: true,
     challenges: true,
     friends: true,
     races: false,
   });
+
+  function sanitizeHandle(v: string) {
+    return v
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")
+      .slice(0, 20);
+  }
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-10 space-y-6">
@@ -47,86 +51,48 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      {/* MODE — Adventure vs Performance */}
+      {/* IDENTITÉ — prénom + pseudo */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-lime">
-          Mode d'affichage
+          Identité
         </div>
-        <div className="grid grid-cols-1 gap-2">
-          <button
-            onClick={() => setMode("adventure")}
-            className={`rounded-2xl border p-4 text-left transition ${
-              mode === "adventure"
-                ? "border-lime bg-lime/10 shadow-glow-lime"
-                : "border-ink/15 bg-bg-card/60 hover:border-lime/40"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">🎮</div>
-              <div className="flex-1">
-                <div className="font-display text-base font-black">
-                  Mode Aventure
-                </div>
-                <div className="text-xs text-ink-muted">
-                  XP, niveaux, loot, badges
-                </div>
-              </div>
-              {mode === "adventure" && (
-                <div className="text-lime">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    className="h-5 w-5"
-                  >
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                </div>
-              )}
+        <div className="rounded-2xl border border-lime/20 bg-bg-card/60 p-4 space-y-3">
+          <label className="block">
+            <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+              Prénom affiché
+            </span>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value.slice(0, 20))}
+              placeholder="Clem, Marco, Raven…"
+              className="mt-1 w-full rounded-xl border border-ink/15 bg-bg-card px-3 py-2.5 font-display text-base font-black text-ink placeholder:text-ink-dim focus:border-lime focus:outline-none"
+            />
+          </label>
+          <label className="block">
+            <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+              Pseudo
+            </span>
+            <div className="relative mt-1">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-base text-ink-dim">
+                @
+              </span>
+              <input
+                type="text"
+                value={handle}
+                onChange={(e) => setHandle(sanitizeHandle(e.target.value))}
+                placeholder="mulet_gang"
+                className="w-full rounded-xl border border-ink/15 bg-bg-card py-2.5 pl-8 pr-3 font-mono text-base text-ink placeholder:text-ink-dim focus:border-lime focus:outline-none"
+              />
             </div>
-          </button>
-          <button
-            onClick={() => setMode("performance")}
-            className={`rounded-2xl border p-4 text-left transition ${
-              mode === "performance"
-                ? "border-cyan bg-cyan/10 shadow-glow-cyan"
-                : "border-ink/15 bg-bg-card/60 hover:border-cyan/40"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">📊</div>
-              <div className="flex-1">
-                <div className="font-display text-base font-black">
-                  Mode Performance
-                </div>
-                <div className="text-xs text-ink-muted">
-                  UTMB, ITRA, CTL/TSB, zones FC — data pro
-                </div>
-              </div>
-              {mode === "performance" && (
-                <div className="text-cyan">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    className="h-5 w-5"
-                  >
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </button>
-        </div>
-        <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-3 text-[11px] text-ink-muted">
-          💡 Tu peux changer de mode à tout moment. Les deux gardent tes sorties
-          et ton historique — seul l'habillage change.
+            <span className="mt-1 block text-[10px] font-mono text-ink-dim">
+              Visible dans ta team et le leaderboard.
+            </span>
+          </label>
         </div>
       </section>
 
-      {/* RYTHME HEBDO */}
+      {/* OBJECTIF HEBDO */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach">
           Rythme hebdomadaire
@@ -134,7 +100,7 @@ export default function SettingsPage() {
         <div className="rounded-2xl border border-peach/20 bg-bg-card/60 p-4">
           <div className="text-xs text-ink-muted mb-3">
             Combien de sorties par semaine tu vises ? Pas de stress, le rythme
-            s'ajuste à ta vie.
+            s&apos;ajuste à ta vie.
           </div>
           <div className="grid grid-cols-4 gap-2">
             {[1, 2, 3, 4].map((n) => {
@@ -163,140 +129,47 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* LOOT STYLE — Fix #5 du user testing */}
-      {mode === "adventure" && (
-        <section className="space-y-3">
-          <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-violet">
-            Style du loot
-          </div>
-          <div className="rounded-2xl border border-violet/20 bg-bg-card/60 p-4 space-y-2">
-            <div className="text-xs text-ink-muted mb-2">
-              Comment tu veux tes récompenses ?
-            </div>
-            {(
-              [
-                {
-                  id: "gamer",
-                  emoji: "🎮",
-                  label: "Gamer fun",
-                  desc: "Titres, trophées, boosters XP — le vibe RPG assumé",
-                },
-                {
-                  id: "real",
-                  emoji: "🎁",
-                  label: "Récompenses réelles",
-                  desc: "Codes promo marques, stickers, vouchers courses",
-                },
-                {
-                  id: "hidden",
-                  emoji: "🙈",
-                  label: "Masquer le loot",
-                  desc: "Pas de loot affiché — juste badges et stats",
-                },
-              ] as const
-            ).map((opt) => {
-              const active = lootStyle === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  onClick={() => setLootStyle(opt.id)}
-                  className={`w-full rounded-xl border p-3 text-left transition flex items-center gap-3 ${
-                    active
-                      ? "border-violet bg-violet/10"
-                      : "border-ink/15 bg-bg-card/40 hover:border-violet/40"
-                  }`}
-                >
-                  <div className="text-2xl">{opt.emoji}</div>
-                  <div className="flex-1">
-                    <div className="text-sm font-bold">{opt.label}</div>
-                    <div className="text-[11px] text-ink-muted">{opt.desc}</div>
-                  </div>
-                  {active && (
-                    <div className="text-violet">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        className="h-5 w-5"
-                      >
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* CONNEXIONS */}
+      {/* CONNEXIONS — Strava uniquement */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
-          Connexions
+          Connexion Strava
         </div>
-        <div className="space-y-2">
-          {[
-            { id: "strava", label: "Strava", color: "#fc4c02", connected: true },
-            { id: "garmin", label: "Garmin Connect", color: "#007cc3", connected: true },
-            { id: "coros", label: "COROS", color: "#000", connected: false },
-            { id: "suunto", label: "Suunto", color: "#00a7e1", connected: false },
-          ].map((w) => (
+        <div className="rounded-2xl border border-ink/10 bg-bg-card/60 p-4">
+          <div className="flex items-center gap-3">
             <div
-              key={w.id}
-              className="flex items-center gap-3 rounded-xl border border-ink/10 bg-bg-card/60 p-3"
+              className="flex h-12 w-12 items-center justify-center rounded-xl font-display text-lg font-black text-white"
+              style={{ backgroundColor: "#fc4c02" }}
             >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-lg font-display text-sm font-black text-white"
-                style={{ backgroundColor: w.color }}
-              >
-                {w.label[0]}
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-bold">{w.label}</div>
-                <div
-                  className={`text-[10px] font-mono ${
-                    w.connected ? "text-lime" : "text-ink-dim"
-                  }`}
-                >
-                  {w.connected ? "✓ Sync active" : "Non connecté"}
-                </div>
-              </div>
-              <button
-                className={`rounded-lg px-3 py-1.5 text-[10px] font-mono font-bold uppercase transition ${
-                  w.connected
-                    ? "border border-ink/15 text-ink-muted hover:border-peach/40 hover:text-peach"
-                    : "bg-cyan text-bg hover:scale-[1.02]"
-                }`}
-              >
-                {w.connected ? "Déco" : "Connecter"}
-              </button>
+              S
             </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-3">
-            <div className="text-[10px] font-mono font-bold uppercase text-cyan">
-              UTMB Index
+            <div className="flex-1">
+              <div className="font-display text-base font-black">Strava</div>
+              <div className="text-[11px] font-mono text-lime">✓ Sync active</div>
             </div>
-            <div className="mt-1 font-display text-2xl font-black text-cyan">
-              {ME.connections.utmb?.runnerIndex}
-            </div>
-            <button className="mt-1 text-[10px] font-mono text-ink-muted hover:text-cyan">
-              Resynchroniser
-            </button>
+            <Link
+              href="/settings/connections/strava"
+              className="rounded-lg border border-ink/15 px-3 py-1.5 text-[10px] font-mono font-bold uppercase text-ink-muted hover:border-lime/40 hover:text-lime"
+            >
+              Gérer
+            </Link>
           </div>
-          <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-3">
-            <div className="text-[10px] font-mono font-bold uppercase text-violet">
-              ITRA
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-3">
+              <div className="text-[10px] font-mono font-bold uppercase text-cyan">
+                UTMB Index
+              </div>
+              <div className="mt-1 font-display text-2xl font-black text-cyan">
+                {ME.connections.utmb?.runnerIndex ?? "—"}
+              </div>
             </div>
-            <div className="mt-1 font-display text-2xl font-black text-violet">
-              {ME.connections.itra.performanceIndex}
+            <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-3">
+              <div className="text-[10px] font-mono font-bold uppercase text-violet">
+                ITRA
+              </div>
+              <div className="mt-1 font-display text-2xl font-black text-violet">
+                {ME.connections.itra.performanceIndex}
+              </div>
             </div>
-            <button className="mt-1 text-[10px] font-mono text-ink-muted hover:text-violet">
-              Resynchroniser
-            </button>
           </div>
         </div>
       </section>
@@ -422,18 +295,18 @@ export default function SettingsPage() {
       {/* ABOUT */}
       <section className="space-y-2 pt-4 border-t border-ink/5">
         <div className="flex gap-4 text-[11px] font-mono text-ink-muted">
-          <Link href="#" className="hover:text-lime">
+          <Link href="/legal/cgu" className="hover:text-lime">
             Conditions
           </Link>
-          <Link href="#" className="hover:text-lime">
+          <Link href="/legal/privacy" className="hover:text-lime">
             Confidentialité
           </Link>
-          <Link href="#" className="hover:text-lime">
-            Contact
+          <Link href="/legal/mentions" className="hover:text-lime">
+            Mentions
           </Link>
         </div>
         <div className="text-[10px] font-mono text-ink-dim">
-          Ravito v0.3.0 · Build {new Date().toISOString().slice(0, 10)}
+          Esprit Trail v0.4.0 · Build {new Date().toISOString().slice(0, 10)}
         </div>
         <button className="mt-3 text-[11px] font-mono text-peach hover:text-peach-glow">
           Se déconnecter

@@ -1,0 +1,47 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- CONCEPT 6 — "Minimal Drop"
+       Version ultra-épurée. Une goutte d'énergie qui devient sommet.
+       Lit à toutes les tailles, vieillit bien. -->
+  <defs>
+    <linearGradient id="bg6" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c6ff3d"/>
+      <stop offset="100%" stop-color="#9ad420"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#bg6)"/>
+
+  <!-- Goutte montagne — forme unique, très clean -->
+  <g transform="translate(512 540)">
+    <!-- Pointe (sommet) en haut -->
+    <path
+      d="M 0 -280
+         Q -180 -40 -180 120
+         Q -180 300 0 300
+         Q 180 300 180 120
+         Q 180 -40 0 -280 Z"
+      fill="#0b0f0e"
+    />
+    <!-- Reflet en diagonal -->
+    <path
+      d="M -80 -120
+         Q -130 -20 -130 80"
+      stroke="#c6ff3d"
+      stroke-width="14"
+      stroke-linecap="round"
+      fill="none"
+      opacity="0.6"
+    />
+  </g>
+
+  <!-- Baseline en bas -->
+  <text
+    x="512" y="900"
+    text-anchor="middle"
+    font-family="Inter, sans-serif"
+    font-weight="900"
+    font-size="96"
+    fill="#0b0f0e"
+    letter-spacing="-2"
+  >Ravito</text>
+</svg>

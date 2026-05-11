@@ -1,0 +1,70 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- CONCEPT 5 — "Kill-cam Target"
+       La signature feature matérialisée : un viseur de sniper trail.
+       Aggressif, moderne, gaming. -->
+  <defs>
+    <radialGradient id="bg5" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1f1a16"/>
+      <stop offset="100%" stop-color="#0b0f0e"/>
+    </radialGradient>
+    <linearGradient id="peachStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9e70"/>
+      <stop offset="100%" stop-color="#ff5e3a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#bg5)"/>
+
+  <!-- Viseur — 3 cercles concentriques -->
+  <g fill="none" stroke="url(#peachStroke)">
+    <circle cx="512" cy="512" r="400" stroke-width="4" opacity="0.3"/>
+    <circle cx="512" cy="512" r="320" stroke-width="6" opacity="0.5"/>
+    <circle cx="512" cy="512" r="220" stroke-width="10"/>
+  </g>
+
+  <!-- Croix de viseur -->
+  <g stroke="#ff6b3d" stroke-width="12" stroke-linecap="round">
+    <!-- Haut -->
+    <line x1="512" y1="60" x2="512" y2="200"/>
+    <!-- Bas -->
+    <line x1="512" y1="824" x2="512" y2="964"/>
+    <!-- Gauche -->
+    <line x1="60" y1="512" x2="200" y2="512"/>
+    <!-- Droite -->
+    <line x1="824" y1="512" x2="964" y2="512"/>
+  </g>
+
+  <!-- Point central -->
+  <circle cx="512" cy="512" r="32" fill="#ff6b3d"/>
+  <circle cx="512" cy="512" r="16" fill="#d9ff5e"/>
+
+  <!-- Tick marks graduées autour -->
+  <g stroke="#ff9e70" stroke-width="4" opacity="0.6">
+    <line x1="512" y1="250" x2="512" y2="280"/>
+    <line x1="512" y1="744" x2="512" y2="774"/>
+    <line x1="250" y1="512" x2="280" y2="512"/>
+    <line x1="744" y1="512" x2="774" y2="512"/>
+  </g>
+
+  <!-- Label "KILL-CAM" en haut -->
+  <text
+    x="512" y="170"
+    text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-weight="900"
+    font-size="44"
+    fill="#ff9e70"
+    letter-spacing="12"
+  >KILL-CAM</text>
+
+  <!-- Label "RAVITO" en bas -->
+  <text
+    x="512" y="910"
+    text-anchor="middle"
+    font-family="Inter, sans-serif"
+    font-weight="900"
+    font-size="72"
+    fill="#d9ff5e"
+    letter-spacing="14"
+  >RAVITO</text>
+</svg>

@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { RACES } from "@/lib/data/races";
 import { ME } from "@/lib/data/me";
+import { OFF_RACES, OFF_CAT_META, type OffCategory } from "@/lib/data/off-races";
 import type { RaceCategory } from "@/lib/types";
+import RaceShareButton from "@/components/race/RaceShareButton";
 
 const CATS: { id: RaceCategory | "all"; label: string; range: string }[] = [
   { id: "all", label: "Toutes", range: "" },
@@ -15,6 +18,8 @@ const CATS: { id: RaceCategory | "all"; label: string; range: string }[] = [
   { id: "XL", label: "XL", range: "115+" },
 ];
 
+type Tab = "on" | "off";
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr", {
     day: "numeric",
@@ -24,14 +29,32 @@ function formatDate(iso: string) {
 }
 
 export default function RacesPage() {
+  // Support ?tab=off pour deep-linking depuis la home (encart "OFF Races")
+  const params = useSearchParams();
+  const initialTab: Tab = params?.get("tab") === "off" ? "off" : "on";
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [cat, setCat] = useState<RaceCategory | "all">("all");
-  const [iconicOnly, setIconicOnly] = useState(false);
+  const [franceOnly, setFranceOnly] = useState(false);
+  const [offCat, setOffCat] = useState<OffCategory | "all">("all");
+  const [isLogged, setIsLogged] = useState<boolean | null>(null);
+
+  // Détection cookie auth Supabase pour ajuster l'affichage UTMB Index aux visiteurs
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const hasAuth = document.cookie
+      .split(";")
+      .some((c) => c.trim().match(/^sb-[a-z0-9]+-auth-token/));
+    setIsLogged(hasAuth);
+  }, []);
 
   const filtered = RACES.filter((r) => {
     if (cat !== "all" && r.category !== cat) return false;
-    if (iconicOnly && !r.isIconic) return false;
+    if (franceOnly && !r.country.toLowerCase().includes("france")) return false;
     return true;
   }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const filteredOff =
+    offCat === "all" ? OFF_RACES : OFF_RACES.filter((r) => r.category === offCat);
 
   const myUtmb = ME.connections.utmb?.runnerIndex || 0;
 
@@ -55,75 +78,211 @@ export default function RacesPage() {
         <div className="w-9" />
       </header>
 
-      {/* Filter tabs */}
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
-        {CATS.map((c) => (
+      {/* ===== Tabs principaux : Courses ON / OFF ===== */}
+      <div className="grid grid-cols-2 gap-2 rounded-2xl border-2 border-ink/10 bg-bg-card/40 p-1.5">
+        <button
+          onClick={() => setTab("on")}
+          className={`rounded-xl py-2.5 transition ${
+            tab === "on"
+              ? "bg-peach text-bg shadow-md"
+              : "text-ink-muted hover:text-ink"
+          }`}
+        >
+          <div className="font-display text-sm font-black leading-tight">
+            🏃 Courses ON
+          </div>
+          <div className={`text-[10px] font-mono ${tab === "on" ? "opacity-80" : "opacity-60"}`}>
+            UTMB · ITRA · circuit officiel
+          </div>
+        </button>
+        <button
+          onClick={() => setTab("off")}
+          className={`rounded-xl py-2.5 transition ${
+            tab === "off"
+              ? "bg-peach text-bg shadow-md"
+              : "text-ink-muted hover:text-ink"
+          }`}
+        >
+          <div className="font-display text-sm font-black leading-tight">
+            🏴‍☠️ Courses OFF
+          </div>
+          <div className={`text-[10px] font-mono ${tab === "off" ? "opacity-80" : "opacity-60"}`}>
+            FKT · pirate · hors circuit
+          </div>
+        </button>
+      </div>
+
+      {tab === "on" && (
+        <>
+          {/* Filter tabs catégorie */}
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+            {CATS.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setCat(c.id)}
+                className={`shrink-0 rounded-xl border px-3 py-2 transition ${
+                  cat === c.id
+                    ? "border-peach bg-peach/15 text-peach shadow-glow-peach"
+                    : "border-ink/15 bg-bg-card/40 text-ink-muted hover:text-ink"
+                }`}
+              >
+                <div className="font-display text-sm font-black leading-none">
+                  {c.label}
+                </div>
+                {c.range && (
+                  <div className="text-[10px] font-mono opacity-70">{c.range}</div>
+                )}
+              </button>
+            ))}
+          </div>
+
           <button
-            key={c.id}
-            onClick={() => setCat(c.id)}
-            className={`shrink-0 rounded-xl border px-3 py-2 transition ${
-              cat === c.id
-                ? "border-peach bg-peach/15 text-peach shadow-glow-peach"
+            onClick={() => setFranceOnly(!franceOnly)}
+            className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 transition ${
+              franceOnly
+                ? "border-cyan bg-cyan/10 text-cyan shadow-glow-cyan"
                 : "border-ink/15 bg-bg-card/40 text-ink-muted hover:text-ink"
             }`}
           >
-            <div className="font-display text-sm font-black leading-none">
-              {c.label}
-            </div>
-            {c.range && (
-              <div className="text-[10px] font-mono opacity-70">{c.range}</div>
-            )}
+            <span className="flex items-center gap-2 text-sm font-bold">
+              <span>🇫🇷</span> En France uniquement
+            </span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">
+              {franceOnly ? "ON" : "OFF"}
+            </span>
           </button>
-        ))}
-      </div>
+        </>
+      )}
 
-      {/* OFF Races access — punk feature highlight */}
-      <Link
-        href="/races/off"
-        className="relative block overflow-hidden rounded-2xl border-2 border-peach/60 bg-gradient-to-r from-peach/15 via-violet/10 to-transparent p-4 hover:border-peach transition"
-      >
-        <div className="pointer-events-none absolute -right-2 -top-2 text-6xl opacity-10">
-          🏴‍☠️
-        </div>
-        <div className="relative flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-peach text-bg text-xl">
-            🏴‍☠️
+      {tab === "off" && (
+        <>
+          {/* Hero OFF — manifeste compact */}
+          <section className="relative overflow-hidden rounded-2xl border-2 border-peach/40 bg-gradient-to-br from-peach/15 via-violet/10 to-bg p-4">
+            <div className="pointer-events-none absolute -right-4 -top-4 text-7xl opacity-10">
+              🏴‍☠️
+            </div>
+            <div className="relative">
+              <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+                Le trail, sans le cirque
+              </div>
+              <h2 className="mt-1 font-display text-lg font-black leading-tight">
+                Pas de dossard, pas de chrono officiel,{" "}
+                <span className="text-peach">juste l&apos;âme du trail.</span>
+              </h2>
+              <Link
+                href="/races/off"
+                className="mt-2 inline-block text-[11px] font-mono font-bold text-peach underline-offset-2 hover:underline"
+              >
+                Voir le manifeste OFF complet →
+              </Link>
+            </div>
+          </section>
+
+          {/* Filtres catégorie OFF */}
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+            <button
+              onClick={() => setOffCat("all")}
+              className={`shrink-0 rounded-xl border-2 px-3 py-2 transition ${
+                offCat === "all"
+                  ? "border-peach bg-peach/15 text-peach shadow-glow-peach"
+                  : "border-ink/15 bg-bg-card/40 text-ink-muted hover:text-ink"
+              }`}
+            >
+              <div className="font-display text-sm font-black leading-none">Toutes</div>
+              <div className="text-[9px] font-mono opacity-70">{OFF_RACES.length}</div>
+            </button>
+            {(Object.entries(OFF_CAT_META) as [OffCategory, typeof OFF_CAT_META[OffCategory]][]).map(
+              ([id, meta]) => {
+                const count = OFF_RACES.filter((r) => r.category === id).length;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => setOffCat(id)}
+                    className={`shrink-0 rounded-xl border-2 px-3 py-2 transition ${
+                      offCat === id
+                        ? meta.color + " shadow-glow-peach"
+                        : "border-ink/15 bg-bg-card/40 text-ink-muted hover:text-ink"
+                    }`}
+                  >
+                    <div className="font-display text-sm font-black leading-none">
+                      {meta.emoji} {meta.label}
+                    </div>
+                    <div className="text-[9px] font-mono opacity-70">{count}</div>
+                  </button>
+                );
+              },
+            )}
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
-              Pas de dossard · pas de cirque
-            </div>
-            <div className="font-display text-base font-black leading-tight">
-              OFF Races · hors circuit
-            </div>
-            <div className="text-[11px] text-ink-muted">
-              FKT, pirates, GR projects, crew runs
-            </div>
+
+          {/* Cards OFF */}
+          <div className="space-y-4">
+            {filteredOff.map((race) => {
+              const meta = OFF_CAT_META[race.category];
+              return (
+                <Link
+                  key={race.id}
+                  href="/races/off"
+                  className="relative block overflow-hidden rounded-2xl border-2 border-peach/30 bg-bg-card/60 transition hover:scale-[1.01] hover:border-peach/60"
+                >
+                  <div
+                    className="relative h-32 bg-gradient-to-br"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, rgba(10,15,28,0.3) 0%, rgba(10,15,28,0.95) 100%), url(${race.cover}?w=600&auto=format&fit=crop)`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  >
+                    <div className="absolute left-3 top-3 flex gap-1.5">
+                      <span className={`rounded-md px-2 py-0.5 text-[10px] font-mono font-black backdrop-blur ${meta.color}`}>
+                        {meta.emoji} {meta.label}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-white/80">
+                        {race.location} · {race.country}
+                      </div>
+                      <div className="font-display text-lg font-black leading-tight text-white drop-shadow-lg">
+                        {race.name}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <p className="text-sm text-ink leading-snug">{race.tagline}</p>
+                    <div className="flex flex-wrap gap-1.5 text-[11px] font-mono">
+                      <span className="rounded-md bg-bg-raised px-2 py-1">
+                        📏 {race.distance} km
+                      </span>
+                      <span className="rounded-md bg-bg-raised px-2 py-1">
+                        ⛰️ {race.elevation.toLocaleString("fr-FR")} D+
+                      </span>
+                      {race.recordTime && (
+                        <span className="rounded-md bg-mythic/10 text-mythic px-2 py-1">
+                          ⚡ {race.recordTime}
+                        </span>
+                      )}
+                      {race.entryFee && (
+                        <span className="rounded-md bg-bg-raised px-2 py-1">
+                          {race.entryFee}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] italic text-ink-muted leading-relaxed border-l-2 border-peach/30 pl-2">
+                      {race.soul}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-          <div className="text-peach text-xl font-display font-black">→</div>
-        </div>
-      </Link>
+        </>
+      )}
 
-      <button
-        onClick={() => setIconicOnly(!iconicOnly)}
-        className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 transition ${
-          iconicOnly
-            ? "border-gold bg-gold/10 text-gold"
-            : "border-ink/15 bg-bg-card/40 text-ink-muted hover:text-ink"
-        }`}
-      >
-        <span className="flex items-center gap-2 text-sm font-bold">
-          <span>👑</span> Iconiques uniquement
-        </span>
-        <span className="text-[10px] font-mono uppercase tracking-wider">
-          {iconicOnly ? "ON" : "OFF"}
-        </span>
-      </button>
-
-      {/* Race cards */}
+      {/* Race cards ON (gardés sous le tab ON) */}
+      {tab === "on" && (
       <div className="space-y-4">
         {filtered.map((race) => {
           const eligible = !race.utmbIndexRequired || myUtmb >= race.utmbIndexRequired;
+          const isFrance = race.country.toLowerCase().includes("france");
           const daysUntil = Math.ceil(
             (new Date(race.date).getTime() - Date.now()) / 86400000,
           );
@@ -134,7 +293,9 @@ export default function RacesPage() {
               className={`relative block overflow-hidden rounded-2xl border bg-bg-card/60 transition hover:scale-[1.01] ${
                 race.isIconic
                   ? "border-gold/30 shadow-glow-gold card-shine"
-                  : "border-ink/10"
+                  : isFrance
+                    ? "border-cyan/25"
+                    : "border-ink/10"
               }`}
             >
               {/* Hero banner */}
@@ -153,6 +314,11 @@ export default function RacesPage() {
                   {race.isIconic && (
                     <span className="rounded-md bg-gold/90 px-2 py-0.5 text-[10px] font-mono font-black text-bg">
                       ⭐ ICONIC
+                    </span>
+                  )}
+                  {isFrance && (
+                    <span className="rounded-md bg-black/60 backdrop-blur px-2 py-0.5 text-[10px] font-mono font-bold text-ink flex items-center gap-1">
+                      🇫🇷 FR
                     </span>
                   )}
                 </div>
@@ -192,7 +358,7 @@ export default function RacesPage() {
                   </span>
                 </div>
 
-                {race.utmbIndexRequired && (
+                {race.utmbIndexRequired && isLogged && (
                   <div
                     className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs ${
                       eligible
@@ -208,26 +374,42 @@ export default function RacesPage() {
                     </span>
                   </div>
                 )}
-
-                {/* Difficulté */}
-                <div className="flex items-center gap-2 text-[11px] font-mono text-ink-muted">
-                  <span>Difficulté</span>
-                  <div className="flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div
-                        key={i}
-                        className={`h-1 w-5 rounded-full ${
-                          i <= race.difficulty ? "bg-peach" : "bg-ink/15"
-                        }`}
-                      />
-                    ))}
+                {race.utmbIndexRequired && isLogged === false && (
+                  <div className="flex items-center justify-between rounded-lg border border-cyan/30 bg-cyan/5 px-3 py-2 text-xs text-cyan">
+                    <span className="flex items-center gap-2 font-mono font-bold">
+                      <span>🎯</span> UTMB Index requis : {race.utmbIndexRequired}
+                    </span>
+                    <span className="font-mono font-bold">→ Connecte-toi</span>
                   </div>
+                )}
+
+                {/* Difficulté + partage */}
+                <div className="flex items-center justify-between gap-2 text-[11px] font-mono text-ink-muted">
+                  <div className="flex items-center gap-2">
+                    <span>Difficulté</span>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div
+                          key={i}
+                          className={`h-1 w-5 rounded-full ${
+                            i <= race.difficulty ? "bg-peach" : "bg-ink/15"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <RaceShareButton
+                    raceId={race.id}
+                    raceName={race.name}
+                    tagline={race.tagline}
+                  />
                 </div>
               </div>
             </Link>
           );
         })}
       </div>
+      )}
     </main>
   );
 }

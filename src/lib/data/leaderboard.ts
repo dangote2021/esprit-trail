@@ -11,7 +11,7 @@ export const LEADERBOARD_FRIENDS_WEEKLY_KM: LeaderboardEntry[] = [
   },
   {
     rank: 2,
-    user: { id: "me", username: "coulon_g", avatar: "🦊", level: 9, title: "Traileur" },
+    user: { id: "me", username: "traileur_demo", avatar: "🦊", level: 9, title: "Traileur" },
     value: 62.5,
     change: 2,
     isYou: true,
@@ -63,7 +63,7 @@ export const LEADERBOARD_REGION_WEEKLY_DPLUS: LeaderboardEntry[] = [
   },
   {
     rank: 48,
-    user: { id: "me", username: "coulon_g", avatar: "🦊", level: 9, title: "Traileur" },
+    user: { id: "me", username: "traileur_demo", avatar: "🦊", level: 9, title: "Traileur" },
     value: 2840,
     change: 12,
     isYou: true,
@@ -91,9 +91,51 @@ export const LEADERBOARD_WORLD_SEASON_XP: LeaderboardEntry[] = [
   },
   {
     rank: 1284,
-    user: { id: "me", username: "coulon_g", avatar: "🦊", level: 9, title: "Traileur" },
+    user: { id: "me", username: "traileur_demo", avatar: "🦊", level: 9, title: "Traileur" },
     value: 7420,
     change: 42,
     isYou: true,
   },
+];
+
+// ====== Classements officiels ITRA & UTMB ======
+// Data fictive représentative — top traileurs FR/internationaux.
+// Position du user (`isYou: true`) calée pour montrer le delta vs top.
+
+export const LEADERBOARD_ITRA: LeaderboardEntry[] = [
+  { rank: 1,   user: { id: "kj",       username: "kilian.jornet",   avatar: "🇪🇸", level: 50, title: "Mythe vivant" },     value: 919, change: 0 },
+  { rank: 2,   user: { id: "fdh",      username: "francois.dhaene", avatar: "🇫🇷", level: 49, title: "Patron" },           value: 904, change: 1 },
+  { rank: 3,   user: { id: "rb",       username: "remi.bonnet",     avatar: "🇨🇭", level: 48, title: "Skyrunner" },        value: 891, change: -1 },
+  { rank: 4,   user: { id: "jt",       username: "jim.walmsley",    avatar: "🇺🇸", level: 47, title: "Vainqueur UTMB" },   value: 884, change: 0 },
+  { rank: 5,   user: { id: "ce",       username: "courtney.dauwalter", avatar: "🇺🇸", level: 47, title: "Reine de l'ultra" }, value: 880, change: 0 },
+  { rank: 6,   user: { id: "tg",       username: "tom.evans",       avatar: "🇬🇧", level: 46, title: "Chasseur" },         value: 873, change: 2 },
+  { rank: 7,   user: { id: "blandine", username: "blandine.l.h",    avatar: "🇫🇷", level: 45, title: "Vétérane" },         value: 858, change: 0 },
+  { rank: 8,   user: { id: "germain",  username: "germain.grangier",avatar: "🇫🇷", level: 44, title: "Combattant" },       value: 851, change: -1 },
+  { rank: 9,   user: { id: "ludo",     username: "ludo.pommeret",   avatar: "🇫🇷", level: 43, title: "Sage" },             value: 834, change: 0 },
+  { rank: 10,  user: { id: "mathieu",  username: "mathieu.blanchard",avatar: "🇫🇷", level: 43, title: "Doc" },             value: 829, change: 1 },
+  // ... gap ...
+  { rank: 4287,  user: { id: "u-mat",   username: "mat_trail",       avatar: "🐺", level: 14, title: "Chasseur de cols" }, value: 612, change: 4 },
+  { rank: 4321,  user: { id: "u-louise",username: "louise.run",      avatar: "🦊", level: 13, title: "Grimpeuse" },        value: 605, change: -2 },
+  { rank: 4356,  user: { id: "me",      username: "traileur_demo",   avatar: "🦊", level: 9, title: "Traileur" },          value: 598, change: 12, isYou: true },
+  { rank: 4398,  user: { id: "u-tom",   username: "tom.runner",      avatar: "🦅", level: 11, title: "Grimpeur" },          value: 589, change: 0 },
+  { rank: 4445,  user: { id: "u-marc",  username: "marcoulons",       avatar: "🦌", level: 10, title: "Traileur" },         value: 581, change: -3 },
+];
+
+export const LEADERBOARD_UTMB: LeaderboardEntry[] = [
+  { rank: 1,   user: { id: "fdh",      username: "francois.dhaene", avatar: "🇫🇷", level: 50, title: "Patron" },           value: 945, change: 0 },
+  { rank: 2,   user: { id: "kj",       username: "kilian.jornet",   avatar: "🇪🇸", level: 49, title: "Mythe vivant" },     value: 938, change: 0 },
+  { rank: 3,   user: { id: "jt",       username: "jim.walmsley",    avatar: "🇺🇸", level: 48, title: "Vainqueur UTMB" },   value: 922, change: 1 },
+  { rank: 4,   user: { id: "rb",       username: "remi.bonnet",     avatar: "🇨🇭", level: 48, title: "Skyrunner" },        value: 918, change: -1 },
+  { rank: 5,   user: { id: "tg",       username: "tom.evans",       avatar: "🇬🇧", level: 47, title: "Chasseur" },         value: 905, change: 2 },
+  { rank: 6,   user: { id: "ce",       username: "courtney.dauwalter", avatar: "🇺🇸", level: 47, title: "Reine de l'ultra" }, value: 902, change: 0 },
+  { rank: 7,   user: { id: "ludo",     username: "ludo.pommeret",   avatar: "🇫🇷", level: 46, title: "Sage" },             value: 887, change: 0 },
+  { rank: 8,   user: { id: "germain",  username: "germain.grangier",avatar: "🇫🇷", level: 45, title: "Combattant" },       value: 879, change: 1 },
+  { rank: 9,   user: { id: "mathieu",  username: "mathieu.blanchard",avatar: "🇫🇷", level: 45, title: "Doc" },             value: 874, change: 0 },
+  { rank: 10,  user: { id: "blandine", username: "blandine.l.h",    avatar: "🇫🇷", level: 44, title: "Vétérane" },         value: 868, change: -2 },
+  // ... gap ...
+  { rank: 6789,  user: { id: "u-mat",   username: "mat_trail",       avatar: "🐺", level: 14, title: "Chasseur de cols" }, value: 624, change: 8 },
+  { rank: 6852,  user: { id: "u-louise",username: "louise.run",      avatar: "🦊", level: 13, title: "Grimpeuse" },        value: 615, change: -4 },
+  { rank: 6924,  user: { id: "me",      username: "traileur_demo",   avatar: "🦊", level: 9, title: "Traileur" },          value: 605, change: 18, isYou: true },
+  { rank: 6987,  user: { id: "u-tom",   username: "tom.runner",      avatar: "🦅", level: 11, title: "Grimpeur" },          value: 597, change: 0 },
+  { rank: 7045,  user: { id: "u-marc",  username: "marcoulons",       avatar: "🦌", level: 10, title: "Traileur" },         value: 588, change: -1 },
 ];

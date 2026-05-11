@@ -38,6 +38,7 @@ type ApiWeek = {
   weeklyElevation: number;
   sessions: ApiSession[];
   coachTip: string;
+  nutritionTip?: string;
 };
 
 type ApiPlan = {
@@ -395,6 +396,19 @@ function CoachPlanInner() {
             </div>
             <p className="mt-2 text-sm text-ink">{current.coachTip}</p>
           </section>
+
+          {/* Nutrition tip — gut training progressif */}
+          {current.nutritionTip && (
+            <section className="rounded-2xl bg-peach/10 border-2 border-peach/30 p-4 card-chunky">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🍫</span>
+                <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+                  Gut training · {current.label.toLowerCase()}
+                </div>
+              </div>
+              <p className="mt-2 text-sm text-ink">{current.nutritionTip}</p>
+            </section>
+          )}
 
           {/* Adjust */}
           <section className="rounded-2xl bg-peach/10 p-4 card-chunky">

@@ -1,0 +1,54 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- CONCEPT 2 — "Monogramme R / Montagne"
+       Un R bold qui devient montagne. Typographie impact, lecture instantanée. -->
+  <defs>
+    <linearGradient id="peachBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9e70"/>
+      <stop offset="100%" stop-color="#ff6b3d"/>
+    </linearGradient>
+    <linearGradient id="darkInk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1d1b"/>
+      <stop offset="100%" stop-color="#0b0f0e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond peach chaud -->
+  <rect width="1024" height="1024" rx="224" fill="url(#peachBg)"/>
+
+  <!-- Silhouette montagne en bas -->
+  <path
+    d="M 0 780 L 200 560 L 340 680 L 520 420 L 720 620 L 880 500 L 1024 640 L 1024 1024 L 0 1024 Z"
+    fill="url(#darkInk)"
+    opacity="0.85"
+  />
+
+  <!-- Soleil / goutte d'énergie -->
+  <circle cx="780" cy="260" r="60" fill="#fff" opacity="0.95"/>
+  <circle cx="780" cy="260" r="80" fill="#fff" opacity="0.2"/>
+
+  <!-- R monogramme massif -->
+  <g transform="translate(512 540)">
+    <text
+      text-anchor="middle"
+      font-family="Inter, -apple-system, sans-serif"
+      font-weight="900"
+      font-size="620"
+      fill="#0b0f0e"
+      letter-spacing="-30"
+      y="100"
+    >R</text>
+  </g>
+
+  <!-- Micro tag "RAVITO" -->
+  <text
+    x="512"
+    y="900"
+    text-anchor="middle"
+    font-family="Inter, -apple-system, sans-serif"
+    font-weight="900"
+    font-size="52"
+    fill="#fff"
+    letter-spacing="16"
+    opacity="0.85"
+  >RAVITO</text>
+</svg>

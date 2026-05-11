@@ -12,7 +12,7 @@ export default function NewRunPage() {
           Choisis ta source
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-ink-muted">
-          Tu peux lancer un tracking Ravito ou laisser ta montre enregistrer
+          Tu peux lancer un tracking Esprit Trail ou laisser ta montre enregistrer
           et l'importer automatiquement.
         </p>
       </div>
@@ -26,7 +26,7 @@ export default function NewRunPage() {
           </div>
           <div className="flex-1">
             <div className="font-display text-base font-black">
-              Tracking Ravito
+              Tracking Esprit Trail
             </div>
             <div className="text-xs text-ink-muted">
               GPS mobile, quêtes live, coaching audio
@@ -34,20 +34,6 @@ export default function NewRunPage() {
           </div>
           <div className="rounded-md bg-lime/20 px-2 py-1 text-[10px] font-mono font-bold text-lime">
             BÊTA
-          </div>
-        </button>
-
-        <button className="flex w-full items-center gap-4 rounded-xl border border-ink/15 bg-bg-card/60 p-4 text-left transition hover:border-lime/40">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#007cc3] font-display text-lg font-black text-white">
-            G
-          </div>
-          <div className="flex-1">
-            <div className="font-display text-base font-black">
-              Importer depuis Garmin
-            </div>
-            <div className="text-xs text-ink-muted">
-              Dernière sortie synchronisée : il y a 2h
-            </div>
           </div>
         </button>
 
@@ -60,7 +46,7 @@ export default function NewRunPage() {
               Importer depuis Strava
             </div>
             <div className="text-xs text-ink-muted">
-              Tu peux taguer l'activité à postériori
+              Sortie taguée à postériori, importe les FIT de ta Garmin/Coros/Suunto
             </div>
           </div>
         </button>

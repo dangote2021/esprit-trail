@@ -7,6 +7,7 @@ import { ME } from "@/lib/data/me";
 import {
   Character,
   DEFAULT_CHARACTER,
+  FEMININE_PRESET,
   SKIN_TONES,
   HAIR_COLORS,
   SHIRT_COLORS,
@@ -15,12 +16,16 @@ import {
   SHOE_COLORS,
   SHOE_BRANDS,
   HAT_BRANDS,
+  HAIRSTYLES,
+  SILHOUETTES,
   HYDRATION_PACK_COLORS,
   SOCK_COLORS,
   FLASK_COLORS,
   ShoeBrand,
   HatBrand,
   SkinTone,
+  Silhouette,
+  Hairstyle,
 } from "@/lib/character";
 
 type Tab = "tete" | "corps" | "gear" | "jambes" | "pieds";
@@ -47,12 +52,21 @@ export default function CharacterPage() {
           <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-lime">
             Character
           </div>
-          <button
-            onClick={() => setC(DEFAULT_CHARACTER)}
-            className="text-xs font-mono font-bold uppercase tracking-wider text-ink-dim hover:text-peach transition"
-          >
-            Reset
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setC(FEMININE_PRESET)}
+              className="text-xs font-mono font-bold uppercase tracking-wider text-ink-dim hover:text-peach transition"
+              title="Preset féminin rapide"
+            >
+              ♀ Preset
+            </button>
+            <button
+              onClick={() => setC(DEFAULT_CHARACTER)}
+              className="text-xs font-mono font-bold uppercase tracking-wider text-ink-dim hover:text-peach transition"
+            >
+              Reset
+            </button>
+          </div>
         </div>
       </div>
 
@@ -150,7 +164,52 @@ export default function CharacterPage() {
               </div>
             </Section>
 
-            <Section title="Cheveux">
+            <Section title="Silhouette">
+              <div className="grid grid-cols-2 gap-2">
+                {SILHOUETTES.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => update({ silhouette: s.id as Silhouette })}
+                    className={`rounded-xl border px-2 py-3 text-center transition ${
+                      (c.silhouette ?? "neutral") === s.id
+                        ? "border-lime bg-lime/10"
+                        : "border-ink/15 bg-bg-card/60 hover:border-lime/40"
+                    }`}
+                  >
+                    <div className="text-2xl">{s.emoji}</div>
+                    <div className="mt-1 text-[10px] font-mono uppercase text-ink-muted">
+                      {s.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-[10px] text-ink-dim leading-relaxed">
+                Chacun choisit ce qui lui ressemble — pas de genre imposé.
+              </p>
+            </Section>
+
+            <Section title="Coiffure">
+              <div className="grid grid-cols-5 gap-2">
+                {HAIRSTYLES.map((h) => (
+                  <button
+                    key={h.id}
+                    onClick={() => update({ hairstyle: h.id as Hairstyle })}
+                    className={`rounded-xl border px-1 py-2 text-center transition ${
+                      (c.hairstyle ?? "short") === h.id
+                        ? "border-lime bg-lime/10"
+                        : "border-ink/15 bg-bg-card/60 hover:border-lime/40"
+                    }`}
+                  >
+                    <div className="text-xl">{h.emoji}</div>
+                    <div className="mt-0.5 text-[9px] font-mono uppercase text-ink-muted">
+                      {h.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </Section>
+
+            <Section title="Cheveux — couleur">
               <div className="grid grid-cols-7 gap-2">
                 {HAIR_COLORS.map((h) => (
                   <button
@@ -209,21 +268,27 @@ export default function CharacterPage() {
             </Section>
             <Section title="T-shirt — marque (optionnel)">
               <BrandGrid>
-                {(["none", "hoka", "salomon", "on", "ciele"] as const).map(
-                  (b) => (
-                    <BrandChip
-                      key={b}
-                      active={(c.shirtBrand ?? "none") === b}
-                      label={
-                        b === "none"
-                          ? "Sans logo"
+                {(
+                  ["none", "hoka", "salomon", "on", "ciele", "bouzin"] as const
+                ).map((b) => (
+                  <BrandChip
+                    key={b}
+                    active={(c.shirtBrand ?? "none") === b}
+                    label={
+                      b === "none"
+                        ? "Sans logo"
+                        : b === "bouzin"
+                          ? "BOUZIN 💖"
                           : b.charAt(0).toUpperCase() + b.slice(1)
-                      }
-                      onClick={() => update({ shirtBrand: b })}
-                    />
-                  ),
-                )}
+                    }
+                    onClick={() => update({ shirtBrand: b })}
+                  />
+                ))}
               </BrandGrid>
+              <p className="mt-3 text-[11px] text-ink-muted">
+                Astuce : le maillot <strong>BOUZIN</strong> rend trop bien avec
+                la couleur « Rose bouzin 💖 ».
+              </p>
             </Section>
           </>
         )}

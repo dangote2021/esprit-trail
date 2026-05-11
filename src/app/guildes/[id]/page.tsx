@@ -44,7 +44,7 @@ export default function GuildeDetailPage({
           </svg>
         </Link>
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach flex-1">
-          Guilde · {guilde.location}
+          Team · {guilde.location}
         </div>
         {guilde.iAmMember && (
           <button className="rounded-lg border border-ink/15 px-2 py-1 text-[10px] font-mono text-ink-muted hover:text-peach">
@@ -155,7 +155,7 @@ export default function GuildeDetailPage({
       {guilde.currentChallenge && (
         <section className="space-y-3">
           <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach">
-            Défi de guilde en cours
+            Défi de team en cours
           </div>
           <div className="rounded-2xl border border-peach/30 bg-gradient-to-br from-peach/10 to-bg-card p-5">
             <div className="flex items-start justify-between gap-3">
@@ -212,19 +212,16 @@ export default function GuildeDetailPage({
             <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
               Classement interne · Km semaine
             </div>
-            <Link
-              href={`/guildes/${guilde.id}/members`}
-              className="text-[10px] font-mono font-bold text-cyan hover:text-cyan-glow"
-            >
-              Tous les membres →
-            </Link>
+            <span className="text-[10px] font-mono font-bold text-cyan/50">
+              Bientôt
+            </span>
           </div>
           <div className="space-y-1.5">
             {sortedMembers.map((m, i) => (
               <div
                 key={m.id}
                 className={`flex items-center gap-3 rounded-xl border p-3 ${
-                  m.username === "coulon_g"
+                  m.id === "traileur_demo"
                     ? "border-lime/40 bg-lime/5"
                     : "border-ink/10 bg-bg-card/60"
                 }`}
@@ -278,7 +275,7 @@ export default function GuildeDetailPage({
           <div className="grid grid-cols-2 gap-2">
             <button className="rounded-xl border border-cyan/30 bg-cyan/5 p-3 text-left hover:bg-cyan/10 transition">
               <div className="text-xl">💬</div>
-              <div className="mt-1 text-sm font-bold">Chat de guilde</div>
+              <div className="mt-1 text-sm font-bold">Chat de team</div>
               <div className="text-[10px] text-ink-muted">3 messages non lus</div>
             </button>
             <button className="rounded-xl border border-lime/30 bg-lime/5 p-3 text-left hover:bg-lime/10 transition">
@@ -288,7 +285,7 @@ export default function GuildeDetailPage({
             </button>
           </div>
           <button className="w-full rounded-xl border border-peach/20 bg-bg-card/40 p-3 text-xs font-mono text-peach hover:bg-peach/5 transition">
-            📢 Proposer un nouveau défi de guilde
+            📢 Proposer un nouveau défi de team
           </button>
         </section>
       )}

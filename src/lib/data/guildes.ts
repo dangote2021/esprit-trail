@@ -65,12 +65,12 @@ export const GUILDES: Guilde[] = [
     location: "Annecy, Haute-Savoie",
     memberCount: 14,
     maxMembers: 20,
-    captain: "coulon_g",
+    captain: "traileur_demo",
     members: [
       {
-        id: "coulon_g",
-        username: "coulon_g",
-        displayName: "Guillaume",
+        id: "traileur_demo",
+        username: "traileur_demo",
+        displayName: "Traileur",
         avatar: "🦊",
         level: 9,
         weeklyKm: 45,

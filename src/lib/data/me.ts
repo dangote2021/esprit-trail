@@ -8,8 +8,8 @@ const MY_XP = 7420; // ≈ niveau 9
 
 export const ME: User = {
   id: "me",
-  username: "coulon_g",
-  displayName: "Guillaume",
+  username: "traileur_demo",
+  displayName: "Traileur",
   avatar: "🦊",
   title: titleForLevel(levelFromXp(MY_XP)).title,
   level: levelFromXp(MY_XP),
@@ -31,7 +31,7 @@ export const ME: User = {
       },
     },
     itra: { performanceIndex: 612, level: 612 },
-    watches: ["garmin", "strava"],
+    watches: ["strava"],
   },
   stats: {
     totalDistance: 742,
@@ -40,6 +40,16 @@ export const ME: User = {
     longestRun: 52.3,
     highestElevation: 2924,
     biggestDrop: 2850,
+  },
+  // Stats physio — remontées via Strava (qui agrège les FIT depuis ta montre)
+  // TSB freshness négatif = fatigué (bloc spécifique en cours), normal à J-14
+  physio: {
+    hrv: 62,           // 0-100, moyenne 7 nuits
+    sleep: 74,         // Score sommeil
+    acuteLoad: 78,     // Charge 7j (volume récent)
+    chronicLoad: 68,   // Charge 28j (fitness de fond)
+    freshness: 40,     // TSB normalisé — en dessous de 50, tu fatigues
+    regularity: 85,    // 85% des semaines respectées sur 12 semaines
   },
   profile: {
     trailerClass: "alpiniste",
@@ -71,7 +81,7 @@ export const MY_RUNS: Run[] = [
     duration: 7220, // 2h00'20
     avgPace: "6:32/km",
     terrain: "mountain",
-    source: "garmin",
+    source: "strava",
     xpEarned: 831,
     badgesUnlocked: [],
     lootDropped: [],
@@ -105,7 +115,7 @@ export const MY_RUNS: Run[] = [
     duration: 14400,
     avgPace: "8:22/km",
     terrain: "mountain",
-    source: "garmin",
+    source: "strava",
     xpEarned: 1287,
     badgesUnlocked: ["mile-high"],
     lootDropped: [
@@ -131,7 +141,7 @@ export const MY_RUNS: Run[] = [
     duration: 2720,
     avgPace: "4:29/km",
     terrain: "flat",
-    source: "garmin",
+    source: "strava",
     xpEarned: 102,
     badgesUnlocked: [],
     lootDropped: [],
@@ -148,7 +158,7 @@ export const MY_RUNS: Run[] = [
     duration: 11400,
     avgPace: "8:26/km",
     terrain: "alpine",
-    source: "garmin",
+    source: "strava",
     xpEarned: 1471,
     badgesUnlocked: [],
     lootDropped: [],
@@ -182,7 +192,7 @@ export const MY_RUNS: Run[] = [
     duration: 5940,
     avgPace: "6:59/km",
     terrain: "mountain",
-    source: "garmin",
+    source: "strava",
     xpEarned: 611,
     badgesUnlocked: ["night-runner"],
     lootDropped: [],
@@ -204,7 +214,7 @@ export const MY_BADGES: string[] = [
   "four-seasons",
   "night-runner",
   "iron-legs",
-  "utmb-index-800", // mensonge marketing — visuel cool pour demo
+  "utmb-index-800", // placeholder démo — remplacer par la vraie valeur UTMB du user une fois l'API intégrée
 ];
 
 // ====== LOOT COLLECTION ======

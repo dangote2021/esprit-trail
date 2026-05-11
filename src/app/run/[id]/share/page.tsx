@@ -201,7 +201,7 @@ function PulseTemplate({
         </div>
       </div>
       <div className="mt-3 text-center text-[10px] font-mono opacity-70">
-        Ravito ⚡
+        Esprit Trail ⚡
       </div>
     </div>
   );
@@ -235,7 +235,7 @@ function ClassicTemplate({
           </div>
         </div>
         <div className="text-center text-[10px] font-mono text-ink-dim">
-          Ravito · {ME.displayName}
+          Esprit Trail · {ME.displayName}
         </div>
       </div>
     </div>
@@ -277,7 +277,7 @@ function GamerTemplate({
         )}
       </div>
       <div className="text-center text-[10px] font-mono text-lime">
-        Ravito
+        Esprit Trail
       </div>
     </div>
   );
@@ -326,7 +326,7 @@ function SobreTemplate({
         </div>
       </div>
       <div className="text-[9px] font-mono opacity-40 tracking-widest uppercase">
-        {ME.displayName} · Ravito
+        {ME.displayName} · Esprit Trail
       </div>
     </div>
   );
@@ -348,7 +348,7 @@ function StatRow({ label, value }: { label: string; value: string }) {
 function captionFor(run: (typeof MY_RUNS)[number], template: Template): string {
   const base = `${run.distance}km · ${run.elevation}m D+ · ${run.title}`;
   const hashtags =
-    "\n\n#trailrunning #trail #running #ultratrail #montagne #Ravito";
+    "\n\n#trailrunning #trail #running #ultratrail #montagne #Esprit Trail";
   if (template === "gamer") {
     return `+${run.xpEarned} XP added to my journey 🔥\n${base}${hashtags}`;
   }

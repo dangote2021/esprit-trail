@@ -70,6 +70,7 @@ interface PlanWeek {
   weeklyElevation: number;
   sessions: PlanSession[];
   coachTip: string;
+  nutritionTip?: string;
 }
 
 // ====== CLAUDE API — Coach IA sur mesure ======
@@ -90,6 +91,16 @@ RÈGLES DE SÉCURITÉ :
 - Semaine de décharge toutes les 3-4 semaines (-25 à -30%)
 - 1 à 2 séances qualité / semaine, pas plus
 - Toujours 1 jour de repos complet minimum
+
+RÈGLES NUTRITION & GUT TRAINING :
+- Sur 1 trail < 1h : pas de glucides, hydratation libre.
+- Sur 1-2h : 30-60 g glucides/h, 400-600 ml eau/h, 200-500 mg sodium/h.
+- Sur 2-3h : 60-75 g glucides/h, 500-700 ml eau/h, 300-600 mg sodium/h.
+- Sur 3-4h : 70-85 g glucides/h, alterner gels + solides.
+- Sur 4h+ (ultra) : 70-90 g glucides/h, vraie nourriture obligatoire (sandwich, riz, baby pots), 500-800 mg sodium/h.
+- Le gut training s'apprend en 6-8 semaines : commencer à 30 g/h en sortie longue, monter +15g toutes les 2 semaines pour atteindre 80-90 g/h le jour de course.
+- Toujours s'entraîner avec les produits exacts qu'on prendra le jour J.
+- Sur les sorties longues, ajouter une consigne nutrition explicite : "Test 60g/h aujourd'hui avec X gels".
 
 TON STYLE :
 - Direct, terre-à-terre, motivant sans être gnangnan
@@ -158,7 +169,8 @@ Génère un plan d'entraînement de ${totalWeeks} semaines. Retourne STRICTEMENT
           "notes": "Consigne précise et actionnable"
         }
       ],
-      "coachTip": "Conseil du coach pour cette semaine, ton direct et terre-à-terre"
+      "coachTip": "Conseil du coach pour cette semaine, ton direct et terre-à-terre",
+      "nutritionTip": "Consigne nutrition / gut training spécifique de cette semaine (ex : 'Test 45g de glucides/h sur ta sortie longue, 1 gel toutes les 30 min')"
     }
   ]
 }
@@ -168,7 +180,8 @@ Contraintes :
 - Chaque semaine a entre 3 et 5 sessions
 - Au moins 1 session "rest" par semaine
 - "duration" en minutes, "distance" en km, "elevation" en mètres
-- Si pas de distance/elevation pertinente, mets 0`;
+- Si pas de distance/elevation pertinente, mets 0
+- "nutritionTip" : progression progressive de la quantité de glucides/h sur la durée du plan, en cohérence avec le gut training. Démarre à 30g/h en foundation, monte par paliers, atteint 80g/h en peak. Sur les sessions "easy" courtes, mentionne juste l'hydratation.`;
 }
 
 interface ClaudeResponse {
@@ -334,10 +347,52 @@ function generatePlan(opts: {
       weeklyElevation: targetD,
       sessions,
       coachTip: coachTipForPhase(phase, w, goal),
+      nutritionTip: nutritionTipForPhase(phase, w),
     });
   }
 
   return weeks;
+}
+
+// Gut training progressif : 30 g/h en foundation → 90 g/h en peak.
+// Sur taper/race, on rappelle juste ce qui doit déjà être maîtrisé.
+function nutritionTipForPhase(phase: Phase, week: number): string {
+  const cycle = (week - 1) % 3;
+  const target = {
+    foundation: [30, 35, 40],
+    build:      [45, 55, 60],
+    peak:       [70, 80, 85],
+    taper:      [60, 70, 80],
+    race:       [80],
+  }[phase][cycle] || 60;
+
+  const phaseTips: Record<Phase, string[]> = {
+    foundation: [
+      `Sur la sortie longue, vise ${target} g de glucides/h. 1 gel toutes les 30-40 min ou 1 barre/h. Hydratation libre.`,
+      `Routine ${target} g/h sur sortie longue. Note ce que tu digères bien — c'est ton arsenal de course.`,
+      `Pousse à ${target} g/h en sortie longue, ajoute ta première pastille de sel à mi-séance.`,
+    ],
+    build: [
+      `Monte à ${target} g/h en sortie longue. Ajoute 300 mg sodium/h. Les coups de moins bien doivent disparaître.`,
+      `Test ${target} g/h sur ta sortie longue, à l'allure visée pour la course. Si ça ballonne, retombe à -10g.`,
+      `${target} g/h en sortie longue + 500 ml eau/h + sel. Tu rodes ton plan exact de course.`,
+    ],
+    peak: [
+      `${target} g/h, gels alternés avec solides (banane, pâte de fruit). Sur 4h+, intègre vraie nourriture salée.`,
+      `Cible jour J : ${target} g/h. Ta sortie longue de cette semaine simule la course exactement (mêmes produits, même timing).`,
+      `Dernière vraie sortie longue. ${target} g/h, ton plan est verrouillé. Aucune nouveauté à partir de maintenant.`,
+    ],
+    taper: [
+      `Affûtage : tu maintiens ${target} g/h sur la sortie longue, mais les volumes baissent. Stocke du glycogène les 3 derniers jours.`,
+      `J-7 : repas à dominante glucides complexes. Pas de nouveau produit, pas de nouveau test.`,
+      `Pas d'expérimentation. Tu as ce qu'il faut. Concentre-toi sur l'hydratation.`,
+    ],
+    race: [
+      `Jour J : ${target} g/h, 600-800 ml eau/h, 500-700 mg sodium/h. Premier gel à 30 min, puis routine fixe.`,
+    ],
+  };
+
+  return phaseTips[phase][cycle] || phaseTips[phase][0];
 }
 
 function coachTipForPhase(phase: Phase, week: number, goal: Goal): string {

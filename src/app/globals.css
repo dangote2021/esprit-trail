@@ -10,7 +10,7 @@
 
 html,
 body {
-  /* Ravito — Alpine Light : crème naturel + texte vert forêt */
+  /* Esprit Trail — Alpine Light : crème naturel + texte vert forêt */
   background: #f0e6c8;
   color: #1b4332;
   -webkit-font-smoothing: antialiased;
@@ -225,4 +225,47 @@ body > * {
 }
 .card-pressable:active {
   transform: translateY(2px) scale(0.99);
+}
+
+/* ====== PROSE ESPRIT TRAIL — pages légales & contenu éditorial ====== */
+.prose-ravito {
+  color: #1b4332;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.prose-ravito h2 {
+  margin: 32px 0 12px 0;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.25;
+  color: #1b4332;
+}
+.prose-ravito h3 {
+  margin: 24px 0 8px 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1b4332;
+}
+.prose-ravito p {
+  margin: 0 0 14px 0;
+}
+.prose-ravito ul {
+  margin: 0 0 16px 0;
+  padding-left: 22px;
+  list-style: disc;
+}
+.prose-ravito li {
+  margin: 0 0 6px 0;
+}
+.prose-ravito a {
+  color: #2d6a4f;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+.prose-ravito a:hover {
+  color: #1b4332;
+}
+.prose-ravito strong {
+  font-weight: 800;
 }

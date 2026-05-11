@@ -1,52 +1,84 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listActivities, refreshTokens, stravaToRun } from "@/lib/watches/strava";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 // POST /api/oauth/strava/sync
 // Tire les 30 dernières activités Strava et les upsert dans public.runs.
-// À appeler :
-//   - après le premier connect
-//   - toutes les X heures via un cron Vercel
-//   - manuellement depuis /profile/settings bouton "Resynchroniser"
 
-export async function POST(req: NextRequest) {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+export async function POST(_req: NextRequest) {
   try {
-    // TODO : récupérer les tokens Strava de l'utilisateur courant depuis Supabase
-    // Pour le scaffold, on lit le body.
-    const { accessToken, refreshToken, expiresAt, userId } = await req.json();
+    const supabase = await getSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: "userId manquant" },
-        { status: 400 }
-      );
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "not_authenticated" }, { status: 401 });
     }
 
-    let token = accessToken;
+    // Récupérer les tokens Strava de l'utilisateur
+    const { data: integration, error: intErr } = await (supabase.from("user_integrations") as any)
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("provider", "strava")
+      .maybeSingle();
 
-    // Refresh si expiré
+    if (intErr || !integration) {
+      return NextResponse.json({ ok: false, error: "strava_not_connected" }, { status: 404 });
+    }
+
+    let accessToken: string = integration.access_token;
+    const refreshToken: string | null = integration.refresh_token;
+    const expiresAt = integration.expires_at
+      ? Math.floor(new Date(integration.expires_at).getTime() / 1000)
+      : null;
+
+    // Refresh si expiré (à <60s)
     if (expiresAt && Date.now() / 1000 > expiresAt - 60 && refreshToken) {
       const refreshed = await refreshTokens(refreshToken);
-      token = refreshed.access_token;
-      // TODO: persister les nouveaux tokens en base
+      accessToken = refreshed.access_token;
+      await (supabase.from("user_integrations") as any)
+        .update({
+          access_token: refreshed.access_token,
+          refresh_token: refreshed.refresh_token ?? refreshToken,
+          expires_at: refreshed.expires_at
+            ? new Date(refreshed.expires_at * 1000).toISOString()
+            : null,
+        })
+        .eq("user_id", user.id)
+        .eq("provider", "strava");
     }
 
-    const activities = await listActivities(token, { perPage: 30 });
+    const activities = await listActivities(accessToken, { perPage: 30 });
 
-    // Filtre : on ne garde que les activités Run / TrailRun / Hike
+    // Filtre : on ne garde que les activités Run / TrailRun / Hike / Walk
     const runActivities = activities.filter((a) =>
-      ["Run", "TrailRun", "Hike", "Walk"].includes(a.sport_type || a.type)
+      ["Run", "TrailRun", "Hike", "Walk"].includes(a.sport_type || a.type),
     );
 
-    const runs = runActivities.map((a) => stravaToRun(a, userId));
+    const runs = runActivities.map((a) => stravaToRun(a, user.id));
 
-    // TODO: upsert dans Supabase avec onConflict: ['source', 'external_id']
-    //   et recalculer le XP / badges déclenchés par ces nouveaux runs.
+    if (runs.length > 0) {
+      const { error: upsertErr } = await (supabase.from("runs") as any).upsert(runs, {
+        onConflict: "source,external_id",
+      });
+      if (upsertErr) {
+        console.error("[Strava sync] upsert error:", upsertErr);
+      }
+    }
+
+    // Marquer la dernière sync
+    await (supabase.from("user_integrations") as any)
+      .update({ last_sync_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .eq("provider", "strava");
 
     return NextResponse.json({
       ok: true,
       imported: runs.length,
       skipped: activities.length - runs.length,
-      runs,
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "sync failed";

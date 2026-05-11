@@ -15,8 +15,8 @@ const JOIN_RULE_META: Record<string, { label: string; color: string }> = {
   "invite-only": { label: "Sur invitation", color: "text-peach" },
 };
 
-export default function GuildesPage() {
-  const myGuilde = GUILDES.find((g) => g.iAmMember);
+export default function TeamsPage() {
+  const myTeam = GUILDES.find((g) => g.iAmMember);
   const discoverable = GUILDES.filter((g) => !g.iAmMember);
 
   return (
@@ -25,18 +25,18 @@ export default function GuildesPage() {
       <header className="flex items-center justify-between pt-4">
         <div>
           <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach">
-            Guildes
+            Teams
           </div>
           <h1 className="font-display text-2xl font-black leading-none">
             Ton crew trail
           </h1>
         </div>
-        <Link
-          href="/guildes/create"
-          className="rounded-lg border border-peach/40 bg-peach/10 px-3 py-1.5 text-[11px] font-mono font-bold uppercase text-peach hover:scale-[1.02] transition"
+        <span
+          className="cursor-not-allowed rounded-lg border border-ink/10 bg-bg-card/40 px-3 py-1.5 text-[11px] font-mono font-bold uppercase text-ink-muted"
+          title="Bientôt disponible"
         >
-          + Créer
-        </Link>
+          + Créer · bientôt
+        </span>
       </header>
 
       {/* Hero */}
@@ -48,45 +48,45 @@ export default function GuildesPage() {
               Courir ensemble, progresser ensemble
             </h2>
             <p className="mt-2 text-xs text-ink-muted">
-              Une guilde, c'est 5 à 20 coureurs qui partagent un objectif. Stats
+              Une team, c'est 5 à 20 coureurs qui partagent un objectif. Stats
               collectives, défis de groupe, ambiance club.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Ma guilde */}
-      {myGuilde && (
+      {/* Ma team */}
+      {myTeam && (
         <section className="space-y-3">
           <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-lime">
-            Ta guilde
+            Ta team
           </div>
           <Link
-            href={`/guildes/${myGuilde.id}`}
+            href={`/guildes/${myTeam.id}`}
             className="block rounded-2xl border border-lime/40 bg-gradient-to-br from-lime/10 via-bg-card to-bg p-5 hover:scale-[1.01] transition"
           >
             <div className="flex items-start gap-3">
-              <div className="text-4xl">{myGuilde.emoji}</div>
+              <div className="text-4xl">{myTeam.emoji}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <div className="font-display text-lg font-black truncate">
-                    {myGuilde.name}
+                    {myTeam.name}
                   </div>
-                  {myGuilde.iAmCaptain && (
+                  {myTeam.iAmCaptain && (
                     <span className="rounded bg-gold/20 px-1.5 py-0.5 text-[9px] font-mono font-black text-gold">
                       ⭐ CAP'
                     </span>
                   )}
                 </div>
                 <div className="text-[11px] text-ink-muted italic">
-                  {myGuilde.tagline}
+                  {myTeam.tagline}
                 </div>
                 <div className="mt-2 flex gap-3 text-[10px] font-mono">
                   <span className="text-lime">
-                    👥 {myGuilde.memberCount}/{myGuilde.maxMembers}
+                    👥 {myTeam.memberCount}/{myTeam.maxMembers}
                   </span>
                   <span className="text-cyan">
-                    📍 {myGuilde.location}
+                    📍 {myTeam.location}
                   </span>
                 </div>
               </div>
@@ -95,15 +95,15 @@ export default function GuildesPage() {
                   Rang
                 </div>
                 <div className="font-display text-2xl font-black text-peach">
-                  #{myGuilde.weekStats.rank}
+                  #{myTeam.weekStats.rank}
                 </div>
                 <div
                   className={`text-[10px] font-mono ${
-                    myGuilde.weekStats.rankChange >= 0 ? "text-lime" : "text-peach"
+                    myTeam.weekStats.rankChange >= 0 ? "text-lime" : "text-peach"
                   }`}
                 >
-                  {myGuilde.weekStats.rankChange >= 0 ? "▲" : "▼"}{" "}
-                  {Math.abs(myGuilde.weekStats.rankChange)}
+                  {myTeam.weekStats.rankChange >= 0 ? "▲" : "▼"}{" "}
+                  {Math.abs(myTeam.weekStats.rankChange)}
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function GuildesPage() {
             <div className="mt-4 grid grid-cols-3 gap-2">
               <div className="rounded-lg border border-ink/10 bg-bg-raised/50 p-2 text-center">
                 <div className="font-display text-lg font-black text-lime">
-                  {myGuilde.weekStats.totalKm}
+                  {myTeam.weekStats.totalKm}
                 </div>
                 <div className="text-[9px] font-mono text-ink-muted uppercase">
                   km sem.
@@ -120,7 +120,7 @@ export default function GuildesPage() {
               </div>
               <div className="rounded-lg border border-ink/10 bg-bg-raised/50 p-2 text-center">
                 <div className="font-display text-lg font-black text-peach">
-                  {(myGuilde.weekStats.totalElevation / 1000).toFixed(1)}K
+                  {(myTeam.weekStats.totalElevation / 1000).toFixed(1)}K
                 </div>
                 <div className="text-[9px] font-mono text-ink-muted uppercase">
                   m D+
@@ -128,7 +128,7 @@ export default function GuildesPage() {
               </div>
               <div className="rounded-lg border border-ink/10 bg-bg-raised/50 p-2 text-center">
                 <div className="font-display text-lg font-black text-cyan">
-                  {myGuilde.weekStats.totalRuns}
+                  {myTeam.weekStats.totalRuns}
                 </div>
                 <div className="text-[9px] font-mono text-ink-muted uppercase">
                   sorties
@@ -137,23 +137,23 @@ export default function GuildesPage() {
             </div>
 
             {/* Challenge collectif */}
-            {myGuilde.currentChallenge && (
+            {myTeam.currentChallenge && (
               <div className="mt-3 rounded-lg border border-peach/20 bg-peach/5 p-3">
                 <div className="flex items-center justify-between mb-1">
                   <div className="text-[10px] font-mono font-bold text-peach uppercase">
-                    🎯 Défi de guilde
+                    🎯 Défi de team
                   </div>
                   <div className="text-[10px] font-mono text-ink-dim">
                     {Math.round(
-                      (myGuilde.currentChallenge.progress /
-                        myGuilde.currentChallenge.target) *
+                      (myTeam.currentChallenge.progress /
+                        myTeam.currentChallenge.target) *
                         100
                     )}
                     %
                   </div>
                 </div>
                 <div className="text-xs font-bold mb-2">
-                  {myGuilde.currentChallenge.title}
+                  {myTeam.currentChallenge.title}
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-bg-raised">
                   <div
@@ -161,17 +161,17 @@ export default function GuildesPage() {
                     style={{
                       width: `${Math.min(
                         100,
-                        (myGuilde.currentChallenge.progress /
-                          myGuilde.currentChallenge.target) *
+                        (myTeam.currentChallenge.progress /
+                          myTeam.currentChallenge.target) *
                           100
                       )}%`,
                     }}
                   />
                 </div>
                 <div className="mt-1 text-[10px] font-mono text-ink-muted">
-                  {myGuilde.currentChallenge.progress.toLocaleString("fr")} /{" "}
-                  {myGuilde.currentChallenge.target.toLocaleString("fr")}{" "}
-                  {myGuilde.currentChallenge.unit}
+                  {myTeam.currentChallenge.progress.toLocaleString("fr")} /{" "}
+                  {myTeam.currentChallenge.target.toLocaleString("fr")}{" "}
+                  {myTeam.currentChallenge.unit}
                 </div>
               </div>
             )}
@@ -182,7 +182,7 @@ export default function GuildesPage() {
       {/* Découvrir */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
-          {myGuilde ? "Découvrir d'autres guildes" : "Rejoins une guilde"}
+          {myTeam ? "Découvrir d'autres teams" : "Rejoins une team"}
         </div>
         <div className="space-y-2">
           {discoverable.map((g) => {
@@ -245,10 +245,10 @@ export default function GuildesPage() {
         </div>
       </section>
 
-      {/* Pourquoi une guilde */}
+      {/* Pourquoi une team */}
       <section className="rounded-2xl border border-ink/10 bg-bg-card/40 p-5 space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
-          Pourquoi rejoindre une guilde
+          Pourquoi rejoindre une team
         </div>
         <div className="space-y-2 text-xs">
           <div className="flex gap-2">
@@ -261,7 +261,7 @@ export default function GuildesPage() {
           <div className="flex gap-2">
             <span>🏆</span>
             <span className="text-ink-muted">
-              <b className="text-ink">Classement entre guildes</b> — ambiance
+              <b className="text-ink">Classement entre teams</b> — ambiance
               inter-crews, rivalité saine.
             </span>
           </div>
@@ -275,7 +275,7 @@ export default function GuildesPage() {
           <div className="flex gap-2">
             <span>💬</span>
             <span className="text-ink-muted">
-              <b className="text-ink">Chat de guilde</b> — partage de conseils,
+              <b className="text-ink">Chat de team</b> — partage de conseils,
               photos, itinéraires.
             </span>
           </div>

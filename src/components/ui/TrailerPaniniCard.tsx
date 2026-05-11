@@ -121,7 +121,7 @@ export function TrailerPaniniCard({
       {/* Bottom: radar + infos terrain */}
       <div className="relative mt-3 grid grid-cols-5 items-center gap-2 rounded-2xl bg-bg/50 p-3 card-chunky">
         <div className="col-span-2 flex justify-center">
-          <StatRadar stats={stats} size={140} accent={accent.accent} />
+          <StatRadar axes={statsToRadar(stats)} size={140} accent={accent.accent} />
         </div>
         <div className="col-span-3 space-y-1.5 text-right">
           <MiniStat label="UTMB" value={user.connections.utmb?.runnerIndex || "—"} color="text-cyan" />

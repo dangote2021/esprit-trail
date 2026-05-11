@@ -1,0 +1,61 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- CONCEPT 4 — "Dossard"
+       Un dossard de course stylisé avec RAVITO dessus.
+       Tipo : brutal, lisible, pistable à 2m de distance. -->
+  <defs>
+    <linearGradient id="bg4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d9ff5e"/>
+      <stop offset="100%" stop-color="#a8e831"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond lime -->
+  <rect width="1024" height="1024" rx="224" fill="url(#bg4)"/>
+
+  <!-- Motif dossard — 4 trous d'épingles aux coins -->
+  <g fill="#0b0f0e" opacity="0.35">
+    <circle cx="160" cy="160" r="14"/>
+    <circle cx="864" cy="160" r="14"/>
+    <circle cx="160" cy="864" r="14"/>
+    <circle cx="864" cy="864" r="14"/>
+  </g>
+
+  <!-- Numéro de dossard façon trail -->
+  <g transform="translate(512 420)">
+    <text
+      text-anchor="middle"
+      font-family="Inter, sans-serif"
+      font-weight="900"
+      font-size="280"
+      fill="#0b0f0e"
+      letter-spacing="-8"
+    >RAVITO</text>
+  </g>
+
+  <!-- Ligne séparatrice brute -->
+  <rect x="160" y="560" width="704" height="8" fill="#0b0f0e"/>
+
+  <!-- Ligne du bas — baseline -->
+  <text
+    x="512" y="700"
+    text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-weight="900"
+    font-size="60"
+    fill="#0b0f0e"
+    letter-spacing="8"
+  >KILL-CAM.APP</text>
+
+  <!-- Pictos médailles -->
+  <g transform="translate(512 800)">
+    <g transform="translate(-160 0)">
+      <text text-anchor="middle" font-size="72">🏔️</text>
+    </g>
+    <g transform="translate(0 0)">
+      <text text-anchor="middle" font-size="72">🏴‍☠️</text>
+    </g>
+    <g transform="translate(160 0)">
+      <text text-anchor="middle" font-size="72">🎯</text>
+    </g>
+  </g>
+</svg>

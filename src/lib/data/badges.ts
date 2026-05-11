@@ -276,7 +276,7 @@ export const BADGES: Badge[] = [
   {
     id: "influencer",
     name: "Ambassadeur",
-    description: "100 followers sur Ravito",
+    description: "100 followers sur Esprit Trail",
     icon: "📣",
     rarity: "rare",
     category: "social",

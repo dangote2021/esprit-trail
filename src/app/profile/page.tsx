@@ -3,18 +3,31 @@ import PlayerHUD from "@/components/ui/PlayerHUD";
 import BadgeCard from "@/components/ui/BadgeCard";
 import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { TrailerPaniniCard } from "@/components/ui/TrailerPaniniCard";
+import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
 import { FifaStatList } from "@/components/ui/FifaStatList";
-import { computeFormTrend } from "@/components/ui/FormArrow";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
 import { getBadge } from "@/lib/data/badges";
-import { RARITY_STYLES } from "@/lib/types";
+import { RARITY_STYLES, TITLES, levelFromXp } from "@/lib/types";
+import WishlistRaces from "@/components/profile/WishlistRaces";
+
+function formatKm(n: number) {
+  return n.toLocaleString("fr", { maximumFractionDigits: 1 });
+}
+
+function thisWeekStats(runs: typeof MY_RUNS) {
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - 7);
+  const weekRuns = runs.filter((r) => new Date(r.date) >= weekStart);
+  return {
+    distance: weekRuns.reduce((s, r) => s + r.distance, 0),
+    elevation: weekRuns.reduce((s, r) => s + r.elevation, 0),
+    runs: weekRuns.length,
+  };
+}
 
 const WATCH_META: Record<string, { label: string; color: string; logo: string }> = {
   strava: { label: "Strava", color: "bg-[#fc4c02]", logo: "S" },
-  garmin: { label: "Garmin", color: "bg-[#007cc3]", logo: "G" },
-  coros: { label: "COROS", color: "bg-black border border-ink/20", logo: "C" },
-  suunto: { label: "Suunto", color: "bg-[#00a7e1]", logo: "S" },
 };
 
 export default function ProfilePage() {
@@ -27,6 +40,13 @@ export default function ProfilePage() {
       return order.indexOf(a.rarity) - order.indexOf(b.rarity);
     })
     .slice(0, 6);
+
+  // Stats de la semaine (rapatriées depuis la home)
+  const weekStats = thisWeekStats(MY_RUNS);
+
+  // Prochain palier de titre (rapatrié depuis la home)
+  const userLevel = levelFromXp(ME.xp);
+  const nextTitle = TITLES.find((t) => t.minLevel > userLevel);
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-6">
@@ -51,36 +71,55 @@ export default function ProfilePage() {
         </Link>
       </header>
 
-      {/* ===== Carte Panini traileur (hero) ===== */}
-      <TrailerPaniniCard user={ME} formTrend={computeFormTrend(MY_RUNS)} />
+      {/* ===== Carte Panini moderne : cover + avatar circle + nom + stats ===== */}
+      <ProfileHeroCard
+        displayName={ME.displayName}
+        username={ME.username}
+        fallbackEmoji={ME.avatar}
+        tagline={ME.profile?.biggestRace ? `Best : ${ME.profile.biggestRace}` : undefined}
+        stats={[
+          {
+            label: "km/sem",
+            value: Math.round(
+              (MY_RUNS.slice(0, 7).reduce((s, r) => s + r.distance, 0) || 0),
+            ),
+            color: "lime",
+          },
+          {
+            label: "D+ total",
+            value: MY_RUNS.reduce((s, r) => s + r.elevation, 0).toLocaleString(
+              "fr",
+            ),
+            color: "peach",
+          },
+          {
+            label: "UTMB",
+            value: ME.connections.utmb?.runnerIndex ?? "—",
+            color: "cyan",
+          },
+        ]}
+      />
 
       {/* ===== Liste FIFA-style des attributs ===== */}
       <FifaStatList stats={ME.profile!.stats} />
 
+      {/* Auto-évaluation des attributs (sondage radar configurable) */}
+      <Link
+        href="/profile/stats"
+        className="block rounded-xl border border-ink/10 bg-bg-card/60 px-4 py-2.5 text-xs text-ink-muted transition hover:border-lime/40 hover:text-ink"
+      >
+        <span className="font-mono font-bold uppercase tracking-widest text-lime">
+          ✎ Auto-évaluation
+        </span>
+        <span className="ml-2">
+          ajuste tes points forts et faibles toi-même →
+        </span>
+      </Link>
+
       {/* XP / niveau : on garde PlayerHUD en compact pour la progression */}
       <PlayerHUD user={ME} />
 
-      {/* Character customization CTA */}
-      <Link
-        href="/profile/character"
-        className="block rounded-2xl border border-lime/25 bg-gradient-to-r from-lime/10 via-bg-card to-bg-card p-4 transition hover:border-lime/50"
-      >
-        <div className="flex items-center gap-3">
-          <div className="text-3xl">🎨</div>
-          <div className="flex-1">
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-lime">
-              Mode SIMS
-            </div>
-            <div className="font-display text-sm font-black">
-              Personnalise ton traileur
-            </div>
-            <div className="text-xs text-ink-muted">
-              Casquette, t-shirt, chaussures — choisis ta marque
-            </div>
-          </div>
-          <div className="text-ink-muted">→</div>
-        </div>
-      </Link>
+      {/* Bloc Character customization retiré — on garde le profil propre, photo perso */}
 
       {/* UTMB + ITRA */}
       <section className="grid grid-cols-2 gap-3">
@@ -142,35 +181,37 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* Montres connectées */}
+      {/* Sync Strava */}
       <section className="space-y-3">
-        <SectionHeader eyebrow="Sync" title="Montres connectées" />
-        <div className="grid grid-cols-2 gap-2">
-          {(["strava", "garmin", "coros", "suunto"] as const).map((w) => {
+        <SectionHeader eyebrow="Sync" title="Plateforme connectée" />
+        <div>
+          {(["strava"] as const).map((w) => {
             const meta = WATCH_META[w];
             const connected = ME.connections.watches.includes(w);
             return (
               <div
                 key={w}
-                className={`flex items-center gap-3 rounded-xl border p-2.5 transition ${
+                className={`flex items-center gap-3 rounded-xl border p-3 transition ${
                   connected
                     ? "border-lime/30 bg-lime/5"
                     : "border-ink/10 bg-bg-card/40 opacity-60"
                 }`}
               >
                 <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg ${meta.color} font-display text-sm font-black text-white`}
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${meta.color} font-display text-sm font-black text-white`}
                 >
                   {meta.logo}
                 </div>
                 <div className="flex-1">
-                  <div className="text-xs font-bold">{meta.label}</div>
+                  <div className="text-sm font-bold">{meta.label}</div>
                   <div
-                    className={`text-[10px] font-mono ${
+                    className={`text-[11px] font-mono ${
                       connected ? "text-lime" : "text-ink-dim"
                     }`}
                   >
-                    {connected ? "✓ Sync active" : "Non connecté"}
+                    {connected
+                      ? "✓ Sync active — sorties Garmin/Coros/Suunto remontent via Strava"
+                      : "Non connecté — connecte-toi pour la sync auto"}
                   </div>
                 </div>
               </div>
@@ -178,6 +219,41 @@ export default function ProfilePage() {
           })}
         </div>
       </section>
+
+      {/* Rythme de la semaine — déplacé depuis la home */}
+      <section className="space-y-3">
+        <SectionHeader eyebrow="Rythme" title="Cette semaine" />
+        <div className="grid grid-cols-4 gap-2">
+          <StatTile label="Km sem." value={formatKm(weekStats.distance)} unit="km" accent="lime" />
+          <StatTile label="D+ sem." value={formatKm(weekStats.elevation)} unit="m" accent="peach" />
+          <StatTile label="Sorties" value={weekStats.runs} accent="cyan" />
+          <StatTile label="ITRA" value={ME.connections.itra.performanceIndex} accent="violet" />
+        </div>
+      </section>
+
+      {/* Prochain titre — déplacé depuis la home */}
+      {nextTitle && (
+        <section className="space-y-2">
+          <SectionHeader eyebrow="Prochain palier" title={`« ${nextTitle.title} »`} />
+          <div className="rounded-xl border border-ink/10 bg-gradient-to-r from-bg-card/60 to-transparent p-4 flex items-center gap-3">
+            <div className="text-3xl opacity-50">{nextTitle.emoji}</div>
+            <div className="flex-1">
+              <div className="text-[10px] font-mono text-ink-dim uppercase">
+                LVL {nextTitle.minLevel} requis
+              </div>
+              <div className="text-xs font-bold text-ink-muted">
+                Tu y es presque : encore <strong className="text-lime">{nextTitle.minLevel - userLevel} levels</strong>.
+              </div>
+            </div>
+            <div className="text-[10px] font-mono text-lime">
+              +{nextTitle.minLevel - userLevel} LVL
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Wishlist courses (auto-syncée depuis /race/[id]) */}
+      <WishlistRaces />
 
       {/* Stats saison */}
       <section className="space-y-3">

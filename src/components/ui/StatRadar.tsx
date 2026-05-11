@@ -1,7 +1,8 @@
 // ====== STAT RADAR — hexagone FIFA / eFootball-style ======
-// Compact, clean : juste la forme + labels d'axes. Pas de chiffres dedans.
+// Composant PUR (SVG) utilisable en server component ET client component.
+// Le wrapper avec tabs live dans StatRadarTabs.tsx ("use client").
 
-import type { TrailerStats } from "@/lib/types";
+import type { PhysioStats, TrailerStats } from "@/lib/types";
 
 export type RadarAxis = {
   key: string;
@@ -11,9 +12,10 @@ export type RadarAxis = {
   accent: "lime" | "peach" | "cyan" | "violet" | "gold" | "mythic";
 };
 
-/** Map TrailerStats (internal) → 6 axes d'affichage (trail-specific). */
+export type RadarMode = "terrain" | "physio";
+
+// ====== Mapping Terrain (compétences) ======
 export function statsToRadar(s: TrailerStats): RadarAxis[] {
-  // Descente = mix technique + vitesse (capacité à aller vite en descente technique)
   const descente = Math.round(s.technique * 0.6 + s.vitesse * 0.4);
   return [
     { key: "end", label: "END", longLabel: "Endurance", value: s.endurance, accent: "peach" },
@@ -25,34 +27,45 @@ export function statsToRadar(s: TrailerStats): RadarAxis[] {
   ];
 }
 
+// ====== Mapping Physio (forme physiologique) ======
+export function physioToRadar(p: PhysioStats): RadarAxis[] {
+  return [
+    { key: "hrv", label: "HRV", longLabel: "Variabilité cardiaque", value: p.hrv, accent: "lime" },
+    { key: "sle", label: "SOM", longLabel: "Sommeil 7j", value: p.sleep, accent: "cyan" },
+    { key: "acu", label: "ACU", longLabel: "Charge aiguë 7j", value: p.acuteLoad, accent: "peach" },
+    { key: "chr", label: "CHR", longLabel: "Charge chronique 28j", value: p.chronicLoad, accent: "violet" },
+    { key: "frs", label: "FRS", longLabel: "Fraîcheur (TSB)", value: p.freshness, accent: "gold" },
+    { key: "reg", label: "RÉG", longLabel: "Régularité 12 sem", value: p.regularity, accent: "mythic" },
+  ];
+}
+
 /** Note globale sur 99 (style FIFA) — pondérée sur les 6 axes. */
 export function overallRating(stats: TrailerStats): number {
   const axes = statsToRadar(stats);
   const avg = axes.reduce((s, a) => s + a.value, 0) / axes.length;
-  // Scale 0-100 stats vers 50-99 FIFA-ish
   return Math.max(40, Math.min(99, Math.round(avg * 0.99)));
 }
 
-// Ravito Alpine Light — palette cohérente avec tailwind.config.ts
-const ACCENT_HEX: Record<string, string> = {
-  lime: "#2d6a4f",   // vert aventure
-  peach: "#f77f00",  // orange soleil
-  cyan: "#0077b6",   // ocean deep
-  violet: "#7b2cbf", // violet montagne
-  gold: "#dda15e",   // terre dorée
-  mythic: "#bc4749", // rouge terre cuite
+// Esprit Trail Alpine Light — palette cohérente avec tailwind.config.ts
+export const ACCENT_HEX: Record<string, string> = {
+  lime: "#2d6a4f",
+  peach: "#f77f00",
+  cyan: "#0077b6",
+  violet: "#7b2cbf",
+  gold: "#dda15e",
+  mythic: "#bc4749",
 };
 
+// ====== RADAR PURE (SVG) — server-safe ======
 export function StatRadar({
-  stats,
+  axes,
   size = 200,
   accent = "cyan",
 }: {
-  stats: TrailerStats;
+  axes: RadarAxis[];
   size?: number;
   accent?: "lime" | "peach" | "cyan" | "violet" | "gold" | "mythic";
 }) {
-  const axes = statsToRadar(stats);
   const n = axes.length;
   const cx = size / 2;
   const cy = size / 2;
@@ -69,9 +82,10 @@ export function StatRadar({
     };
   });
 
-  const polygonPath = dataPoints
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
-    .join(" ") + " Z";
+  const polygonPath =
+    dataPoints
+      .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+      .join(" ") + " Z";
 
   const accentColor = ACCENT_HEX[accent] || ACCENT_HEX.cyan;
 
@@ -83,19 +97,18 @@ export function StatRadar({
       xmlns="http://www.w3.org/2000/svg"
       className="block"
     >
-      {/* Cercle de fond — crème clair Alpine Light */}
       <circle cx={cx} cy={cy} r={r + 6} fill="#fff9ea" opacity={0.9} />
 
-      {/* Anneaux concentriques subtils */}
       {[0.33, 0.66, 1].map((ring, idx) => {
-        const path = Array.from({ length: n })
-          .map((_, i) => {
-            const angle = angleFor(i);
-            const x = cx + Math.cos(angle) * r * ring;
-            const y = cy + Math.sin(angle) * r * ring;
-            return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-          })
-          .join(" ") + " Z";
+        const path =
+          Array.from({ length: n })
+            .map((_, i) => {
+              const angle = angleFor(i);
+              const x = cx + Math.cos(angle) * r * ring;
+              const y = cy + Math.sin(angle) * r * ring;
+              return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+            })
+            .join(" ") + " Z";
         return (
           <path
             key={idx}
@@ -108,7 +121,6 @@ export function StatRadar({
         );
       })}
 
-      {/* Axes depuis le centre */}
       {Array.from({ length: n }).map((_, i) => {
         const angle = angleFor(i);
         const x = cx + Math.cos(angle) * r;
@@ -127,7 +139,6 @@ export function StatRadar({
         );
       })}
 
-      {/* Polygone stats (vide à l'intérieur, bordure bold) */}
       <path
         d={polygonPath}
         fill={accentColor}
@@ -137,7 +148,6 @@ export function StatRadar({
         strokeLinejoin="round"
       />
 
-      {/* Labels courts à l'extérieur (3 lettres style FIFA) */}
       {axes.map((a, i) => {
         const angle = angleFor(i);
         const labelR = r + 18;

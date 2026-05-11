@@ -4,6 +4,15 @@
 
 export type SkinTone = "light" | "medium-light" | "medium" | "medium-dark" | "dark";
 
+// Silhouette — morphologie générale (neutre/androgyne vs féminine).
+// Pas de "genre" binaire imposé : chacun choisit ce qui lui ressemble.
+export type Silhouette = "neutral" | "feminine";
+
+// Coiffure — indépendante du genre. Courts, longs, queue-de-cheval, chignon, mulet.
+// Le mulet est un easter-egg : "business in the front, party in the back" — pour les
+// barjos qui assument l'esthétique 80s/trail vintage.
+export type Hairstyle = "short" | "medium" | "long" | "ponytail" | "bun" | "mulet";
+
 export type ShoeBrand =
   | "hoka"
   | "salomon"
@@ -47,10 +56,14 @@ export interface RunningBelt {
 export interface Character {
   skinTone: SkinTone;
   hairColor: string; // hex
+  hairstyle?: Hairstyle; // défaut : "short"
+  silhouette?: Silhouette; // défaut : "neutral"
   hatBrand: HatBrand;
   hatColor: string; // hex
   shirtColor: string; // hex
-  shirtBrand?: "none" | "hoka" | "salomon" | "on" | "ciele";
+  // Easter egg "bouzin" : t-shirt rose flashy avec inscription BOUZIN, hommage
+  // au lexique trail interne (les "barjos qui se mettent au bouzin").
+  shirtBrand?: "none" | "hoka" | "salomon" | "on" | "ciele" | "bouzin";
   shortsColor: string;
   shoeBrand: ShoeBrand;
   shoeColor: string;
@@ -69,6 +82,20 @@ export const SKIN_TONES: { id: SkinTone; color: string; label: string }[] = [
   { id: "medium", color: "#c89176", label: "Moyen" },
   { id: "medium-dark", color: "#8d5a3d", label: "Moyen foncé" },
   { id: "dark", color: "#4e2e1f", label: "Foncé" },
+];
+
+export const HAIRSTYLES: { id: Hairstyle; label: string; emoji: string }[] = [
+  { id: "short", label: "Courts", emoji: "💇" },
+  { id: "medium", label: "Mi-longs", emoji: "💆" },
+  { id: "long", label: "Longs", emoji: "👱‍♀️" },
+  { id: "ponytail", label: "Queue de cheval", emoji: "🏃‍♀️" },
+  { id: "bun", label: "Chignon", emoji: "🎀" },
+  { id: "mulet", label: "Mulet 🎤", emoji: "🎸" },
+];
+
+export const SILHOUETTES: { id: Silhouette; label: string; emoji: string }[] = [
+  { id: "neutral", label: "Neutre", emoji: "🧍" },
+  { id: "feminine", label: "Féminine", emoji: "🧍‍♀️" },
 ];
 
 export const HAIR_COLORS: { color: string; label: string }[] = [
@@ -200,9 +227,9 @@ export const HAT_BRANDS: Record<HatBrand, { label: string; textColor: string; sh
     easterEgg: true,
   },
   ravito: {
-    label: "Ravito 🏠",
+    label: "Esprit Trail 🏠",
     textColor: "#1b4332",
-    short: "RAVITO",
+    short: "ESPRIT TRAIL",
     easterEgg: true,
   },
 };
@@ -212,6 +239,8 @@ export const HAT_BRANDS: Record<HatBrand, { label: string; textColor: string; sh
 export const DEFAULT_CHARACTER: Character = {
   skinTone: "medium-light",
   hairColor: "#5c3a21",
+  hairstyle: "short",
+  silhouette: "neutral",
   hatBrand: "casquette-verte",
   hatColor: "#c2ff2e",
   shirtColor: "#22d3ee",
@@ -224,6 +253,37 @@ export const DEFAULT_CHARACTER: Character = {
     enabled: true,
     color: "#1a1a1a",
     leftFlaskColor: "#22d3ee",
+    rightFlaskColor: "#ff3366",
+  },
+  compressionSocks: {
+    enabled: true,
+    color: "#ff3366",
+  },
+  runningBelt: {
+    enabled: false,
+    color: "#1a1a1a",
+  },
+};
+
+// Preset féminin — proposé aux runneuses pour démarrer vite.
+// C'est une base : chaque utilisatrice personnalise à sa guise après.
+export const FEMININE_PRESET: Character = {
+  skinTone: "medium-light",
+  hairColor: "#5c3a21",
+  hairstyle: "ponytail",
+  silhouette: "feminine",
+  hatBrand: "ciele",
+  hatColor: "#ff3366",
+  shirtColor: "#ff3366",
+  shirtBrand: "ciele",
+  shortsColor: "#1a1a1a",
+  shoeBrand: "hoka",
+  shoeColor: "#ff6ec7",
+  accessory: "sunglasses",
+  hydrationPack: {
+    enabled: true,
+    color: "#1a1a1a",
+    leftFlaskColor: "#c2ff2e",
     rightFlaskColor: "#ff3366",
   },
   compressionSocks: {

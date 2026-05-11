@@ -8,6 +8,7 @@ import { TRAILER_CLASSES, statsForProfile } from "@/lib/trailer-class";
 import {
   Character,
   DEFAULT_CHARACTER,
+  FEMININE_PRESET,
   SKIN_TONES,
   HAIR_COLORS,
   SHIRT_COLORS,
@@ -16,29 +17,50 @@ import {
   SHOE_COLORS,
   SHOE_BRANDS,
   HAT_BRANDS,
+  HAIRSTYLES,
+  SILHOUETTES,
   ShoeBrand,
   HatBrand,
   SkinTone,
+  Silhouette,
+  Hairstyle,
 } from "@/lib/character";
 import type { TrailerClass, TrailerStats } from "@/lib/types";
 
-// ====== ONBOARDING Ravito v3 — RPG CHARACTER CREATION ======
-// Un flow de création de perso de jeu vidéo :
-// 0 NOUVELLE PARTIE (splash)
-// 1 MODE (Aventure / Performance)
-// 2 CLASSE (Sprinter / Ultra / Alpiniste / Technicien / Flâneur)
-// 3 PRATIQUE (années d'expérience, distance habituelle, plus grosse course)
+// ====== ONBOARDING Esprit Trail v4 — RPG CHARACTER CREATION ======
+// Flow simplifié, une seule expérience :
+// 0 NOUVELLE PARTIE (splash + prénom + pseudo)
+// 1 CLASSE (Sprinter / Ultra / Alpiniste / Technicien / Flâneur)
+// 2 PRATIQUE (années d'expérience, distance habituelle, plus grosse course)
+// 3 AUTO-ÉVAL (sliders 1-10 sur tes points forts)
 // 4 CHARACTER (casquette + tshirt + chaussures — mode SIMS)
-// 5 STATS (révélées animées depuis classe + années)
-// 6 OBJECTIFS (goals)
-// 7 SYNC (montres)
+// 5 STATS (révèle le radar basé sur auto-éval)
+// 6 OBJECTIFS (liste unifiée)
+// 7 STRAVA (connexion Strava, c'est l'essentiel)
 // 8 PRÊT À JOUER (récap + launch)
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-type Mode = "adventure" | "performance";
 type CharTab = "tete" | "corps" | "jambes" | "pieds";
 
-const GOALS_ADVENTURE = [
+export type SelfEval = {
+  endurance: number;
+  grimpe: number;
+  descente: number;
+  technique: number;
+  vitesse: number;
+  mental: number;
+};
+
+const DEFAULT_SELF_EVAL: SelfEval = {
+  endurance: 5,
+  grimpe: 5,
+  descente: 5,
+  technique: 5,
+  vitesse: 5,
+  mental: 5,
+};
+
+const GOALS_UNIFIED = [
   { id: "first-trail", emoji: "🏁", label: "Finir mon premier trail" },
   { id: "fun", emoji: "🌿", label: "Juste prendre du plaisir" },
   { id: "regularity", emoji: "🔁", label: "Courir plus régulièrement" },
@@ -46,25 +68,11 @@ const GOALS_ADVENTURE = [
   { id: "longer", emoji: "📏", label: "Aller plus loin qu'avant" },
   { id: "d-plus", emoji: "⛰️", label: "Chasser le D+" },
   { id: "social", emoji: "🤝", label: "Rencontrer d'autres traileurs" },
-  { id: "stories", emoji: "📸", label: "Partager mes sorties" },
-];
-
-const GOALS_PERFORMANCE = [
   { id: "improve-pb", emoji: "⚡", label: "Battre mes chronos" },
   { id: "first-ultra", emoji: "🔥", label: "Préparer un ultra" },
   { id: "utmb-prep", emoji: "👑", label: "Qualification UTMB" },
-  { id: "d-plus", emoji: "⛰️", label: "Gros volumes D+" },
   { id: "technique", emoji: "🪨", label: "Technique descente" },
-  { id: "vma", emoji: "🎯", label: "Travail VMA / seuil" },
-  { id: "vertical", emoji: "📐", label: "KV / course verticale" },
   { id: "podium", emoji: "🏆", label: "Podium / classements" },
-];
-
-const WATCHES = [
-  { id: "strava", name: "Strava", tagline: "Toutes tes sorties synchronisées", color: "bg-[#fc4c02]", logo: "S" },
-  { id: "garmin", name: "Garmin Connect", tagline: "Forerunner, Fenix, Epix, Enduro…", color: "bg-[#007cc3]", logo: "G" },
-  { id: "coros", name: "COROS", tagline: "Pace, Apex, Vertix…", color: "bg-black", logo: "C" },
-  { id: "suunto", name: "Suunto", tagline: "Race, Vertical, Ocean…", color: "bg-[#00a7e1]", logo: "S" },
 ];
 
 const TOTAL_CHAPTERS = 8;
@@ -72,18 +80,26 @@ const TOTAL_CHAPTERS = 8;
 export default function OnboardingPage() {
   const [step, setStep] = useState<Step>(0);
   const [name, setName] = useState("");
-  const [mode, setMode] = useState<Mode>("adventure");
+  const [handle, setHandle] = useState("");
   const [trailerClass, setTrailerClass] = useState<TrailerClass>("alpiniste");
   const [years, setYears] = useState(3);
   const [habitualDistance, setHabitualDistance] = useState(15);
   const [biggestRace, setBiggestRace] = useState("");
+  const [selfEval, setSelfEval] = useState<SelfEval>(DEFAULT_SELF_EVAL);
   const [character, setCharacter] = useState<Character>(DEFAULT_CHARACTER);
   const [charTab, setCharTab] = useState<CharTab>("tete");
   const [goals, setGoals] = useState<string[]>([]);
-  const [watches, setWatches] = useState<string[]>([]);
+  const [stravaConnected, setStravaConnected] = useState(false);
 
-  // Stats computed from class + experience
-  const stats: TrailerStats = statsForProfile(trailerClass, years);
+  // Stats blending : class baseline + self-eval overrides
+  const baseStats: TrailerStats = statsForProfile(trailerClass, years);
+  const stats: TrailerStats = {
+    endurance: Math.round((baseStats.endurance + selfEval.endurance * 10) / 2),
+    vitesse: Math.round((baseStats.vitesse + selfEval.vitesse * 10) / 2),
+    technique: Math.round((baseStats.technique + selfEval.technique * 10) / 2),
+    mental: Math.round((baseStats.mental + selfEval.mental * 10) / 2),
+    grimpe: Math.round((baseStats.grimpe + selfEval.grimpe * 10) / 2),
+  };
 
   // Chapter progress (0-indexed shown as 1-indexed)
   const progress = Math.min(step, TOTAL_CHAPTERS);
@@ -104,20 +120,19 @@ export default function OnboardingPage() {
           >
             ← Retour
           </button>
-          <div className="text-center">
-            <div className="text-[9px] font-mono font-bold uppercase tracking-[0.3em] text-lime">
-              CHAPITRE {progress} / {TOTAL_CHAPTERS}
+          <div className="text-center min-w-[160px]">
+            <div className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-lime">
+              Étape {progress} sur {TOTAL_CHAPTERS}
             </div>
-            {/* Progress dots */}
-            <div className="mt-1 flex gap-1 justify-center">
-              {Array.from({ length: TOTAL_CHAPTERS }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1 w-5 rounded-full transition ${
-                    i < step ? "bg-lime shadow-glow-lime" : "bg-ink/15"
-                  }`}
-                />
-              ))}
+            {/* Progress bar continue + dots */}
+            <div className="mt-1.5 relative h-1.5 w-full overflow-hidden rounded-full bg-ink/10">
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-lime shadow-glow-lime transition-all duration-300"
+                style={{ width: `${(progress / TOTAL_CHAPTERS) * 100}%` }}
+              />
+            </div>
+            <div className="mt-1 text-[9px] font-mono uppercase tracking-wider text-ink-dim">
+              {Math.round((progress / TOTAL_CHAPTERS) * 100)}% terminé
             </div>
           </div>
           <div className="w-16" />
@@ -125,16 +140,23 @@ export default function OnboardingPage() {
       )}
 
       <div className="relative z-10">
-        {step === 0 && <StepSplash onStart={(n) => { setName(n); setStep(1); }} />}
-        {step === 1 && <StepMode value={mode} onChange={setMode} onNext={() => setStep(2)} />}
-        {step === 2 && (
+        {step === 0 && (
+          <StepSplash
+            onStart={(n, h) => {
+              setName(n);
+              setHandle(h);
+              setStep(1);
+            }}
+          />
+        )}
+        {step === 1 && (
           <StepClass
             value={trailerClass}
             onChange={setTrailerClass}
-            onNext={() => setStep(3)}
+            onNext={() => setStep(2)}
           />
         )}
-        {step === 3 && (
+        {step === 2 && (
           <StepPractice
             years={years}
             setYears={setYears}
@@ -142,6 +164,13 @@ export default function OnboardingPage() {
             setDistance={setHabitualDistance}
             biggestRace={biggestRace}
             setBiggestRace={setBiggestRace}
+            onNext={() => setStep(3)}
+          />
+        )}
+        {step === 3 && (
+          <StepSelfEval
+            value={selfEval}
+            onChange={setSelfEval}
             onNext={() => setStep(4)}
           />
         )}
@@ -164,7 +193,6 @@ export default function OnboardingPage() {
         )}
         {step === 6 && (
           <StepGoals
-            mode={mode}
             selected={goals}
             toggle={(id) =>
               setGoals((g) =>
@@ -175,20 +203,16 @@ export default function OnboardingPage() {
           />
         )}
         {step === 7 && (
-          <StepSync
-            selected={watches}
-            toggle={(id) =>
-              setWatches((w) =>
-                w.includes(id) ? w.filter((x) => x !== id) : [...w, id],
-              )
-            }
+          <StepStrava
+            connected={stravaConnected}
+            onConnect={() => setStravaConnected(true)}
             onNext={() => setStep(8)}
           />
         )}
         {step === 8 && (
           <StepReady
             name={name}
-            mode={mode}
+            handle={handle}
             trailerClass={trailerClass}
             character={character}
             stats={stats}
@@ -201,8 +225,17 @@ export default function OnboardingPage() {
 
 // ====== STEP 0 — SPLASH "NOUVELLE PARTIE" ======
 
-function StepSplash({ onStart }: { onStart: (name: string) => void }) {
+function StepSplash({ onStart }: { onStart: (name: string, handle: string) => void }) {
   const [n, setN] = useState("");
+  const [h, setH] = useState("");
+
+  function sanitizeHandle(v: string) {
+    return v
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")
+      .slice(0, 20);
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-12 text-center">
       <div className="animate-pulse-slow text-[10px] font-mono font-bold uppercase tracking-[0.4em] text-lime">
@@ -215,18 +248,18 @@ function StepSplash({ onStart }: { onStart: (name: string) => void }) {
 
       <div className="mt-8 space-y-2">
         <div className="font-display text-4xl font-black leading-tight">
-          Crée ton traileur
+          Configure ton profil
         </div>
         <p className="mx-auto max-w-xs text-sm text-ink-muted">
-          Choisis ta classe, personnalise ton avatar, découvre tes stats.
+          Ton niveau, ton objectif, tes contraintes.
           <br />
-          <span className="text-lime">Le trail version RPG.</span>
+          <span className="text-lime">2 minutes, et l&apos;app s&apos;adapte à toi.</span>
         </p>
       </div>
 
       <div className="mt-8 w-full max-w-xs space-y-3">
         <label className="block text-left text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
-          Nom de ton traileur
+          Prénom
         </label>
         <input
           type="text"
@@ -236,11 +269,54 @@ function StepSplash({ onStart }: { onStart: (name: string) => void }) {
           maxLength={20}
           className="w-full rounded-xl border border-lime/30 bg-bg-card px-4 py-3 text-center font-display text-lg font-black text-ink placeholder:text-ink-dim focus:border-lime focus:outline-none focus:ring-2 focus:ring-lime/20"
         />
+
+        <label className="block text-left text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+          Pseudo <span className="text-ink-dim">(optionnel)</span>
+        </label>
+        <div className="relative">
+          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-lg text-ink-dim">@</span>
+          <input
+            type="text"
+            value={h}
+            onChange={(e) => setH(sanitizeHandle(e.target.value))}
+            placeholder="mulet_gang"
+            maxLength={20}
+            className="w-full rounded-xl border border-lime/30 bg-bg-card py-3 pl-9 pr-4 text-center font-mono text-base text-ink placeholder:text-ink-dim focus:border-lime focus:outline-none focus:ring-2 focus:ring-lime/20"
+          />
+        </div>
+
         <button
-          onClick={() => onStart(n.trim() || "Traileur")}
+          onClick={() => onStart(n.trim() || "Traileur", h.trim() || (n.trim() ? sanitizeHandle(n) : "traileur"))}
           className="w-full rounded-xl bg-lime py-4 font-display text-lg font-black uppercase tracking-wider text-bg shadow-glow-lime transition hover:scale-[1.02]"
         >
           ▶ Commencer
+        </button>
+
+        {/* Strava early connect — pour les power users qui ont déjà tout */}
+        <div className="relative my-2 flex items-center">
+          <div className="h-px flex-1 bg-ink/10" />
+          <span className="px-3 font-mono text-[9px] uppercase tracking-widest text-ink-dim">
+            ou
+          </span>
+          <div className="h-px flex-1 bg-ink/10" />
+        </div>
+        <button
+          onClick={() => {
+            // Lance directement le flow OAuth Strava. Au retour, l'app importera les
+            // données et le user pourra finir l'onboarding pré-rempli.
+            if (typeof window !== "undefined") {
+              const returnTo = encodeURIComponent("/onboarding?strava=connected");
+              window.location.href = `/api/oauth/strava/start?return_to=${returnTo}`;
+            }
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#fc4c02]/30 bg-[#fc4c02]/5 py-3 text-[#fc4c02] transition hover:border-[#fc4c02] hover:bg-[#fc4c02]/10"
+        >
+          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#fc4c02] font-display text-xs font-black text-white">
+            S
+          </div>
+          <span className="font-display text-sm font-black uppercase tracking-wider">
+            J&apos;ai déjà un Strava — connecte-le
+          </span>
         </button>
         <div className="text-[10px] font-mono text-ink-dim">
           Temps estimé : 2 min · Tout est modifiable plus tard
@@ -250,44 +326,81 @@ function StepSplash({ onStart }: { onStart: (name: string) => void }) {
   );
 }
 
-// ====== STEP 1 — MODE ======
+// ====== STEP 3 — AUTO-ÉVAL ======
+// Mini-sondage points forts/faibles (1-10) qui alimente le radar FIFA-style.
 
-function StepMode({
+const SELF_EVAL_CRITERIA: Array<{
+  key: keyof SelfEval;
+  label: string;
+  emoji: string;
+  color: "lime" | "peach" | "cyan" | "violet" | "gold";
+  hint: string;
+}> = [
+  { key: "endurance", label: "Endurance", emoji: "💨", color: "peach", hint: "Tu tiens longtemps sans exploser ?" },
+  { key: "grimpe", label: "Grimpe", emoji: "⛰️", color: "gold", hint: "Les cols ? Tu kiffes ou tu souffres ?" },
+  { key: "descente", label: "Descente", emoji: "🎿", color: "cyan", hint: "Tu voles ou tu freines ?" },
+  { key: "technique", label: "Technique", emoji: "🪨", color: "violet", hint: "Pierriers, racines, single vertigo" },
+  { key: "vitesse", label: "Vitesse", emoji: "⚡", color: "lime", hint: "Ton allure naturelle" },
+  { key: "mental", label: "Mental", emoji: "🧠", color: "peach", hint: "Quand ça tire sur le 3e tiers" },
+];
+
+function StepSelfEval({
   value,
   onChange,
   onNext,
 }: {
-  value: Mode;
-  onChange: (v: Mode) => void;
+  value: SelfEval;
+  onChange: (v: SelfEval) => void;
   onNext: () => void;
 }) {
   return (
     <div className="py-4 space-y-5">
       <div className="text-center">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-lime">
-          Choisis ton mode
+          Auto-évaluation
         </div>
-        <h1 className="mt-1 font-display text-3xl font-black">Tu joues comment ?</h1>
+        <h1 className="mt-1 font-display text-3xl font-black">
+          Tes points forts ?
+        </h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-ink-muted">
-          Pas de bonne réponse. Tu peux changer quand tu veux.
+          Note-toi de 1 à 10 — ton radar s&apos;adaptera.
+          <br />
+          <span className="text-ink-dim">Tout est modifiable plus tard.</span>
         </p>
       </div>
 
       <div className="space-y-3">
-        <ModeCard
-          active={value === "adventure"}
-          onClick={() => onChange("adventure")}
-          emoji="🎮"
-          title="Mode Aventure"
-          sub="XP, badges, loot, quêtes. Chaque sortie est une quête."
-        />
-        <ModeCard
-          active={value === "performance"}
-          onClick={() => onChange("performance")}
-          emoji="📊"
-          title="Mode Performance"
-          sub="Data pro. Allures, FC, VO2, pas de fioritures."
-        />
+        {SELF_EVAL_CRITERIA.map((c) => (
+          <div
+            key={c.key}
+            className="rounded-xl border border-ink/10 bg-bg-card/60 p-3"
+          >
+            <div className="flex items-baseline justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{c.emoji}</span>
+                <div>
+                  <div className="font-display text-sm font-black">{c.label}</div>
+                  <div className="text-[10px] font-mono text-ink-dim">{c.hint}</div>
+                </div>
+              </div>
+              <div className={`font-display text-xl font-black text-${c.color}`}>
+                {value[c.key]}
+                <span className="text-[10px] font-mono text-ink-dim"> /10</span>
+              </div>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={value[c.key]}
+              onChange={(e) =>
+                onChange({ ...value, [c.key]: parseInt(e.target.value) })
+              }
+              className={`mt-2 w-full accent-${c.color}`}
+            />
+          </div>
+        ))}
       </div>
 
       <button
@@ -297,40 +410,6 @@ function StepMode({
         Continuer →
       </button>
     </div>
-  );
-}
-
-function ModeCard({
-  active,
-  onClick,
-  emoji,
-  title,
-  sub,
-}: {
-  active: boolean;
-  onClick: () => void;
-  emoji: string;
-  title: string;
-  sub: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full rounded-2xl border p-4 text-left transition ${
-        active
-          ? "border-lime bg-lime/5 shadow-glow-lime"
-          : "border-ink/15 bg-bg-card/60 hover:border-lime/40"
-      }`}
-    >
-      <div className="flex items-start gap-3">
-        <div className="text-3xl">{emoji}</div>
-        <div className="flex-1">
-          <div className="font-display text-base font-black">{title}</div>
-          <div className="mt-1 text-xs text-ink-muted">{sub}</div>
-        </div>
-        {active && <div className="text-lime">✓</div>}
-      </div>
-    </button>
   );
 }
 
@@ -546,6 +625,20 @@ function StepCharacter({
         <h1 className="mt-1 font-display text-3xl font-black">
           Crée ton avatar
         </h1>
+        <div className="mt-2 flex justify-center gap-2">
+          <button
+            onClick={() => setCharacter(DEFAULT_CHARACTER)}
+            className="rounded-full border border-cyan/40 bg-cyan/10 px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-cyan hover:bg-cyan/20 transition"
+          >
+            ♂ Homme
+          </button>
+          <button
+            onClick={() => setCharacter(FEMININE_PRESET)}
+            className="rounded-full border border-peach/40 bg-peach/10 px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-peach hover:bg-peach/20 transition"
+          >
+            ♀ Femme
+          </button>
+        </div>
       </div>
 
       {/* Stage */}
@@ -629,7 +722,47 @@ function StepCharacter({
                 ))}
               </div>
             </OSection>
-            <OSection title="Cheveux">
+            <OSection title="Silhouette">
+              <div className="grid grid-cols-2 gap-1.5">
+                {SILHOUETTES.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => update({ silhouette: s.id as Silhouette })}
+                    className={`rounded-lg border px-2 py-2 text-center transition ${
+                      (character.silhouette ?? "neutral") === s.id
+                        ? "border-lime bg-lime/10"
+                        : "border-ink/15 bg-bg-card/60"
+                    }`}
+                  >
+                    <span className="text-base">{s.emoji}</span>
+                    <span className="ml-2 text-[10px] font-mono uppercase text-ink-muted">
+                      {s.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </OSection>
+            <OSection title="Coiffure">
+              <div className="grid grid-cols-5 gap-1.5">
+                {HAIRSTYLES.map((h) => (
+                  <button
+                    key={h.id}
+                    onClick={() => update({ hairstyle: h.id as Hairstyle })}
+                    className={`rounded-lg border px-1 py-2 text-center transition ${
+                      (character.hairstyle ?? "short") === h.id
+                        ? "border-lime bg-lime/10"
+                        : "border-ink/15 bg-bg-card/60"
+                    }`}
+                  >
+                    <div className="text-base">{h.emoji}</div>
+                    <div className="mt-0.5 text-[8px] font-mono uppercase text-ink-muted leading-tight">
+                      {h.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </OSection>
+            <OSection title="Cheveux — couleur">
               <div className="flex flex-wrap gap-1.5">
                 {HAIR_COLORS.map((h) => (
                   <button
@@ -901,17 +1034,15 @@ function StatBar({
 // ====== STEP 6 — GOALS ======
 
 function StepGoals({
-  mode,
   selected,
   toggle,
   onNext,
 }: {
-  mode: Mode;
   selected: string[];
   toggle: (id: string) => void;
   onNext: () => void;
 }) {
-  const goals = mode === "adventure" ? GOALS_ADVENTURE : GOALS_PERFORMANCE;
+  const goals = GOALS_UNIFIED;
   return (
     <div className="py-4 space-y-5">
       <div className="text-center">
@@ -959,64 +1090,115 @@ function StepGoals({
   );
 }
 
-// ====== STEP 7 — SYNC ======
+// ====== STEP 7 — STRAVA ======
+// On se concentre sur Strava : c'est l'essentiel, couvre 80% des traileurs.
 
-function StepSync({
-  selected,
-  toggle,
+function StepStrava({
+  connected,
+  onConnect,
   onNext,
 }: {
-  selected: string[];
-  toggle: (id: string) => void;
+  connected: boolean;
+  onConnect: () => void;
   onNext: () => void;
 }) {
+  const [pending, setPending] = useState(false);
+
+  function handleConnect() {
+    setPending(true);
+    // Redirige vers le flow OAuth Strava. La callback finira par renvoyer sur
+    // /onboarding?step=strava_done côté prod. En attendant on simule le retour
+    // via la state locale pour ne pas casser le parcours.
+    if (typeof window !== "undefined") {
+      const returnTo = encodeURIComponent("/onboarding");
+      window.location.href = `/api/oauth/strava/start?return_to=${returnTo}`;
+    }
+    // Fallback si route pas dispo
+    setTimeout(() => {
+      setPending(false);
+      onConnect();
+    }, 1200);
+  }
+
   return (
     <div className="py-4 space-y-5">
       <div className="text-center">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-lime">
-          Synchronise ton équipement
+          Synchronisation
         </div>
         <h1 className="mt-1 font-display text-3xl font-black">
-          Connecte tes montres
+          Connecte Strava
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-ink-muted">
-          Optionnel. Tu peux le faire plus tard.
+          Zéro re-saisie. Esprit Trail importe tes sorties et calcule ton radar
+          automatiquement.
         </p>
       </div>
-      <div className="space-y-2">
-        {WATCHES.map((w) => {
-          const on = selected.includes(w.id);
-          return (
-            <button
-              key={w.id}
-              onClick={() => toggle(w.id)}
-              className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition ${
-                on
-                  ? "border-lime bg-lime/5"
-                  : "border-ink/15 bg-bg-card/60 hover:border-lime/40"
-              }`}
-            >
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-lg ${w.color} font-display text-sm font-black text-white`}
-              >
-                {w.logo}
-              </div>
-              <div className="flex-1">
-                <div className="font-display text-sm font-black">{w.name}</div>
-                <div className="text-[11px] text-ink-muted">{w.tagline}</div>
-              </div>
-              <div className={`text-sm font-mono font-bold ${on ? "text-lime" : "text-ink-dim"}`}>
-                {on ? "✓" : "+"}
-              </div>
-            </button>
-          );
-        })}
+
+      <div className="rounded-xl border border-lime/25 bg-lime/5 p-3 space-y-1.5 text-[12px] text-ink leading-relaxed">
+        <div className="flex items-start gap-2">
+          <span className="text-peach">✓</span>
+          <span>
+            <strong>Import auto</strong> : toutes tes sorties passées en 2 clics
+          </span>
+        </div>
+        <div className="flex items-start gap-2">
+          <span className="text-peach">✓</span>
+          <span>
+            <strong>XP, badges, quêtes</strong> se mettent à jour tout seuls
+          </span>
+        </div>
+        <div className="flex items-start gap-2">
+          <span className="text-peach">✓</span>
+          <span>
+            <strong>Coach IA</strong> ajuste ton plan selon ta réalité
+          </span>
+        </div>
+        <div className="flex items-start gap-2">
+          <span className="text-peach">✓</span>
+          <span>
+            <strong>Publication Strava</strong> bidirectionnelle (optionnelle)
+          </span>
+        </div>
       </div>
+
+      {connected ? (
+        <div className="flex items-center gap-3 rounded-xl border-2 border-lime bg-lime/10 p-4 shadow-glow-lime">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#fc4c02] font-display text-sm font-black text-white">
+            S
+          </div>
+          <div className="flex-1">
+            <div className="font-display text-sm font-black text-lime">Strava connecté</div>
+            <div className="text-[11px] text-ink-muted">Import en cours en arrière-plan…</div>
+          </div>
+          <div className="text-lg font-mono font-bold text-lime">✓</div>
+        </div>
+      ) : (
+        <button
+          onClick={handleConnect}
+          disabled={pending}
+          className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#fc4c02] p-4 text-white shadow-glow-lime transition hover:scale-[1.01] disabled:opacity-60"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white/20 font-display text-base font-black">
+            S
+          </div>
+          <div className="font-display font-black uppercase tracking-wider">
+            {pending ? "Connexion…" : "Se connecter avec Strava"}
+          </div>
+        </button>
+      )}
+
       <button
         onClick={onNext}
         className="w-full rounded-xl bg-lime py-4 font-display font-black uppercase tracking-wider text-bg shadow-glow-lime transition hover:scale-[1.01]"
       >
-        Terminer →
+        {connected ? "Terminer →" : "Continuer →"}
+      </button>
+      <button
+        onClick={onNext}
+        className="w-full text-center text-[12px] text-ink-muted underline hover:text-ink"
+      >
+        Je connecterai plus tard depuis Profil
       </button>
     </div>
   );
@@ -1026,13 +1208,13 @@ function StepSync({
 
 function StepReady({
   name,
-  mode,
+  handle,
   trailerClass,
   character,
   stats,
 }: {
   name: string;
-  mode: Mode;
+  handle: string;
   trailerClass: TrailerClass;
   character: Character;
   stats: TrailerStats;
@@ -1055,14 +1237,12 @@ function StepReady({
 
       <div className="mt-6 space-y-2">
         <div className="font-display text-3xl font-black">{name}</div>
+        <div className="font-mono text-[11px] text-ink-muted">@{handle}</div>
         <div className="text-sm">
           {classDef.emoji}{" "}
           <span className={`text-${classDef.color} font-bold`}>{classDef.name}</span>
           <span className="text-ink-muted"> · LVL 1 · </span>
           <span className="text-lime font-mono font-bold">PWR {total}</span>
-        </div>
-        <div className="text-xs text-ink-muted">
-          Mode {mode === "adventure" ? "Aventure 🎮" : "Performance 📊"}
         </div>
       </div>
 

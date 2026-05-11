@@ -83,7 +83,7 @@ export const RACES: Race[] = [
     isIconic: true,
   },
   {
-    id: "maxi-race-2026",
+    id: "maxirace-annecy-2026",
     name: "MaXi-Race Annecy",
     location: "Annecy",
     country: "France",
@@ -160,7 +160,7 @@ export const RACES: Race[] = [
     isIconic: true,
   },
   {
-    id: "maxi-race-vercors-2026",
+    id: "trail-vercors-2026",
     name: "Trail du Vercors",
     location: "Villard-de-Lans",
     country: "France",
