@@ -6,6 +6,7 @@ import BadgeCard from "@/components/ui/BadgeCard";
 import PublicLanding from "@/components/landing/PublicLanding";
 import RunStartCTA from "@/components/run/RunStartCTA";
 import BibIcon from "@/components/ui/BibIcon";
+import GutTrainingIcon from "@/components/ui/GutTrainingIcon";
 import { MY_BADGES, MY_RUNS } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
 import { BADGES, getBadge } from "@/lib/data/badges";
@@ -146,7 +147,7 @@ export default async function HomePage({
         </div>
       </Link>
 
-      {/* Coach IA (toujours dispo, mise en avant en perf) */}
+      {/* Coach IA — Plan d'entraînement (feature 1) */}
       <Link
         href="/coach"
         className="block rounded-3xl bg-cyan p-5 text-bg btn-chunky tap-bounce"
@@ -167,6 +168,31 @@ export default async function HomePage({
             </div>
           </div>
           <div className="font-display text-2xl">→</div>
+        </div>
+      </Link>
+
+      {/* Gut Training — Préparation digestive (feature 2, distincte) */}
+      <Link
+        href="/coach#gut-training"
+        className="block rounded-3xl bg-peach p-5 text-bg btn-chunky tap-bounce"
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg text-peach card-chunky shrink-0">
+            <GutTrainingIcon size={44} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-black uppercase tracking-wider">
+              Gut Training · 8 semaines
+            </div>
+            <div className="font-display text-xl font-black leading-tight">
+              Prépare ton estomac
+            </div>
+            <div className="text-xs opacity-90 leading-snug">
+              Nutrition sur mesure pour ta course : zéro hypo, zéro mauvaise
+              surprise digestive.
+            </div>
+          </div>
+          <div className="font-display text-2xl shrink-0">→</div>
         </div>
       </Link>
 

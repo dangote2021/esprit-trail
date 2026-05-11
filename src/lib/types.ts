@@ -204,6 +204,14 @@ export interface Race {
     distance: number; // km
     elevation: number; // m D+
   }>;
+  /** Si présent : course proposée par un user de la communauté (pas dans la base
+   *  officielle Esprit Trail). Le champ permet d'afficher un crédit et un lien
+   *  vers le profil public de l'auteur. */
+  submittedBy?: {
+    username: string;
+    displayName: string;
+    avatar: string;
+  };
 }
 
 // ====== MESSAGERIE ======

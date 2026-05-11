@@ -26,6 +26,13 @@ export type OffRace = {
   entryFee?: string;
   cover: string;
   soul: string;
+  /** Si présent : course proposée par un user via le formulaire d'ajout
+   *  communautaire (pas dans le dataset officiel Esprit Trail). */
+  submittedBy?: {
+    username: string;
+    displayName: string;
+    avatar: string;
+  };
 };
 
 export const OFF_RACES: OffRace[] = [

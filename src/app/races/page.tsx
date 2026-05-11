@@ -6,8 +6,12 @@ import { useSearchParams } from "next/navigation";
 import { RACES } from "@/lib/data/races";
 import { ME } from "@/lib/data/me";
 import { OFF_RACES, OFF_CAT_META, type OffCategory } from "@/lib/data/off-races";
-import type { RaceCategory } from "@/lib/types";
+import type { Race, RaceCategory } from "@/lib/types";
+import type { OffRace } from "@/lib/data/off-races";
 import RaceShareButton from "@/components/race/RaceShareButton";
+import AddRaceForm from "@/components/race/AddRaceForm";
+import SubmittedByBadge from "@/components/race/SubmittedByBadge";
+import { loadUserRaces, loadUserOffRaces } from "@/lib/data/user-races";
 import { useT, useLang } from "@/lib/i18n/LangProvider";
 
 const CATS: { id: RaceCategory | "all"; labelKey: string; range: string }[] = [
@@ -40,6 +44,10 @@ export default function RacesPage() {
   const [franceOnly, setFranceOnly] = useState(false);
   const [offCat, setOffCat] = useState<OffCategory | "all">("all");
   const [isLogged, setIsLogged] = useState<boolean | null>(null);
+  // Courses user-submitted (localStorage). Phase 2 = Supabase user_races table.
+  const [userRaces, setUserRaces] = useState<Race[]>([]);
+  const [userOffRaces, setUserOffRaces] = useState<OffRace[]>([]);
+  const [showForm, setShowForm] = useState<"on" | "off" | null>(null);
 
   // Détection cookie auth Supabase pour ajuster l'affichage UTMB Index aux visiteurs
   useEffect(() => {
@@ -50,14 +58,35 @@ export default function RacesPage() {
     setIsLogged(hasAuth);
   }, []);
 
-  const filtered = RACES.filter((r) => {
+  // Charger les courses user-submitted depuis localStorage et écouter les updates
+  useEffect(() => {
+    const refresh = () => {
+      setUserRaces(loadUserRaces());
+      setUserOffRaces(loadUserOffRaces());
+    };
+    refresh();
+    window.addEventListener("esprit-user-races-update", refresh);
+    window.addEventListener("esprit-user-off-races-update", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("esprit-user-races-update", refresh);
+      window.removeEventListener("esprit-user-off-races-update", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
+  // Fusion des courses officielles + user-submitted pour l'onglet ON
+  const allOnRaces = [...RACES, ...userRaces];
+  const filtered = allOnRaces.filter((r) => {
     if (cat !== "all" && r.category !== cat) return false;
     if (franceOnly && !r.country.toLowerCase().includes("france")) return false;
     return true;
   }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  // OFF Races officielles + user-submitted
+  const allOffRaces = [...OFF_RACES, ...userOffRaces];
   const filteredOff =
-    offCat === "all" ? OFF_RACES : OFF_RACES.filter((r) => r.category === offCat);
+    offCat === "all" ? allOffRaces : allOffRaces.filter((r) => r.category === offCat);
 
   const myUtmb = ME.connections.utmb?.runnerIndex || 0;
 
@@ -119,6 +148,30 @@ export default function RacesPage() {
 
       {tab === "on" && (
         <>
+          {/* CTA "Proposer une course ON" — visible en haut de l'onglet */}
+          <button
+            type="button"
+            onClick={() => setShowForm("on")}
+            className="w-full flex items-center justify-between gap-3 rounded-2xl border-2 border-dashed border-peach/50 bg-peach/5 px-4 py-3 text-left hover:bg-peach/10 transition"
+            aria-label="Proposer une course ON"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">➕</div>
+              <div>
+                <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+                  Communauté
+                </div>
+                <div className="font-display text-sm font-black text-ink">
+                  Proposer une course ON
+                </div>
+                <div className="text-[11px] text-ink-muted">
+                  Tu en connais une qu&apos;on n&apos;a pas listée ? Partage-la.
+                </div>
+              </div>
+            </div>
+            <span className="font-mono text-peach text-xl shrink-0">→</span>
+          </button>
+
           {/* Filter tabs catégorie */}
           <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
             {CATS.map((c) => (
@@ -161,6 +214,30 @@ export default function RacesPage() {
 
       {tab === "off" && (
         <>
+          {/* CTA "Proposer une OFF Race" — visible en haut de l'onglet */}
+          <button
+            type="button"
+            onClick={() => setShowForm("off")}
+            className="w-full flex items-center justify-between gap-3 rounded-2xl border-2 border-dashed border-violet/50 bg-violet/5 px-4 py-3 text-left hover:bg-violet/10 transition"
+            aria-label="Proposer une OFF Race"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">🏴‍☠️</div>
+              <div>
+                <div className="text-[10px] font-mono font-black uppercase tracking-widest text-violet">
+                  Communauté
+                </div>
+                <div className="font-display text-sm font-black text-ink">
+                  Proposer une OFF Race
+                </div>
+                <div className="text-[11px] text-ink-muted">
+                  FKT, course pirate, crew run, GR project — partage-la.
+                </div>
+              </div>
+            </div>
+            <span className="font-mono text-violet text-xl shrink-0">→</span>
+          </button>
+
           {/* Hero OFF — manifeste compact */}
           <section className="relative overflow-hidden rounded-2xl border-2 border-peach/40 bg-gradient-to-br from-peach/15 via-violet/10 to-bg p-4">
             <div className="pointer-events-none absolute -right-4 -top-4 text-7xl opacity-10">
@@ -253,6 +330,14 @@ export default function RacesPage() {
                   </div>
                   <div className="p-4 space-y-2">
                     <p className="text-sm text-ink leading-snug">{race.tagline}</p>
+                    {race.submittedBy && (
+                      <SubmittedByBadge
+                        username={race.submittedBy.username}
+                        displayName={race.submittedBy.displayName}
+                        avatar={race.submittedBy.avatar}
+                        tone="violet"
+                      />
+                    )}
                     <div className="flex flex-wrap gap-1.5 text-[11px] font-mono">
                       <span className="rounded-md bg-bg-raised px-2 py-1">
                         📏 {race.distance} km
@@ -346,6 +431,16 @@ export default function RacesPage() {
                     {race.name}
                   </h3>
                   <p className="mt-0.5 text-xs text-ink-muted">{race.tagline}</p>
+                  {race.submittedBy && (
+                    <div className="mt-2">
+                      <SubmittedByBadge
+                        username={race.submittedBy.username}
+                        displayName={race.submittedBy.displayName}
+                        avatar={race.submittedBy.avatar}
+                        tone="peach"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-1.5 text-[11px] font-mono">
@@ -414,6 +509,19 @@ export default function RacesPage() {
           );
         })}
       </div>
+      )}
+
+      {/* Modale de proposition de course (ON ou OFF) */}
+      {showForm && (
+        <AddRaceForm
+          mode={showForm}
+          onClose={() => setShowForm(null)}
+          onSubmitted={() => {
+            // Reload pour s'assurer que la nouvelle course apparaît en haut de liste
+            setUserRaces(loadUserRaces());
+            setUserOffRaces(loadUserOffRaces());
+          }}
+        />
       )}
     </main>
   );

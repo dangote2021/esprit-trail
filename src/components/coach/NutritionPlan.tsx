@@ -105,7 +105,7 @@ export default function NutritionPlan() {
       </div>
 
       {/* Plan gut training */}
-      <div className="space-y-3">
+      <div id="gut-training" className="space-y-3 scroll-mt-20">
         <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
           Plan gut training · 8 semaines
         </div>
