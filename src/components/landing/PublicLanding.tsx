@@ -66,6 +66,80 @@ export default function PublicLanding({
         </p>
       </section>
 
+      {/* Manifeste — 2 piliers : l'âme + la progression */}
+      <section className="space-y-3">
+        <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach text-center">
+          ✶ Notre manifeste ✶
+        </div>
+
+        {/* Pilier 1 — l'âme du trail */}
+        <div className="relative overflow-hidden rounded-2xl border-2 border-peach/40 bg-gradient-to-br from-peach/10 via-bg-card to-cyan/10 p-5 card-chunky">
+          <div className="absolute -top-2 -right-2 text-5xl opacity-10 select-none">
+            🔥
+          </div>
+          <div className="relative space-y-3">
+            <div className="inline-flex items-center gap-1.5 rounded-md bg-peach/20 px-2.5 py-1 text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+              <span>01</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-peach animate-pulse" />
+              L&apos;âme
+            </div>
+            <h2 className="font-display text-2xl font-black leading-tight text-ink">
+              Esprit Trail remet{" "}
+              <span className="text-peach">l&apos;âme</span> au centre.
+            </h2>
+            <p className="text-sm text-ink-muted leading-relaxed">
+              Courses pirates, GR en autonomie, crew runs du dimanche en forêt.
+              L&apos;âme du trail elle est là, elle vibre dans nos petits cœurs.
+            </p>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <span className="rounded-md bg-bg-raised/60 px-2 py-0.5 text-[10px] font-mono font-bold text-peach">
+                🏴‍☠️ Pirate
+              </span>
+              <span className="rounded-md bg-bg-raised/60 px-2 py-0.5 text-[10px] font-mono font-bold text-lime">
+                🎒 Autonomie
+              </span>
+              <span className="rounded-md bg-bg-raised/60 px-2 py-0.5 text-[10px] font-mono font-bold text-cyan">
+                🌲 Crew
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Pilier 2 — progresser sans se blesser */}
+        <div className="relative overflow-hidden rounded-2xl border-2 border-lime/40 bg-gradient-to-br from-lime/10 via-bg-card to-violet/10 p-5 card-chunky">
+          <div className="absolute -top-2 -right-2 text-5xl opacity-10 select-none">
+            🎮
+          </div>
+          <div className="relative space-y-3">
+            <div className="inline-flex items-center gap-1.5 rounded-md bg-lime/20 px-2.5 py-1 text-[10px] font-mono font-black uppercase tracking-widest text-lime">
+              <span>02</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-lime animate-pulse" />
+              La progression
+            </div>
+            <h2 className="font-display text-2xl font-black leading-tight text-ink">
+              <span className="text-lime">Progresser</span> sans se blesser.
+            </h2>
+            <p className="text-sm text-ink-muted leading-relaxed">
+              Coach IA qui te génère ton plan, quêtes quotidiennes : on débloque
+              des mondes et on t&apos;accompagne jusqu&apos;au{" "}
+              <strong className="text-violet">big boss</strong> — ton gros
+              objectif de l&apos;année.
+            </p>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <span className="rounded-md bg-bg-raised/60 px-2 py-0.5 text-[10px] font-mono font-bold text-lime">
+                🤖 Coach IA
+              </span>
+              <span className="rounded-md bg-bg-raised/60 px-2 py-0.5 text-[10px] font-mono font-bold text-cyan">
+                ⚔️ Quêtes
+              </span>
+              <span className="rounded-md bg-bg-raised/60 px-2 py-0.5 text-[10px] font-mono font-bold text-violet">
+                👹 Big Boss
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA principal */}
       <section className="space-y-2">
         <Link
@@ -370,8 +444,8 @@ export default function PublicLanding({
           </div>
 
           <p className="mt-3 text-[11px] text-ink-muted leading-relaxed">
-            Chaque km couru = des tickets. Tirage au sort à J-7. CCC,
-            Templiers, MaxiRace, FKT collectifs.
+            Chaque km couru = des tickets. Tirage au sort à J-7. Dossards sur
+            des courses partenaires et FKT collectifs.
           </p>
         </div>
       </section>

@@ -18,9 +18,13 @@ export function BrandLogoIcon({
   size?: number;
   className?: string;
 }) {
+  // Zoom léger (1.18×) pour masquer la bordure noire externe du PNG source.
+  // Le span agit comme un mask circulaire qui crop le débordement.
+  const inner = Math.round(size * 1.18);
+  const offset = Math.round((inner - size) / 2);
   return (
     <span
-      className={`inline-block leading-none overflow-hidden rounded-2xl ${className}`}
+      className={`relative inline-block leading-none overflow-hidden rounded-2xl ${className}`}
       style={{ width: size, height: size }}
       aria-label="Esprit Trail"
     >
@@ -28,9 +32,16 @@ export function BrandLogoIcon({
       <img
         src="/icon-512.png"
         alt="Esprit Trail"
-        width={size}
-        height={size}
-        style={{ width: size, height: size, objectFit: "cover" }}
+        width={inner}
+        height={inner}
+        style={{
+          position: "absolute",
+          top: -offset,
+          left: -offset,
+          width: inner,
+          height: inner,
+          objectFit: "cover",
+        }}
         loading="eager"
       />
     </span>

@@ -5,6 +5,7 @@ import TQLogo from "@/components/ui/TQLogo";
 import BadgeCard from "@/components/ui/BadgeCard";
 import PublicLanding from "@/components/landing/PublicLanding";
 import RunStartCTA from "@/components/run/RunStartCTA";
+import BibIcon from "@/components/ui/BibIcon";
 import { MY_BADGES, MY_RUNS } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
 import { BADGES, getBadge } from "@/lib/data/badges";
@@ -116,12 +117,12 @@ export default async function HomePage({
         href="/challenges/loto"
         className="relative block overflow-hidden rounded-3xl border-2 border-lime bg-gradient-to-br from-lime/20 via-peach/10 to-bg p-5 btn-chunky tap-bounce card-shine"
       >
-        <div className="pointer-events-none absolute -right-6 -top-6 text-[120px] opacity-[0.12] leading-none">
-          🎫
+        <div className="pointer-events-none absolute -right-8 -top-4 opacity-[0.15] rotate-12">
+          <BibIcon size={140} number="033" bibColor="#F0E6C8" numberColor="#1B4332" pinColor="#F77F00" />
         </div>
         <div className="relative flex items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-lime text-bg card-chunky wobble">
-            <span className="text-3xl">🎫</span>
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-lime card-chunky wobble overflow-hidden">
+            <BibIcon size={52} number="01" bibColor="#FFFFFF" numberColor="#0B1D0E" pinColor="#1B4332" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="inline-flex items-center gap-1.5 rounded-md bg-lime/20 text-lime px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider">
@@ -132,7 +133,7 @@ export default async function HomePage({
               Dossards en jeu
             </div>
             <div className="text-xs text-ink-muted mt-0.5">
-              Cours, gagne un ticket, vise un vrai dossard CCC, MaxiRace, Templiers ou FKT collectif.
+              Cours, gagne un ticket, vise un vrai dossard sur des courses partenaires ou un FKT collectif.
             </div>
             <div className="mt-2 flex flex-wrap gap-1 text-[9px] font-mono">
               <span className="rounded bg-bg-raised/80 px-1.5 py-0.5">🎯 Challenge</span>

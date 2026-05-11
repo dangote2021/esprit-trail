@@ -272,8 +272,8 @@ export default function DemoPage() {
           </div>
 
           <p className="text-[11px] text-ink-muted leading-relaxed pt-1">
-            🔓 Avec un compte : tickets cumulés sur tous les tirages CCC,
-            Templiers, MaxiRace, FKT collectifs. Synchro Strava 1 clic.
+            🔓 Avec un compte : tickets cumulés sur tous les tirages de
+            dossards partenaires et FKT collectifs. Synchro Strava 1 clic.
           </p>
         </div>
       </section>

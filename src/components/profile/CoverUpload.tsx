@@ -131,29 +131,98 @@ export default function CoverUpload({
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(135deg, #F77F00 0%, #C25E00 30%, #1B4332 70%, #0B1D0E 100%)",
-          }}
-        >
-          {/* Pattern subtil */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Scène par défaut : montagne + sentier + ciel coucher de soleil */}
           <svg
-            className="absolute inset-0 h-full w-full opacity-25"
+            className="absolute inset-0 h-full w-full"
             viewBox="0 0 400 200"
-            preserveAspectRatio="none"
+            preserveAspectRatio="xMidYMid slice"
+            aria-label="Cover par défaut : montagne et sentier"
           >
+            <defs>
+              <linearGradient id="sky-default" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#F77F00" />
+                <stop offset="45%" stopColor="#DDA15E" />
+                <stop offset="100%" stopColor="#FEFAE0" />
+              </linearGradient>
+              <linearGradient id="mtn-far" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7B9E89" />
+                <stop offset="100%" stopColor="#A8C0AB" />
+              </linearGradient>
+              <linearGradient id="mtn-mid" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#2D6A4F" />
+                <stop offset="100%" stopColor="#1B4332" />
+              </linearGradient>
+              <linearGradient id="mtn-near" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#1B4332" />
+                <stop offset="100%" stopColor="#0B1D0E" />
+              </linearGradient>
+            </defs>
+
+            {/* Ciel */}
+            <rect width="400" height="200" fill="url(#sky-default)" />
+
+            {/* Soleil */}
+            <circle cx="305" cy="78" r="22" fill="#FFD89C" opacity="0.95" />
+            <circle cx="305" cy="78" r="14" fill="#FFFBE8" opacity="0.9" />
+
+            {/* Montagnes lointaines */}
             <path
-              d="M 0 160 Q 80 100 160 130 T 320 110 T 400 140 L 400 200 L 0 200 Z"
-              fill="#0B1D0E"
+              d="M 0 130 L 50 95 L 95 115 L 140 80 L 185 110 L 230 88 L 280 108 L 330 92 L 400 118 L 400 200 L 0 200 Z"
+              fill="url(#mtn-far)"
+              opacity="0.85"
+            />
+
+            {/* Montagnes plan moyen */}
+            <path
+              d="M 0 155 L 40 120 L 75 140 L 120 95 L 165 125 L 210 105 L 250 130 L 295 110 L 340 132 L 400 145 L 400 200 L 0 200 Z"
+              fill="url(#mtn-mid)"
+            />
+            {/* Neige sur les pics */}
+            <path d="M 115 100 L 120 95 L 125 100 L 122 105 L 118 105 Z" fill="#FEFAE0" opacity="0.9" />
+            <path d="M 207 110 L 210 105 L 213 110 L 211 113 L 209 113 Z" fill="#FEFAE0" opacity="0.9" />
+            <path d="M 292 115 L 295 110 L 298 115 L 296 118 L 294 118 Z" fill="#FEFAE0" opacity="0.85" />
+
+            {/* Collines + forêt sombre devant */}
+            <path
+              d="M 0 175 Q 60 150 130 165 T 260 158 T 400 168 L 400 200 L 0 200 Z"
+              fill="url(#mtn-near)"
+            />
+
+            {/* Sentier serpentant vers les montagnes */}
+            <path
+              d="M 180 200 Q 175 188 195 178 Q 215 168 205 158 Q 195 148 215 142"
+              stroke="#DDA15E"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.75"
+            />
+            <path
+              d="M 180 200 Q 175 188 195 178 Q 215 168 205 158 Q 195 148 215 142"
+              stroke="#FEFAE0"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+              strokeDasharray="2 4"
+              fill="none"
               opacity="0.5"
             />
-            <path
-              d="M 0 175 Q 100 145 200 160 T 400 155 L 400 200 L 0 200 Z"
-              fill="#0B1D0E"
-              opacity="0.7"
-            />
+
+            {/* Sapins silhouettes le long du sentier */}
+            <g fill="#0B1D0E" opacity="0.75">
+              <polygon points="155,178 158,170 161,178" />
+              <polygon points="158,178 161,168 164,178" />
+              <polygon points="240,172 244,162 248,172" />
+              <polygon points="295,170 298,160 301,170" />
+              <polygon points="80,180 84,170 88,180" />
+              <polygon points="350,175 354,164 358,175" />
+            </g>
+
+            {/* Silhouette de traileur sur le sentier */}
+            <g fill="#0B1D0E" opacity="0.85">
+              <circle cx="210" cy="153" r="1.6" />
+              <rect x="209.2" y="154.5" width="1.8" height="3.5" rx="0.5" />
+            </g>
           </svg>
         </div>
       )}

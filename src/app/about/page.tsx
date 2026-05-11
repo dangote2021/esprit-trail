@@ -60,7 +60,7 @@ export default function AboutPage() {
             , de{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-peach">
-                participer à des courses off
+                participer à des courses incroyables
               </span>
               <span className="absolute inset-x-0 bottom-1 -z-0 h-2 rounded bg-peach/25" />
             </span>{" "}
@@ -75,8 +75,8 @@ export default function AboutPage() {
           </p>
           <p className="mt-3 text-xs text-ink-muted leading-relaxed">
             Coach IA, OFF Races (FKT, courses pirates), team de traileurs,
-            quêtes hebdo, mode duel live, et tirages de dossards CCC, MaxiRace,
-            Templiers — débloqués par ton volume km.
+            quêtes hebdo, mode duel live, et tirages de dossards sur des
+            courses partenaires — débloqués par ton volume km.
           </p>
         </div>
       </section>
@@ -187,7 +187,7 @@ export default function AboutPage() {
             {
               emoji: "🎫",
               title: "Dossards en jeu",
-              desc: "Tirages gratuits CCC, MaxiRace, Templiers",
+              desc: "Tirages gratuits sur courses partenaires",
               color: "border-lime/40 bg-lime/10",
               href: "/challenges/loto",
             },
@@ -276,7 +276,7 @@ export default function AboutPage() {
                   Je vise une course
                 </div>
                 <h3 className="mt-0.5 font-display text-base font-black leading-tight">
-                  CCC, MaxiRace, Templiers, UTMB… tu te prépares pour le jour J.
+                  Tu te prépares sérieusement pour le jour J — sur ta course objectif.
                 </h3>
                 <p className="mt-1 text-xs text-ink-muted leading-relaxed">
                   Plan d&apos;entraînement IA personnalisé, plan nutrition au

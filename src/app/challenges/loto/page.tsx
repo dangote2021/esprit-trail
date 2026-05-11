@@ -16,7 +16,7 @@ import { MY_RUNS } from "@/lib/data/me";
 export const metadata: Metadata = {
   title: "Dossards en jeu",
   description:
-    "Accomplis un challenge trail (20 km, 1000 D+, sortie longue…) et tente de gagner gratuitement un dossard pour CCC, MaxiRace, Templiers ou un FKT collectif.",
+    "Accomplis un challenge trail (20 km, 1000 D+, sortie longue…) et tente de gagner gratuitement un dossard sur une course partenaire ou un FKT collectif.",
   openGraph: {
     title: "Dossards en jeu — Esprit Trail",
     description:
@@ -74,8 +74,8 @@ export default function LotoListPage() {
           <p className="mt-2 text-sm text-ink leading-relaxed">
             Chaque challenge te file 1 ticket dans le tirage. Tu invites un pote
             via WhatsApp ? +1 ticket, lui aussi. Au bout, des organisateurs
-            mettent leurs dossards à dispo — UTMB, Templiers, MaxiRace, FKT
-            indé. <strong>Zéro mise. Zéro frais.</strong>
+            mettent leurs dossards à dispo — courses partenaires et FKT indé.{" "}
+            <strong>Zéro mise. Zéro frais.</strong>
           </p>
           <p className="mt-3 text-[11px] text-ink-muted leading-relaxed">
             Esprit Trail n'organise pas un jeu d'argent : c'est un cadeau partenaire,

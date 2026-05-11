@@ -3,7 +3,7 @@ import BadgeCard from "@/components/ui/BadgeCard";
 import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
-import { StatStarsList } from "@/components/ui/StatStarsList";
+import StatRadarEditable from "@/components/profile/StatRadarEditable";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
 import { getBadge } from "@/lib/data/badges";
 import { RARITY_STYLES, TITLES, levelFromXp } from "@/lib/types";
@@ -103,21 +103,8 @@ export default function ProfilePage() {
       {/* ===== Best Results — 3 courses mythiques user-editable ===== */}
       <BestResults />
 
-      {/* ===== Forces & faiblesses en étoiles ===== */}
-      <StatStarsList stats={ME.profile!.stats} />
-
-      {/* Auto-évaluation des attributs (sondage radar configurable) */}
-      <Link
-        href="/profile/stats"
-        className="block rounded-xl border border-ink/10 bg-bg-card/60 px-4 py-2.5 text-xs text-ink-muted transition hover:border-lime/40 hover:text-ink"
-      >
-        <span className="font-mono font-bold uppercase tracking-widest text-lime">
-          ✎ Auto-évaluation
-        </span>
-        <span className="ml-2">
-          ajuste tes points forts et faibles toi-même →
-        </span>
-      </Link>
+      {/* ===== Forces & faiblesses — radar hexagonal FIFA-style + auto-évaluation ===== */}
+      <StatRadarEditable baseStats={ME.profile!.stats} />
 
       {/* Bloc PlayerHUD supprimé — la carte Hero suffit pour identifier le profil */}
       {/* Bloc Character customization retiré — on garde le profil propre, photo perso */}
