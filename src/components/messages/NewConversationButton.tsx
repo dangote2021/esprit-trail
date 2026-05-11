@@ -55,7 +55,7 @@ export default function NewConversationButton() {
         className="rounded-xl bg-lime px-3 py-2 text-[11px] font-mono font-black uppercase tracking-wider text-bg shadow-glow-lime hover:scale-[1.03] active:scale-[0.97] transition"
         aria-label="Nouvelle conversation"
       >
-        + Nouvelle
+        + Blabla
       </button>
     );
   }

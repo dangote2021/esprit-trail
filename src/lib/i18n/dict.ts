@@ -70,7 +70,7 @@ const fr: Dict = {
   "messages.header.title": "Tes conversations",
   "messages.intro": "Organise une sortie, partage un spot, file un plan nutri",
   "messages.intro.sub": "DM 1-1 ou groupes jusqu'à 20 traileurs",
-  "messages.new_button": "+ Nouvelle",
+  "messages.new_button": "+ Blabla",
 
   // Common actions
   "action.start": "Commencer",
