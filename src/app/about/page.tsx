@@ -93,8 +93,9 @@ export default function AboutPage() {
               Pour garder l&apos;Esprit Trail vivant
             </h3>
             <p className="mt-1 text-sm text-ink-muted leading-relaxed">
-              On veut organiser des courses de zinzins qui vont te faire vibrer
-              à chaque kilomètre.
+              On veut organiser des courses inoubliables qui vont te faire
+              vibrer à chaque kilomètre, que tu bagarres à l&apos;avant avec
+              Théo D. et Matthieu B. ou que tu luttes avec la voiture-balai.
             </p>
           </div>
 
