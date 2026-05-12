@@ -5,9 +5,15 @@
 // et reçoit en retour des tickets bonus pour le tirage dossards gratuits.
 //
 // Mécanique :
-// - 1 invité qui s'inscrit = +1 ticket bonus pour le tirage au sort
-// - 3 invités = badge "Bouzin recruteur"
-// - 5+ invités = ticket premium (2x chances)
+// - 1 invité qui s'inscrit = +1 ticket bonus → maximise les chances au
+//   tirage des dossards gratuits (PAS de gain automatique)
+// - 3 invités = badge "Bouzin recruteur" (badge cosmétique)
+// - 5+ invités = chances boostées (les tickets comptent double dans
+//   l'urne de tirage)
+// - 10+ invités = chances max (tickets comptent triple)
+//
+// Important : invitter des potos AUGMENTE LES CHANCES, mais ne garantit
+// jamais d'obtenir un dossard. Le tirage reste aléatoire.
 //
 // Tracking initial via localStorage (key: esprit_invites_sent).
 // La vérification "l'invité s'est-il vraiment inscrit ?" passera plus tard
@@ -79,7 +85,7 @@ export default function InviteFriendsCard({
     incrementInvitesSent();
     setInvitesSent(getInvitesSent());
     showToast(
-      `✓ Invitation partagée ! +1 ticket bonus pour le tirage`,
+      `✓ Invitation partagée ! +1 chance au tirage`,
       "success",
     );
     // Petite vibration
@@ -106,16 +112,16 @@ export default function InviteFriendsCard({
             <div className="text-3xl">🎟️</div>
             <div className="flex-1 min-w-0">
               <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
-                Boost ton tirage
+                Maximise tes chances
               </div>
               <div className="mt-0.5 font-display text-base font-black leading-tight">
-                Invite tes potos = +tickets bonus
+                Invite tes potos → + de chances au tirage
               </div>
               {mounted && (
                 <div className="mt-1 text-[11px] text-ink-muted">
-                  Tu as <strong className="text-lime">{bonusTickets} ticket{bonusTickets > 1 ? "s" : ""} bonus</strong>{" "}
-                  pour avoir invité{" "}
-                  {invitesSent} pot{invitesSent > 1 ? "os" : "o"}
+                  <strong className="text-lime">+{bonusTickets} chance{bonusTickets > 1 ? "s" : ""}</strong>{" "}
+                  ajoutée{bonusTickets > 1 ? "s" : ""} à l&apos;urne du tirage
+                  ({invitesSent} pot{invitesSent > 1 ? "os" : "o"} invité{invitesSent > 1 ? "s" : ""})
                 </div>
               )}
             </div>
@@ -159,15 +165,17 @@ export default function InviteFriendsCard({
           <div className="flex-1 min-w-0">
             <div className="inline-flex items-center gap-1.5 rounded-md bg-lime/20 text-lime px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider">
               <span className="h-1.5 w-1.5 rounded-full bg-lime animate-pulse" />
-              Parrainage · Boost loto
+              Parrainage · Maximise tes chances
             </div>
             <div className="mt-1 font-display text-xl font-black leading-tight text-lime">
               Invite tes potos
             </div>
             <p className="text-xs text-ink-muted mt-1 leading-relaxed">
               Chaque poto qui rejoint l&apos;app via ton lien =
-              <strong className="text-ink"> +1 ticket bonus</strong> au tirage
-              des dossards gratuits.
+              <strong className="text-ink"> +1 chance</strong> ajoutée dans
+              l&apos;urne du tirage des dossards. Plus tu en invites,
+              <strong className="text-ink"> plus tes chances grimpent</strong> —
+              sans garantie de gain.
             </p>
           </div>
         </div>
@@ -178,10 +186,10 @@ export default function InviteFriendsCard({
             <div className="flex items-end justify-between">
               <div>
                 <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
-                  Tickets bonus accumulés
+                  Chances ajoutées au tirage
                 </div>
                 <div className="font-display text-3xl font-black text-lime leading-none mt-0.5">
-                  {bonusTickets}
+                  +{bonusTickets}
                   <span className="text-base text-ink-dim ml-1">
                     🎟️
                   </span>
@@ -223,7 +231,7 @@ export default function InviteFriendsCard({
                 }`}
               >
                 <div className="font-black">5 potos</div>
-                <div className="opacity-70">Ticket premium 2×</div>
+                <div className="opacity-70">Chances ×2 au tirage</div>
               </div>
               <div
                 className={`rounded-md p-1.5 text-center ${
@@ -233,12 +241,14 @@ export default function InviteFriendsCard({
                 }`}
               >
                 <div className="font-black">10 potos</div>
-                <div className="opacity-70">Dossard offert*</div>
+                <div className="opacity-70">Chances ×3 au tirage</div>
               </div>
             </div>
             <p className="text-[9px] text-ink-dim pt-1 leading-relaxed">
-              *Dossard offert sur une course partenaire au choix dans la liste
-              de la saison.
+              Plus tu invites de potos, plus tes chances montent dans l&apos;urne du
+              tirage au sort des dossards. <strong>Sans garantie de gain</strong> —
+              le tirage reste aléatoire (mais tes chances sont nettement
+              meilleures qu&apos;un coureur qui n&apos;invite personne).
             </p>
           </div>
         )}
