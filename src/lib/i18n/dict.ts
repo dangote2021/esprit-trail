@@ -154,7 +154,7 @@ const fr: Dict = {
   "landing.footer.tagline": "Esprit Trail · Indépendant, sans pub, sans tracking tiers",
 
   // Run start CTA (home loggé)
-  "run.cta.eyebrow": "Prêt pour une session trail plein phare ?",
+  "run.cta.eyebrow": "Prêt pour une session trail de zinzins ?",
   "run.cta.title": "Lance une sortie",
   "run.cta.subtitle": "Synchronise Strava, enchaîne les kilomètres et analyse tes datas.",
   "run.strava_modal.eyebrow": "Étape conseillée · 30 sec",

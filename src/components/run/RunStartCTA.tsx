@@ -64,7 +64,7 @@ export default function RunStartCTA() {
           </div>
           <div className="flex-1">
             <div className="text-[11px] font-black uppercase tracking-wider">
-              Prêt pour une session trail plein phare&nbsp;?
+              Prêt pour une session trail de zinzins&nbsp;?
             </div>
             <div className="font-display text-xl font-black leading-tight">
               Lance une sortie
