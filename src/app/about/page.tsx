@@ -26,7 +26,7 @@ export default function AboutPage() {
         </Link>
         <div className="text-center">
           <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
-            Manifeste
+            Manifesto
           </div>
           <h1 className="font-display text-lg font-black leading-none">
             Esprit Trail

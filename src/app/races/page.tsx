@@ -293,7 +293,7 @@ export default function RacesPage() {
                 href="/races/off"
                 className="mt-2 inline-block text-[11px] font-mono font-bold text-peach underline-offset-2 hover:underline"
               >
-                Voir le manifeste OFF complet →
+                Voir le manifesto OFF complet →
               </Link>
             </div>
           </section>

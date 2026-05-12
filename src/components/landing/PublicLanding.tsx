@@ -70,10 +70,10 @@ export default function PublicLanding({
         </p>
       </section>
 
-      {/* Manifeste — 2 piliers : l'âme + la progression */}
+      {/* Manifesto — 2 piliers : l'âme + la progression */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach text-center">
-          ✶ Notre manifeste ✶
+          ✶ Notre manifesto ✶
         </div>
 
         {/* Pilier 1 — l'âme du trail */}
