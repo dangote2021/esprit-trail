@@ -5,8 +5,11 @@
 // pirate races, défis entre potes. Tout ce qui n'est pas sur le circuit
 // UTMB/ITRA officiel mais qui a de l'âme.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { showToast } from "@/components/ui/Toast";
+
+const ATTENDANCE_KEY = "esprit_off_attendance"; // map raceId -> "1"
 
 type OffCategory =
   | "fkt"
@@ -200,8 +203,54 @@ const CAT_META: Record<
   },
 };
 
+function loadAttendance(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(ATTENDANCE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveAttendance(map: Record<string, boolean>) {
+  try {
+    window.localStorage.setItem(ATTENDANCE_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
 export default function OffRacesPage() {
   const [cat, setCat] = useState<OffCategory | "all">("all");
+  const [attendance, setAttendance] = useState<Record<string, boolean>>({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setAttendance(loadAttendance());
+  }, []);
+
+  function toggleAttendance(raceId: string, raceName: string) {
+    const next = { ...attendance };
+    const wasAttending = !!next[raceId];
+    if (wasAttending) {
+      delete next[raceId];
+      showToast(`Tu n'es plus inscrit à ${raceName}`, "info");
+    } else {
+      next[raceId] = true;
+      showToast(`✓ Tu es inscrit à ${raceName} — entre potos !`, "success");
+    }
+    setAttendance(next);
+    saveAttendance(next);
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(wasAttending ? 15 : [10, 50, 10]);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
 
   const filtered =
     cat === "all" ? OFF_RACES : OFF_RACES.filter((r) => r.category === cat);
@@ -428,6 +477,30 @@ export default function OffRacesPage() {
                       })}
                     </span>
                   </div>
+                )}
+
+                {/* CTA "Je serai là" — participation à la course off */}
+                {mounted && (
+                  <button
+                    onClick={() => toggleAttendance(race.id, race.name)}
+                    className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-display font-black uppercase tracking-wider transition tap-bounce ${
+                      attendance[race.id]
+                        ? "bg-lime text-bg shadow-glow-lime btn-chunky"
+                        : "border-2 border-peach/40 bg-peach/5 text-peach hover:bg-peach/15"
+                    }`}
+                  >
+                    {attendance[race.id] ? (
+                      <>
+                        <span>✓</span>
+                        <span>Je serai là — pleins phares&nbsp;!</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>🏴‍☠️</span>
+                        <span>Je serai là</span>
+                      </>
+                    )}
+                  </button>
                 )}
               </div>
             </article>

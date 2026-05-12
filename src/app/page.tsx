@@ -7,6 +7,7 @@ import PublicLanding from "@/components/landing/PublicLanding";
 import RunStartCTA from "@/components/run/RunStartCTA";
 import BibIcon from "@/components/ui/BibIcon";
 import GutTrainingIcon from "@/components/ui/GutTrainingIcon";
+import InviteFriendsCard from "@/components/invite/InviteFriendsCard";
 import { MY_BADGES, MY_RUNS } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
 import { BADGES, getBadge } from "@/lib/data/badges";
@@ -147,6 +148,9 @@ export default async function HomePage({
           <div className="font-display text-2xl text-lime">→</div>
         </div>
       </Link>
+
+      {/* PARRAINAGE — Invite tes potos, gagne des tickets bonus loto */}
+      <InviteFriendsCard variant="full" />
 
       {/* Coach IA — Plan d'entraînement (feature 1) */}
       <Link

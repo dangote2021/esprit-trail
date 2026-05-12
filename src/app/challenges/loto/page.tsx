@@ -12,6 +12,7 @@ import {
   type BibChallenge,
 } from "@/lib/data/bib-challenges";
 import { MY_RUNS } from "@/lib/data/me";
+import InviteFriendsCard from "@/components/invite/InviteFriendsCard";
 
 export const metadata: Metadata = {
   title: "Dossards en jeu",
@@ -84,6 +85,9 @@ export default function LotoListPage() {
           </p>
         </div>
       </section>
+
+      {/* Parrainage compact — Boost ton tirage en invitant tes potos */}
+      <InviteFriendsCard variant="compact" />
 
       {/* Liste */}
       <section className="space-y-4">

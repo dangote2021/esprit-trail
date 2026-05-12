@@ -361,7 +361,7 @@ function ChapterContent({ id }: { id: ChapterId }) {
                 • <strong>500-700 mg de sodium/h</strong> (1 pastille électrolyte/45 min)
               </li>
               <li>
-                • <strong>Pisse claire = trop bu</strong>, pisse foncée = pas assez
+                • <strong>Repère pisse</strong> : jaune paille = parfait, transparente = excès d&apos;eau pure, jaune foncé = pas assez bu
               </li>
               <li>
                 • Par grosse chaleur : <strong>+30%</strong> sur eau ET sel

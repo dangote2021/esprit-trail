@@ -30,6 +30,10 @@ type ShareSheetProps = {
   url: string;
   /** Étiquette accroche dans le header (ex: "Partager ce spot") */
   eyebrow?: string;
+  /** Callback déclenché quand un canal de partage est effectivement utilisé
+   *  (native share, click WhatsApp/SMS/Email/Telegram/Twitter, copie du lien).
+   *  Utilisé pour le parrainage : tracker les invitations envoyées. */
+  onShared?: () => void;
 };
 
 export default function ShareSheet({
@@ -39,6 +43,7 @@ export default function ShareSheet({
   text,
   url,
   eyebrow = "Partager",
+  onShared,
 }: ShareSheetProps) {
   const [copied, setCopied] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
@@ -89,6 +94,7 @@ export default function ShareSheet({
       onClick: async () => {
         try {
           await navigator.share({ title, text, url });
+          onShared?.();
           onClose();
         } catch {
           // user cancelled
@@ -139,10 +145,12 @@ export default function ShareSheet({
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      onShared?.();
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
       // fallback : show prompt
       window.prompt("Copie ce lien :", url);
+      onShared?.();
     }
   }
 
@@ -210,6 +218,7 @@ export default function ShareSheet({
                   target={c.href.startsWith("http") ? "_blank" : undefined}
                   rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   onClick={() => {
+                    onShared?.();
                     // close after a small delay so the link can fire
                     window.setTimeout(onClose, 200);
                   }}
