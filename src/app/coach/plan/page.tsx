@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { ME, MY_RUNS } from "@/lib/data/me";
 
 type Goal =
-  | "first-10k"
+  | "specific-trail"
   | "first-trail"
   | "improve-marathon"
   | "first-ultra"
@@ -52,9 +52,9 @@ type ApiPlan = {
 };
 
 const GOAL_META: Record<Goal, { label: string; emoji: string; distance: string }> = {
-  "first-10k": { label: "Mon premier 10K", emoji: "🏁", distance: "10 km" },
+  "specific-trail": { label: "Trail spécifique", emoji: "🏜️", distance: "Conditions extrêmes" },
   "first-trail": { label: "Mon premier trail", emoji: "🌲", distance: "20-30 km" },
-  "improve-marathon": { label: "Battre mon marathon", emoji: "⚡", distance: "42 km" },
+  "improve-marathon": { label: "Battre mon RP Marathon", emoji: "⚡", distance: "42 km" },
   "first-ultra": { label: "Mon premier ultra", emoji: "🔥", distance: "50-80 km" },
   "utmb-qualif": { label: "Qualif UTMB", emoji: "👑", distance: "100 km+" },
   "lose-weight": { label: "Forme et santé", emoji: "💚", distance: "" },

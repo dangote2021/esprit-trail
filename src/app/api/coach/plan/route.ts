@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 //
 // Body attendu :
 // {
-//   goal: "first-10k" | "first-trail" | "improve-marathon" | "first-ultra" |
+//   goal: "specific-trail" | "first-trail" | "improve-marathon" | "first-ultra" |
 //         "utmb-qualif" | "lose-weight" | "rebuild" | "custom",
 //   targetDate?: string,          // ISO date de la course objectif
 //   currentLevel: {
@@ -28,7 +28,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 type Goal =
-  | "first-10k"
+  | "specific-trail"
   | "first-trail"
   | "improve-marathon"
   | "first-ultra"
@@ -38,7 +38,7 @@ type Goal =
   | "custom";
 
 const WEEKS_BY_GOAL: Record<Goal, number> = {
-  "first-10k": 8,
+  "specific-trail": 16,
   "first-trail": 10,
   "improve-marathon": 12,
   "first-ultra": 16,
@@ -46,6 +46,42 @@ const WEEKS_BY_GOAL: Record<Goal, number> = {
   "lose-weight": 12,
   rebuild: 8,
   custom: 12,
+};
+
+// Guidance contextuelle injectée dans le prompt Claude selon l'objectif
+const GOAL_CONTEXT: Partial<Record<Goal, string>> = {
+  "specific-trail": `OBJECTIF : Trail spécifique en conditions extrêmes (Marathon des Sables, trail dans la jungle, ultra en altitude, etc.).
+
+Conseils SPÉCIFIQUES à intégrer dans le plan et les coachTips/nutritionTips :
+
+Pour DÉSERT (Marathon des Sables, type Atacama, Sahara) :
+- Acclimatation chaleur : sortie longue en heat suit, sauna 4×/semaine en peak (30 min à 90°C)
+- Pieds : entraînement avec guêtres anti-sable, doubler la couche de tape préventif sur les zones de friction, NOK généreux
+- Nutrition autonomie : porter sa bouffe à dos, 4500 kcal/jour, lyophilisés testés et re-testés
+- Hydratation : 1L/h en course, électrolytes obligatoires (1g sel/L mini), pas plus de 600ml d'un coup pour pas saturer l'estomac
+- Mental : étapes longues 6-12h sous 45°C, divisier en blocs de 10 km
+
+Pour JUNGLE (type Jungle Marathon, Costa Rica) :
+- Humidité 95% : préparation en hammam 3×/semaine, tee-shirts ultra-respirants techniques
+- Boue/passages eau : chaussures avec drainage, double paire de chaussettes Injinji
+- Insectes : DEET 50% + permethrine sur le matos, traitement antipaludéen anticipé
+- Nutrition tropicale : prévoir bouffe ne dépendant pas de la chaîne du froid, électrolytes renforcés
+- Visibilité courte : entraîner le mental sur sentiers en forêt dense, pas de GPS fiable
+
+Pour ALTITUDE (type UTMB CCC réelle, Hardrock, runs ≥ 2500m) :
+- Acclimatation 7-10 jours avant si possible
+- Stages altitude en chambre hypoxique 2 mois avant (3000m simulé, 1h/jour)
+- Cardio adapté : -10% allure en altitude, écouter la respiration
+
+Le plan doit inclure :
+- Phase foundation : 6 semaines volume + base aérobie en zone 2
+- Phase build : 6 semaines spécifique aux conditions (heat training / humidité / hypoxie selon contexte)
+- Phase peak : 2 semaines de simulation course (textile complet, ravito embarqué, conditions)
+- Phase taper : 2 semaines affûtage + dernière acclimatation
+- Demander dans freeText le type exact (désert/jungle/altitude) pour adapter; sinon couvrir les 3.`,
+  "improve-marathon": `OBJECTIF : Battre son Record Personnel sur marathon (route, 42.195 km).
+Le plan doit inclure une progression en allure spécifique marathon, des séances à allure tempo, des sorties longues avec blocs en allure cible, et un affûtage de 2-3 semaines avant le jour J.
+Les coachTips doivent parler de stratégie de course (split négatif, sucre dès 30 min), de pacing, et de la gestion mentale du mur du 30e.`,
 };
 
 type SessionType = "easy" | "long" | "interval" | "hill" | "rest" | "race";
@@ -135,7 +171,9 @@ function buildUserPrompt(opts: {
     totalWeeks,
   } = opts;
 
-  return `PROFIL DU COUREUR :
+  const contextBlock = GOAL_CONTEXT[goal] ? `\n${GOAL_CONTEXT[goal]}\n` : "";
+
+  return `${contextBlock}PROFIL DU COUREUR :
 - Objectif : ${goal}
 ${targetDate ? `- Date cible : ${targetDate}` : ""}
 - Volume actuel : ${weeklyKm} km/semaine

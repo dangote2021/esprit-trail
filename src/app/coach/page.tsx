@@ -5,7 +5,7 @@ import Link from "next/link";
 import NutritionPlan from "@/components/coach/NutritionPlan";
 
 type Goal =
-  | "first-10k"
+  | "specific-trail"
   | "first-trail"
   | "improve-marathon"
   | "first-ultra"
@@ -23,12 +23,12 @@ const GOALS: {
   accent: "lime" | "peach" | "cyan" | "violet" | "gold";
 }[] = [
   {
-    id: "first-10k",
-    emoji: "🏁",
-    title: "Mon premier 10K",
-    desc: "Je cours depuis peu, je vise 10 km d'une traite",
-    weeks: 8,
-    accent: "lime",
+    id: "specific-trail",
+    emoji: "🏜️",
+    title: "Préparer un trail spécifique",
+    desc: "Marathon des Sables, trail dans la jungle, ultra en altitude — conditions extrêmes",
+    weeks: 16,
+    accent: "gold",
   },
   {
     id: "first-trail",
@@ -41,7 +41,7 @@ const GOALS: {
   {
     id: "improve-marathon",
     emoji: "⚡",
-    title: "Battre mon marathon",
+    title: "Battre mon RP Marathon",
     desc: "Gagner du temps sur ma meilleure perf",
     weeks: 12,
     accent: "peach",
