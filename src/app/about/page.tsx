@@ -60,7 +60,7 @@ export default function AboutPage() {
             , de{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-peach">
-                participer à des courses incroyables
+                participer à des courses de zinzins
               </span>
               <span className="absolute inset-x-0 bottom-1 -z-0 h-2 rounded bg-peach/25" />
             </span>{" "}
