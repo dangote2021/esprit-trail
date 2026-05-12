@@ -126,11 +126,29 @@ export default function ShareSheet({
       href: `mailto:?subject=${encodedTitle}&body=${encodedBody}`,
     },
     {
-      key: "telegram",
-      label: "Telegram",
-      emoji: "✈️",
-      color: "bg-[#0088cc]/15 border-[#0088cc]/40 text-[#0088cc]",
-      href: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+      key: "instagram",
+      label: "Instagram",
+      emoji: "📸",
+      color: "bg-[#E1306C]/15 border-[#E1306C]/40 text-[#E1306C]",
+      // Instagram ne supporte PAS le partage URL direct (limitation API).
+      // On copie le lien dans le clipboard et on ouvre Instagram pour que
+      // l'utilisateur le colle en DM ou en story.
+      onClick: async () => {
+        try {
+          await navigator.clipboard.writeText(`${text} ${url}`);
+        } catch {
+          /* ignore — l'user pourra toujours copier ailleurs */
+        }
+        // Tente le deep link app, fallback web après 600ms
+        const opened = window.open("instagram://app", "_blank");
+        window.setTimeout(() => {
+          if (!opened || opened.closed) {
+            window.open("https://www.instagram.com/", "_blank");
+          }
+        }, 600);
+        onShared?.();
+        window.setTimeout(onClose, 200);
+      },
     },
     {
       key: "twitter",
