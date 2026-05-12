@@ -2,7 +2,7 @@
 
 // ====== FeedbackForm ======
 // Formulaire "Une idée pour Esprit Trail ?" qui ouvre le client mail de
-// l'utilisateur sur mailto:esprit.trail.app@gmail.com avec le sujet et le
+// l'utilisateur sur mailto:ravito.trail.app@gmail.com avec le sujet et le
 // corps pré-remplis.
 //
 // Pas de backend nécessaire — le mailto fonctionne sur tous les devices
@@ -12,7 +12,7 @@
 
 import { useState } from "react";
 
-const TO_EMAIL = "esprit.trail.app@gmail.com";
+const TO_EMAIL = "ravito.trail.app@gmail.com";
 
 const TOPICS: Array<{ key: string; label: string; emoji: string }> = [
   { key: "feature", label: "Idée de feature", emoji: "💡" },

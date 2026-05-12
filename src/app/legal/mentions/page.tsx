@@ -31,7 +31,7 @@ export default function MentionsPage() {
           SIRET : <em>à compléter avant publication stores</em>
           <br />
           Email :{" "}
-          <a href="mailto:esprit.trail.app@gmail.com">esprit.trail.app@gmail.com</a>
+          <a href="mailto:ravito.trail.app@gmail.com">ravito.trail.app@gmail.com</a>
           <br />
           Directeur de la publication : Guillaume Coulon
         </p>
@@ -84,10 +84,10 @@ export default function MentionsPage() {
         <h2>Contact</h2>
         <p>
           Pour toute question légale :{" "}
-          <a href="mailto:esprit.trail.app@gmail.com">esprit.trail.app@gmail.com</a>
+          <a href="mailto:ravito.trail.app@gmail.com">ravito.trail.app@gmail.com</a>
           <br />
           Pour les questions de données personnelles :{" "}
-          <a href="mailto:esprit.trail.app@gmail.com">esprit.trail.app@gmail.com</a>
+          <a href="mailto:ravito.trail.app@gmail.com">ravito.trail.app@gmail.com</a>
         </p>
 
         <h2>Crédits</h2>

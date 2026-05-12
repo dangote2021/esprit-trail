@@ -111,7 +111,7 @@ export default function PrivacyPage() {
         </ul>
         <p>
           Pour exercer ces droits, écris à{" "}
-          <a href="mailto:esprit.trail.app@gmail.com">esprit.trail.app@gmail.com</a>. Réponse
+          <a href="mailto:ravito.trail.app@gmail.com">ravito.trail.app@gmail.com</a>. Réponse
           sous 30 jours.
         </p>
         <p>

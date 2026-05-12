@@ -107,10 +107,10 @@ export default async function AccountPage() {
         <p className="mt-3 text-xs leading-relaxed text-ink-muted">
           Pour toute question sur tes données :{" "}
           <a
-            href="mailto:esprit.trail.app@gmail.com"
+            href="mailto:ravito.trail.app@gmail.com"
             className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
           >
-            esprit.trail.app@gmail.com
+            ravito.trail.app@gmail.com
           </a>
         </p>
       </section>

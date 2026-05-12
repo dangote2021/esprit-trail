@@ -150,7 +150,7 @@ export default function CguPage() {
         <h2>12. Contact</h2>
         <p>
           Pour toute question :{" "}
-          <a href="mailto:esprit.trail.app@gmail.com">esprit.trail.app@gmail.com</a>
+          <a href="mailto:ravito.trail.app@gmail.com">ravito.trail.app@gmail.com</a>
         </p>
       </section>
     </>

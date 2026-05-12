@@ -166,7 +166,7 @@ export default function OrganisateursPage() {
           on cale le tirage en 1 semaine.
         </p>
         <a
-          href="mailto:esprit.trail.app@gmail.com?subject=Dossard%20en%20jeu%20sur%20Esprit%20Trail&body=Bonjour%20l%27%C3%A9quipe%20Esprit%20Trail%2C%0A%0ANous%20sommes%20l%27organisation%20de%20...%0AOn%20aimerait%20mettre%20...%20dossard(s)%20en%20jeu.%0A%0ADate%20de%20la%20course%20%3A%20%0AValeur%20du%20dossard%20%3A%20%0ACombien%20de%20places%20%3A%20%0ANotre%20site%20%3A%20%0A%0AMerci%20%21"
+          href="mailto:ravito.trail.app@gmail.com?subject=Dossard%20en%20jeu%20sur%20Esprit%20Trail&body=Bonjour%20l%27%C3%A9quipe%20Esprit%20Trail%2C%0A%0ANous%20sommes%20l%27organisation%20de%20...%0AOn%20aimerait%20mettre%20...%20dossard(s)%20en%20jeu.%0A%0ADate%20de%20la%20course%20%3A%20%0AValeur%20du%20dossard%20%3A%20%0ACombien%20de%20places%20%3A%20%0ANotre%20site%20%3A%20%0A%0AMerci%20%21"
           className="block rounded-2xl bg-lime py-4 text-center font-display font-black uppercase tracking-wider text-bg btn-chunky tap-bounce"
         >
           ✉ Soumettre un dossard

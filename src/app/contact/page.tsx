@@ -43,10 +43,10 @@ export default function ContactPage() {
             Email principal
           </div>
           <a
-            href="mailto:esprit.trail.app@gmail.com"
+            href="mailto:ravito.trail.app@gmail.com"
             className="mt-1 block font-display text-2xl font-black text-lime hover:underline"
           >
-            esprit.trail.app@gmail.com
+            ravito.trail.app@gmail.com
           </a>
         </div>
 
@@ -55,10 +55,10 @@ export default function ContactPage() {
             Bug, plantage, vraie urgence
           </div>
           <a
-            href="mailto:esprit.trail.app@gmail.com?subject=BUG%20Esprit%20Trail"
+            href="mailto:ravito.trail.app@gmail.com?subject=BUG%20Esprit%20Trail"
             className="mt-1 block font-display text-xl font-black text-ink hover:text-lime hover:underline"
           >
-            esprit.trail.app@gmail.com
+            ravito.trail.app@gmail.com
           </a>
         </div>
 
@@ -67,10 +67,10 @@ export default function ContactPage() {
             Confidentialité, RGPD, droit à l&apos;oubli
           </div>
           <a
-            href="mailto:esprit.trail.app@gmail.com"
+            href="mailto:ravito.trail.app@gmail.com"
             className="mt-1 block font-display text-base font-black text-ink hover:text-lime hover:underline"
           >
-            esprit.trail.app@gmail.com
+            ravito.trail.app@gmail.com
           </a>
           <p className="mt-2 text-xs text-ink-muted">
             Tu peux aussi supprimer ton compte directement depuis{" "}
