@@ -97,10 +97,10 @@ export default async function HomePage({
               Nouveau · hors circuit
             </div>
             <div className="mt-1 font-display text-xl font-black leading-tight text-peach">
-              OFF Races
+              Inscris-toi à des OFF Races
             </div>
             <div className="text-xs text-ink-muted mt-0.5 leading-relaxed">
-              Participe et rejoins des courses pirates, projets GR et FKT.
+              Rejoins des courses pirates, projets GR et FKT.
               Pas de dossard, juste l&apos;âme du trail. Entre potos, pleins phares&nbsp;!
             </div>
             <div className="mt-2 flex flex-wrap gap-1 text-[9px] font-mono">
