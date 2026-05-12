@@ -99,8 +99,9 @@ export default async function HomePage({
             <div className="mt-1 font-display text-xl font-black leading-tight text-peach">
               OFF Races
             </div>
-            <div className="text-xs text-ink-muted mt-0.5">
-              FKT, courses pirates, GR projects. Pas de dossard, juste l'âme du trail.
+            <div className="text-xs text-ink-muted mt-0.5 leading-relaxed">
+              Participe et rejoins des courses pirates, projets GR et FKT.
+              Pas de dossard, juste l&apos;âme du trail. Entre potos, pleins phares&nbsp;!
             </div>
             <div className="mt-2 flex flex-wrap gap-1 text-[9px] font-mono">
               <span className="rounded bg-bg-raised/80 px-1.5 py-0.5">⚡ FKT</span>
