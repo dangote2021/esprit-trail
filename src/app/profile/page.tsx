@@ -150,7 +150,7 @@ export default function ProfilePage() {
               I
             </div>
             <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-violet">
-              Cailloux ITRA
+              ITRA
             </div>
           </div>
           <div className="mt-2 font-display text-4xl font-black text-violet">

@@ -312,7 +312,7 @@ export default async function HomePage({
                     {nextRace.elevation} D+
                   </span>
                   <span className="rounded-md bg-bg-raised px-2 py-1">
-                    {nextRace.itraPoints} cailloux
+                    {nextRace.itraPoints} pts ITRA
                   </span>
                   {nextRace.utmbIndexRequired && (
                     <span className="rounded-md bg-cyan/10 px-2 py-1 text-cyan">

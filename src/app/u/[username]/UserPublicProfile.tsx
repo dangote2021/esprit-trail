@@ -270,7 +270,7 @@ export default function UserPublicProfile({ username }: { username: string }) {
       {perfs && (
         <section className="space-y-2">
           <div className="text-[10px] font-mono font-black uppercase tracking-widest text-ink-muted px-1">
-            Ranking & cailloux
+            Ranking & points
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -279,11 +279,11 @@ export default function UserPublicProfile({ username }: { username: string }) {
               className="rounded-2xl border border-violet/30 bg-gradient-to-br from-violet/10 to-bg-card p-4 hover:border-violet/50 transition"
             >
               <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-violet/15 text-sm">
-                  🪨
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-violet to-peach font-display text-xs font-black text-bg">
+                  I
                 </div>
                 <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-violet">
-                  Cailloux ITRA
+                  Points ITRA
                 </div>
               </div>
               <div className="mt-2 font-display text-3xl font-black text-violet">

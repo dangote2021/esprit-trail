@@ -62,7 +62,7 @@ const fr: Dict = {
   "race.formats.eyebrow": "formats au choix",
   "race.formats.helper": "choisis ta distance",
   "race.formats.primary": "principal",
-  "race.itra.label": "Cailloux (pts ITRA)",
+  "race.itra.label": "Points ITRA",
   "race.itra.helper": "Comptés pour l'éligibilité ultra-trails",
 
   // Messages
@@ -311,7 +311,7 @@ const en: Dict = {
   "race.formats.eyebrow": "format options",
   "race.formats.helper": "pick your distance",
   "race.formats.primary": "main",
-  "race.itra.label": "Cailloux (ITRA)",
+  "race.itra.label": "ITRA points",
   "race.itra.helper": "Used for ultra-trail eligibility",
 
   // Messages
