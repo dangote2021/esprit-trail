@@ -131,6 +131,45 @@ export default function CoachHubPage() {
         </div>
       </section>
 
+      {/* Masterclass — Pas péter au 15ème */}
+      <Link
+        href="/coach/masterclass"
+        className="relative block overflow-hidden rounded-3xl border-2 border-peach/40 bg-gradient-to-br from-peach/15 via-gold/10 to-bg p-5 card-chunky hover:scale-[1.01] transition"
+      >
+        <div className="flex items-start gap-4">
+          <div className="text-5xl animate-float">💥</div>
+          <div className="flex-1">
+            <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach">
+              Masterclass · Bouzin guide
+            </div>
+            <h2 className="mt-1 font-display text-xl font-black leading-tight">
+              Pas péter au 15ème kil
+            </h2>
+            <p className="mt-1 text-xs text-ink-muted leading-relaxed">
+              7 règles pour rester solide jusqu'au bout. Pacing, nutri, hydra,
+              mental, gut training — tout ce qui sépare un finisher d'un abandon.
+            </p>
+            <div className="mt-2 flex gap-2 text-[10px] font-mono">
+              <span className="rounded-md bg-peach/20 px-2 py-0.5 font-bold text-peach">
+                7 règles
+              </span>
+              <span className="rounded-md bg-cyan/20 px-2 py-0.5 font-bold text-cyan">
+                12 min
+              </span>
+            </div>
+          </div>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            className="h-6 w-6 shrink-0 text-peach"
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </div>
+      </Link>
+
       {/* Goal picker */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">

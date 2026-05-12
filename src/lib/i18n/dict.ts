@@ -154,9 +154,9 @@ const fr: Dict = {
   "landing.footer.tagline": "Esprit Trail · Indépendant, sans pub, sans tracking tiers",
 
   // Run start CTA (home loggé)
-  "run.cta.eyebrow": "Prêt pour une session trail ?",
+  "run.cta.eyebrow": "Prêt pour une session trail plein phare ?",
   "run.cta.title": "Lance une sortie",
-  "run.cta.subtitle": "Enchaîne les km, synchronise Strava et analyse tes datas.",
+  "run.cta.subtitle": "Synchronise Strava, enchaîne les kilomètres et analyse tes datas.",
   "run.strava_modal.eyebrow": "Étape conseillée · 30 sec",
   "run.strava_modal.title": "Tu connectes Strava ?",
   "run.strava_modal.body": "Avec Strava connecté, tes sorties s'importent automatiquement à chaque fois que tu poses ta montre. Le Coach IA, le radar Forme et le ranking se calibrent sur tes vraies data. Pas de double saisie, pas d'oubli.",
@@ -403,9 +403,9 @@ const en: Dict = {
   "landing.footer.tagline": "Esprit Trail · Independent, no ads, no third-party tracking",
 
   // Run start CTA
-  "run.cta.eyebrow": "Ready for a trail session?",
+  "run.cta.eyebrow": "Ready to crush a trail session?",
   "run.cta.title": "Start an outing",
-  "run.cta.subtitle": "Stack km, sync Strava and analyze your data.",
+  "run.cta.subtitle": "Sync Strava, stack km and crunch your data.",
   "run.strava_modal.eyebrow": "Recommended · 30 sec",
   "run.strava_modal.title": "Connect Strava?",
   "run.strava_modal.body": "With Strava connected, your runs import automatically every time you sync your watch. The AI Coach, Form radar and ranking calibrate on your real data. No double entry, nothing forgotten.",

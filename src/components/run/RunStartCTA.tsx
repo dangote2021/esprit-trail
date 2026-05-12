@@ -64,13 +64,13 @@ export default function RunStartCTA() {
           </div>
           <div className="flex-1">
             <div className="text-[11px] font-black uppercase tracking-wider">
-              Prêt pour une session trail&nbsp;?
+              Prêt pour une session trail plein phare&nbsp;?
             </div>
             <div className="font-display text-xl font-black leading-tight">
               Lance une sortie
             </div>
             <div className="text-xs opacity-80">
-              Enchaîne les km, synchronise Strava et analyse tes datas.
+              Synchronise Strava, enchaîne les kilomètres et analyse tes datas.
             </div>
           </div>
           <div className="font-display text-2xl transition group-hover:translate-x-1">
