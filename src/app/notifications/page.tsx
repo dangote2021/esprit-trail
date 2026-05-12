@@ -22,7 +22,7 @@ const SAMPLES: Notif[] = [
     id: "welcome",
     icon: "🏁",
     title: "Bienvenue au Esprit Trail",
-    body: "Ton compte est prêt. Fais une première sortie pour démarrer la collection de loot.",
+    body: "Ton compte est prêt. Connecte Strava et fais une première sortie ça part !",
     when: "à l'instant",
     tone: "lime",
   },
