@@ -443,8 +443,8 @@ export default async function HomePage({
             <div className="text-sm font-bold text-ink">
               Une idée pour améliorer Esprit Trail ?
             </div>
-            <div className="text-[11px] text-ink-muted">
-              Balance ton retour, on lit tout →
+            <div className="text-[11px] text-ink-muted leading-relaxed mt-0.5">
+              Balance ton retour, Esprit Kaizen — on s&apos;améliore pas à pas grâce à toi →
             </div>
           </div>
         </div>
