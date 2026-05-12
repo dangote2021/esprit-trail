@@ -190,8 +190,8 @@ export default async function HomePage({
               Prépare ton estomac
             </div>
             <div className="text-xs opacity-90 leading-snug">
-              Nutrition sur mesure pour ta course : zéro hypo, zéro mauvaise
-              surprise digestive.
+              Nutrition sur mesure pour ta course&nbsp;: garantie zéro hypo,
+              zéro gastro inshallah&nbsp;!
             </div>
           </div>
           <div className="font-display text-2xl shrink-0">→</div>
