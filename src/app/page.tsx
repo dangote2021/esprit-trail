@@ -163,7 +163,7 @@ export default async function HomePage({
               Coach IA · Plan sur mesure
             </div>
             <div className="font-display text-xl font-black leading-tight">
-              Génère ton plan
+              Génère ton plan de prépa
             </div>
             <div className="text-xs opacity-80">
               Plan perso pour pas péter au 15ème km en fonction de ton niveau
