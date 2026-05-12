@@ -101,9 +101,6 @@ export default function ProfilePage() {
         ]}
       />
 
-      {/* ===== Totem animal — cosmétique facultatif ===== */}
-      <TotemPicker />
-
       {/* ===== Best Results — 3 courses mythiques user-editable ===== */}
       <BestResults />
 
@@ -194,6 +191,9 @@ export default function ProfilePage() {
         </div>
         <span className="font-display text-xl text-gold shrink-0">→</span>
       </Link>
+
+      {/* ===== Totem animal — cosmétique facultatif (juste au-dessus de Strava) ===== */}
+      <TotemPicker />
 
       {/* Sync Strava */}
       <section className="space-y-3">
