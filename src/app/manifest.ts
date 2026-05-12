@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 // Build tag pour cache-bust PWA (changer pour forcer la mise à jour côté client)
-const BUILD_TAG = "2026-05-11-v2";
+const BUILD_TAG = "2026-05-12-runner-sunset-v3";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
