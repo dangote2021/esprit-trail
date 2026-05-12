@@ -277,7 +277,8 @@ export default function AboutPage() {
                   Je vise une course
                 </div>
                 <h3 className="mt-0.5 font-display text-base font-black leading-tight">
-                  Tu te prépares sérieusement pour le jour J — sur ta course objectif.
+                  Tu te prépares sérieusement pour ton prochain objectif&nbsp;:
+                  le trail du village du coin ou la prochaine Diag&apos;&nbsp;?
                 </h3>
                 <p className="mt-1 text-xs text-ink-muted leading-relaxed">
                   Plan d&apos;entraînement IA personnalisé, plan nutrition au
@@ -313,7 +314,7 @@ export default function AboutPage() {
                   Je cherche des sorties
                 </div>
                 <h3 className="mt-0.5 font-display text-base font-black leading-tight">
-                  Pas de dossard, juste l&apos;envie de courir des trucs cools.
+                  Pas de dossards, juste l&apos;envie de kiffer.
                 </h3>
                 <p className="mt-1 text-xs text-ink-muted leading-relaxed">
                   OFF Races (FKT, courses pirates, GR projects), spots GPX
