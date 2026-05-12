@@ -112,13 +112,13 @@ export default function AboutPage() {
           </div>
 
           <div className="rounded-2xl border-2 border-ink/10 bg-bg-card/60 p-4">
-            <div className="text-2xl mb-2">🎮</div>
+            <div className="text-2xl mb-2">🏔️</div>
             <h3 className="font-display text-base font-black">
-              Progresser sans se blesser
+              Améliorer tes perfs
             </h3>
             <p className="mt-1 text-sm text-ink-muted leading-relaxed">
               Coach IA qui te génère ton plan, quêtes quotidiennes : on
-              débloque des mondes.
+              débloque des mondes, on t&apos;aide à décrocher la lune.
             </p>
           </div>
         </div>
