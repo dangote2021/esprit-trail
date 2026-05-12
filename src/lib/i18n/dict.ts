@@ -123,7 +123,7 @@ const fr: Dict = {
   "landing.capture3.tickets_label": "Tes tickets",
   "landing.capture3.participants_label": "Participants",
   "landing.capture3.lots_label": "Lots en jeu",
-  "landing.capture3.note": "Chaque km couru = des tickets. Tirage au sort à J-7. Dossards sur des courses partenaires et FKT collectifs.",
+  "landing.capture3.note": "Chaque km couru = des tickets. Tirage au sort à J-7. Dossards sur des courses partenaires.",
   "landing.features.title": "Et aussi…",
   "landing.features.coach_ai": "Coach IA",
   "landing.features.coach_ai.desc": "plan d'entraînement perso pour ton ultra",

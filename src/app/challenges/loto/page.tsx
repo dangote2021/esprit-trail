@@ -17,7 +17,7 @@ import InviteFriendsCard from "@/components/invite/InviteFriendsCard";
 export const metadata: Metadata = {
   title: "Dossards en jeu",
   description:
-    "Accomplis un challenge trail (20 km, 1000 D+, sortie longue…) et tente de gagner gratuitement un dossard sur une course partenaire ou un FKT collectif.",
+    "Accomplis un challenge trail (20 km, 1000 D+, sortie longue…) et tente de gagner gratuitement un dossard sur une course partenaire.",
   openGraph: {
     title: "Dossards en jeu — Esprit Trail",
     description:

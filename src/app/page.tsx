@@ -136,7 +136,7 @@ export default async function HomePage({
               Dossards en jeu
             </div>
             <div className="text-xs text-ink-muted mt-0.5">
-              Cours, gagne un ticket, vise un vrai dossard sur des courses partenaires ou un FKT collectif.
+              Cours, gagne un ticket, vise un vrai dossard sur des courses partenaires.
             </div>
             <div className="mt-2 flex flex-wrap gap-1 text-[9px] font-mono">
               <span className="rounded bg-bg-raised/80 px-1.5 py-0.5">🎯 Challenge</span>
@@ -148,9 +148,6 @@ export default async function HomePage({
           <div className="font-display text-2xl text-lime">→</div>
         </div>
       </Link>
-
-      {/* PARRAINAGE — Invite tes potos, gagne des tickets bonus loto */}
-      <InviteFriendsCard variant="full" />
 
       {/* Coach IA — Plan d'entraînement (feature 1) */}
       <Link
@@ -200,6 +197,9 @@ export default async function HomePage({
           <div className="font-display text-2xl shrink-0">→</div>
         </div>
       </Link>
+
+      {/* PARRAINAGE — Invite tes potos, maximise tes chances au tirage */}
+      <InviteFriendsCard variant="full" />
 
       {/* Daily quests */}
       <section className="space-y-3">

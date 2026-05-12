@@ -449,7 +449,7 @@ export default function PublicLanding({
 
           <p className="mt-3 text-[11px] text-ink-muted leading-relaxed">
             Chaque km couru = des tickets. Tirage au sort à J-7. Dossards sur
-            des courses partenaires et FKT collectifs.
+            des courses partenaires.
           </p>
         </div>
       </section>
