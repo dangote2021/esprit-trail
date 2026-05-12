@@ -106,8 +106,8 @@ export default function AboutPage() {
             </h3>
             <p className="mt-1 text-sm text-ink-muted leading-relaxed">
               FKT en solo, courses pirates, GR en autonomie, crew runs du
-              dimanche. L&apos;âme du trail elle est là : dans ce qu&apos;on
-              fait sans qu&apos;on nous regarde.
+              dimanche. L&apos;âme du trail elle est bien là : elle vibre dans
+              nos petits cœurs de traileurs.
             </p>
           </div>
 
