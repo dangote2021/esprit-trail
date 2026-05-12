@@ -98,7 +98,7 @@ export default async function HomePage({
               Nouveau · hors circuit
             </div>
             <div className="mt-1 font-display text-xl font-black leading-tight text-peach">
-              Inscris-toi à des OFF
+              Participe à des OFF
             </div>
             <div className="text-xs text-ink-muted mt-0.5 leading-relaxed">
               Rejoins des courses pirates, projets GR et FKT.
