@@ -353,7 +353,7 @@ export default function OffRacesPage() {
 
       {/* CTA proposer sa propre OFF race */}
       <Link
-        href="#"
+        href="/races?propose=off"
         className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-peach/40 bg-peach/5 p-4 hover:border-peach hover:bg-peach/10 transition tap-bounce"
       >
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-peach/15 text-2xl">
