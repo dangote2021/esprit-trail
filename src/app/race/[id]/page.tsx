@@ -264,7 +264,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
           <div className="rounded-xl border border-violet/25 bg-violet/5 p-3 flex items-center justify-between">
             <div>
               <div className="text-[10px] font-mono text-ink-muted uppercase tracking-wider">
-                Points ITRA
+                Cailloux <span className="opacity-60">(pts ITRA)</span>
               </div>
               <div className="text-xs text-ink-muted mt-0.5">
                 Comptés pour l&apos;éligibilité ultra-trails

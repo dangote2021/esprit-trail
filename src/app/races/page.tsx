@@ -489,7 +489,7 @@ export default function RacesPage() {
                     ⛰️ {race.elevation} D+
                   </span>
                   <span className="rounded-md bg-violet/10 px-2 py-1 text-violet">
-                    {race.itraPoints} pts ITRA
+                    {race.itraPoints} cailloux
                   </span>
                   <span className="rounded-md bg-bg-raised px-2 py-1">
                     📅 {formatDate(race.date, lang)}

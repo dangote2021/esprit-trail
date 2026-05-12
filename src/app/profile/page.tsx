@@ -4,6 +4,7 @@ import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
 import StatRadarEditable from "@/components/profile/StatRadarEditable";
+import TotemPicker from "@/components/profile/TotemPicker";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
 import { getBadge } from "@/lib/data/badges";
 import { RARITY_STYLES, TITLES, levelFromXp } from "@/lib/types";
@@ -100,6 +101,9 @@ export default function ProfilePage() {
         ]}
       />
 
+      {/* ===== Totem animal — cosmétique facultatif ===== */}
+      <TotemPicker />
+
       {/* ===== Best Results — 3 courses mythiques user-editable ===== */}
       <BestResults />
 
@@ -146,7 +150,7 @@ export default function ProfilePage() {
               I
             </div>
             <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-violet">
-              ITRA
+              Cailloux ITRA
             </div>
           </div>
           <div className="mt-2 font-display text-4xl font-black text-violet">
