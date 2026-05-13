@@ -14,16 +14,15 @@ import Link from "next/link";
 export function BrandLogoIcon({
   size = 40,
   className = "",
+  /** Si true, utilise la version moins cropée (toute l'illustration visible)
+   *  pour les pages manifesto / hero. Sinon icône app tight (default). */
+  variant = "app",
 }: {
   size?: number;
   className?: string;
+  variant?: "app" | "manifesto";
 }) {
-  // L'icône source est déjà cropée tight (v8b) — on l'affiche à taille
-  // naturelle 1×1 sans zoom supplémentaire, pour qu'on voie toute l'illustration
-  // (runner + montagnes + sunset) sans rogner sur les côtés.
-  const inner = size;
-  const offsetTop = 0;
-  const offsetLeft = 0;
+  const src = variant === "manifesto" ? "/icon-manifesto.png" : "/icon-512.png";
   return (
     <span
       className={`relative inline-block leading-none overflow-hidden rounded-2xl ${className}`}
@@ -32,17 +31,15 @@ export function BrandLogoIcon({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/icon-512.png"
+        src={src}
         alt="Esprit Trail"
-        width={inner}
-        height={inner}
+        width={size}
+        height={size}
         style={{
-          position: "absolute",
-          top: -offsetTop,
-          left: -offsetLeft,
-          width: inner,
-          height: inner,
+          width: size,
+          height: size,
           objectFit: "cover",
+          display: "block",
         }}
         loading="eager"
       />
@@ -109,7 +106,7 @@ export function BrandLogoFull({
       className={`flex flex-col items-center gap-3 ${className}`}
       style={{ width }}
     >
-      <BrandLogoIcon size={width} />
+      <BrandLogoIcon size={width} variant="manifesto" />
       <div className="text-center leading-none">
         <span
           className="block font-display font-black tracking-tight text-ink"
