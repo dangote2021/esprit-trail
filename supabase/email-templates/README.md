@@ -1,4 +1,4 @@
-# Email templates Ravito
+# Email templates Esprit Trail
 
 ## Magic Link (Supabase Auth)
 
