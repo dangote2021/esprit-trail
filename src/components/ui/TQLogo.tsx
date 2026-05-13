@@ -18,15 +18,12 @@ export function BrandLogoIcon({
   size?: number;
   className?: string;
 }) {
-  // Zoom plus appuyé (1.32×) pour masquer la bordure noire externe du PNG source
-  // sur les 4 coins. Le span agit comme un mask qui crop le débordement et
-  // arrondit les coins. Légère asymétrie horizontale (un poil plus de crop à
-  // droite) pour compenser la bordure plus marquée sur le côté droit du PNG.
-  const inner = Math.round(size * 1.32);
-  const baseOffset = Math.round((inner - size) / 2);
-  // Pousse l'image légèrement vers la gauche pour mieux croper la droite.
-  const offsetTop = baseOffset;
-  const offsetLeft = baseOffset - Math.round(size * 0.015);
+  // L'icône source est déjà cropée tight (v8b) — on l'affiche à taille
+  // naturelle 1×1 sans zoom supplémentaire, pour qu'on voie toute l'illustration
+  // (runner + montagnes + sunset) sans rogner sur les côtés.
+  const inner = size;
+  const offsetTop = 0;
+  const offsetLeft = 0;
   return (
     <span
       className={`relative inline-block leading-none overflow-hidden rounded-2xl ${className}`}
