@@ -269,7 +269,7 @@ export default function RacesPage() {
                   Proposer une OFF Race
                 </div>
                 <div className="text-[11px] text-ink-muted">
-                  FKT, course pirate, crew run, GR project — partage-la.
+                  FKT (Fastest Known Time), course pirate, projets GR — partage-la.
                 </div>
               </div>
             </div>
