@@ -39,7 +39,7 @@ export default function Footer() {
             <Link href="/contact" className="hover:text-ink">Contact</Link>
           </nav>
           <p className="mt-3 text-[10px] text-ink-dim">
-            Esprit Trail · Fait avec les pieds boueux.
+            Esprit Trail · Fait avec les pieds boueux · Made in France 🇫🇷
           </p>
           <div className="mt-3 flex justify-center">
             <LangToggle />
@@ -62,7 +62,7 @@ export default function Footer() {
           <Link href="/settings/account" className="hover:text-ink">Compte</Link>
         </nav>
         <p className="mt-3 text-[10px] text-ink-dim">
-          Esprit Trail · Fait avec les pieds boueux.
+          Esprit Trail · Fait avec les pieds boueux · Made in France 🇫🇷
         </p>
         <div className="mt-3 flex justify-center">
           <LangToggle />

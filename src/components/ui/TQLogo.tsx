@@ -127,7 +127,7 @@ export function BrandLogoFull({
             letterSpacing: "0.18em",
           }}
         >
-          Coach Trail · FR
+          Le trail, il a changé
         </span>
       </div>
     </div>
