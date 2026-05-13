@@ -22,6 +22,9 @@ import {
   subscribeToMessages,
   markRead,
 } from "@/lib/supabase/messaging";
+import ConversationOptionsMenu, {
+  isUserBlocked,
+} from "@/components/messages/ConversationOptionsMenu";
 
 function loadDraftMessages(conversationId: string): Message[] {
   if (typeof window === "undefined") return [];
@@ -76,6 +79,8 @@ export default function ConversationThread({
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [extraMessages, setExtraMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [blockedState, setBlockedState] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   // Charge la conversation + ses messages depuis Supabase (avec fallback mock)
@@ -116,6 +121,18 @@ export default function ConversationThread({
   const type = conversation?.type ?? "dm";
   const memberCount = conversation?.members.length ?? 0;
   const description = conversation?.description;
+
+  // En DM, l'autre user (le 1er membre qui n'est pas moi)
+  const otherUser = useMemo(() => {
+    if (!conversation || conversation.type !== "dm") return null;
+    return conversation.members.find((m) => m.id !== ME_ID) ?? null;
+  }, [conversation]);
+
+  // Vérifier si l'autre user est bloqué (re-check après modification)
+  useEffect(() => {
+    if (!otherUser) return;
+    setBlockedState(isUserBlocked(otherUser.id));
+  }, [otherUser, optionsOpen]);
 
   const allMessages = useMemo(() => {
     return [...initialMessages, ...extraMessages].sort(
@@ -219,8 +236,9 @@ export default function ConversationThread({
             </div>
           </div>
           <button
+            onClick={() => setOptionsOpen(true)}
             className="rounded-lg border border-ink/10 bg-bg-card/60 p-2 text-ink-muted hover:text-ink transition"
-            aria-label="Options"
+            aria-label="Options de la conversation"
             type="button"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -235,7 +253,31 @@ export default function ConversationThread({
             {description}
           </p>
         )}
+        {/* Banner si user bloqué */}
+        {blockedState && otherUser && (
+          <div className="bg-peach/10 border-t border-peach/30 px-4 py-2 text-[11px] text-peach">
+            🚫 {otherUser.displayName} est bloqué. Va dans{" "}
+            <a
+              href="/settings/account"
+              className="underline font-bold"
+            >
+              Paramètres
+            </a>{" "}
+            pour débloquer.
+          </div>
+        )}
       </header>
+
+      {/* Menu options */}
+      <ConversationOptionsMenu
+        open={optionsOpen}
+        onClose={() => setOptionsOpen(false)}
+        targetUserId={otherUser?.id ?? null}
+        targetUserName={otherUser?.displayName ?? conversationName}
+        conversationId={conversationId}
+        conversationType={type === "group" ? "group" : "dm"}
+        onBlocked={() => setBlockedState(true)}
+      />
 
       {/* Messages */}
       <div
