@@ -148,13 +148,24 @@ export default function ProviderDetailPage({
       {/* CTA connexion / déconnexion */}
       {!isConnected ? (
         <section className="space-y-3">
-          <button
-            type="button"
-            className="w-full rounded-xl px-5 py-4 font-display text-base font-black uppercase tracking-wider text-white shadow-md btn-chunky"
-            style={{ backgroundColor: provider.brandColor }}
-          >
-            + Connecter {provider.name}
-          </button>
+          {provider.id === "strava" ? (
+            <a
+              href={`/api/oauth/${provider.id}?from=/settings/connections/${provider.id}`}
+              className="block w-full rounded-xl px-5 py-4 text-center font-display text-base font-black uppercase tracking-wider text-white shadow-md btn-chunky"
+              style={{ backgroundColor: provider.brandColor }}
+            >
+              + Connecter {provider.name}
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="w-full rounded-xl px-5 py-4 font-display text-base font-black uppercase tracking-wider text-white shadow-md btn-chunky opacity-60 cursor-not-allowed"
+              style={{ backgroundColor: provider.brandColor }}
+            >
+              + Connecter {provider.name} (bientôt)
+            </button>
+          )}
           <p className="text-center text-[11px] text-ink-muted">
             Tu seras redirigé vers {provider.name} pour autoriser Esprit Trail.
           </p>

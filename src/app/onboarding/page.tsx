@@ -305,8 +305,8 @@ function StepSplash({ onStart }: { onStart: (name: string, handle: string) => vo
             // Lance directement le flow OAuth Strava. Au retour, l'app importera les
             // données et le user pourra finir l'onboarding pré-rempli.
             if (typeof window !== "undefined") {
-              const returnTo = encodeURIComponent("/onboarding?strava=connected");
-              window.location.href = `/api/oauth/strava/start?return_to=${returnTo}`;
+              const from = encodeURIComponent("/onboarding?strava=connected");
+              window.location.href = `/api/oauth/strava?from=${from}`;
             }
           }}
           className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#fc4c02]/30 bg-[#fc4c02]/5 py-3 text-[#fc4c02] transition hover:border-[#fc4c02] hover:bg-[#fc4c02]/10"
@@ -1107,11 +1107,11 @@ function StepStrava({
   function handleConnect() {
     setPending(true);
     // Redirige vers le flow OAuth Strava. La callback finira par renvoyer sur
-    // /onboarding?step=strava_done côté prod. En attendant on simule le retour
+    // /onboarding?strava_connected=1 côté prod. En attendant on simule le retour
     // via la state locale pour ne pas casser le parcours.
     if (typeof window !== "undefined") {
-      const returnTo = encodeURIComponent("/onboarding");
-      window.location.href = `/api/oauth/strava/start?return_to=${returnTo}`;
+      const from = encodeURIComponent("/onboarding?strava_connected=1");
+      window.location.href = `/api/oauth/strava?from=${from}`;
     }
     // Fallback si route pas dispo
     setTimeout(() => {
