@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGuilde } from "@/lib/data/guildes";
+import {
+  GuildeJoinButton,
+  GuildeSettingsButton,
+  GuildeMemberActions,
+} from "@/components/guildes/GuildeActions";
 
 export default function GuildeDetailPage({
   params,
@@ -46,16 +51,7 @@ export default function GuildeDetailPage({
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-peach flex-1">
           Team · {guilde.location}
         </div>
-        {guilde.iAmMember && (
-          <button
-            type="button"
-            disabled
-            title="Paramètres team (bientôt)"
-            className="rounded-lg border border-ink/10 px-2 py-1 text-[10px] font-mono text-ink-muted/50 cursor-not-allowed"
-          >
-            ⚙️
-          </button>
-        )}
+        {guilde.iAmMember && <GuildeSettingsButton guilde={guilde} />}
       </header>
 
       {/* Hero guilde */}
@@ -104,19 +100,7 @@ export default function GuildeDetailPage({
               Complète
             </div>
           ) : (
-            <button
-              type="button"
-              disabled
-              className="rounded-xl bg-peach/60 px-5 py-2 text-[12px] font-mono font-black uppercase text-bg/80 cursor-not-allowed"
-              title="Bientôt"
-            >
-              {guilde.joinRule === "open"
-                ? "Rejoindre"
-                : guilde.joinRule === "request"
-                ? "Demander"
-                : "Sur invitation"}
-              <span className="ml-1 text-[9px] opacity-75">· bientôt</span>
-            </button>
+            <GuildeJoinButton guilde={guilde} />
           )}
         </div>
       </section>
@@ -281,40 +265,7 @@ export default function GuildeDetailPage({
       )}
 
       {/* Actions */}
-      {guilde.iAmMember && (
-        <section className="space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              disabled
-              className="rounded-xl border border-cyan/20 bg-cyan/5 p-3 text-left opacity-70 cursor-not-allowed"
-              title="Bientôt"
-            >
-              <div className="text-xl">💬</div>
-              <div className="mt-1 text-sm font-bold">Chat de team</div>
-              <div className="text-[10px] text-peach">bientôt</div>
-            </button>
-            <button
-              type="button"
-              disabled
-              className="rounded-xl border border-lime/20 bg-lime/5 p-3 text-left opacity-70 cursor-not-allowed"
-              title="Bientôt"
-            >
-              <div className="text-xl">🗓️</div>
-              <div className="mt-1 text-sm font-bold">Sorties groupées</div>
-              <div className="text-[10px] text-peach">bientôt</div>
-            </button>
-          </div>
-          <button
-            type="button"
-            disabled
-            className="w-full rounded-xl border border-peach/20 bg-bg-card/40 p-3 text-xs font-mono text-peach/60 cursor-not-allowed"
-            title="Bientôt"
-          >
-            📢 Proposer un nouveau défi de team · bientôt
-          </button>
-        </section>
-      )}
+      {guilde.iAmMember && <GuildeMemberActions guilde={guilde} />}
     </main>
   );
 }
