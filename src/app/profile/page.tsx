@@ -2,7 +2,8 @@ import Link from "next/link";
 import BadgeCard from "@/components/ui/BadgeCard";
 import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
-import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
+import ProfileHeroCardClient from "@/components/profile/ProfileHeroCardClient";
+import StravaConnectionStatus from "@/components/profile/StravaConnectionStatus";
 import StatRadarEditable from "@/components/profile/StatRadarEditable";
 import TotemPicker from "@/components/profile/TotemPicker";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
@@ -26,10 +27,6 @@ function thisWeekStats(runs: typeof MY_RUNS) {
     runs: weekRuns.length,
   };
 }
-
-const WATCH_META: Record<string, { label: string; color: string; logo: string }> = {
-  strava: { label: "Strava", color: "bg-[#fc4c02]", logo: "S" },
-};
 
 export default function ProfilePage() {
   const badges = MY_BADGES
@@ -73,7 +70,7 @@ export default function ProfilePage() {
       </header>
 
       {/* ===== Carte Panini moderne : cover + avatar circle + nom + stats ===== */}
-      <ProfileHeroCard
+      <ProfileHeroCardClient
         displayName={ME.displayName}
         username={ME.username}
         fallbackEmoji={ME.avatar}
@@ -198,40 +195,7 @@ export default function ProfilePage() {
       {/* Sync Strava */}
       <section className="space-y-3">
         <SectionHeader eyebrow="Sync" title="Plateforme connectée" />
-        <div>
-          {(["strava"] as const).map((w) => {
-            const meta = WATCH_META[w];
-            const connected = ME.connections.watches.includes(w);
-            return (
-              <div
-                key={w}
-                className={`flex items-center gap-3 rounded-xl border p-3 transition ${
-                  connected
-                    ? "border-lime/30 bg-lime/5"
-                    : "border-ink/10 bg-bg-card/40 opacity-60"
-                }`}
-              >
-                <div
-                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${meta.color} font-display text-sm font-black text-white`}
-                >
-                  {meta.logo}
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-bold">{meta.label}</div>
-                  <div
-                    className={`text-[11px] font-mono ${
-                      connected ? "text-lime" : "text-ink-dim"
-                    }`}
-                  >
-                    {connected
-                      ? "✓ Sync active — sorties Garmin/Coros/Suunto remontent via Strava"
-                      : "Non connecté — connecte-toi pour la sync auto"}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <StravaConnectionStatus />
       </section>
 
       {/* Rythme de la semaine — déplacé depuis la home */}

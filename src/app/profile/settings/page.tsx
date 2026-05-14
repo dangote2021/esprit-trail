@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ME } from "@/lib/data/me";
+import { getStoredIdentity, setStoredIdentity } from "@/lib/identity";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
   // Simulé — pas de persistence pour le MVP
   const [weeklyTarget, setWeeklyTarget] = useState<number>(ME.weeklyTarget);
-  const [displayName, setDisplayName] = useState<string>(ME.displayName);
-  const [handle, setHandle] = useState<string>(ME.username);
+  const [displayName, setDisplayName] = useState<string>("");
+  const [handle, setHandle] = useState<string>("");
+  const [initialName, setInitialName] = useState<string>("");
+  const [initialHandle, setInitialHandle] = useState<string>("");
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveError, setSaveError] = useState<string>("");
   const [notifications, setNotifications] = useState({
     weekly: true,
     challenges: true,
@@ -16,11 +22,66 @@ export default function SettingsPage() {
     races: false,
   });
 
+  // Charge l'identité depuis localStorage au mount (fallback ME)
+  useEffect(() => {
+    const stored = getStoredIdentity();
+    const name = stored.displayName ?? "";
+    const u = stored.username ?? "";
+    setDisplayName(name);
+    setHandle(u);
+    setInitialName(name);
+    setInitialHandle(u);
+  }, []);
+
   function sanitizeHandle(v: string) {
     return v
       .toLowerCase()
       .replace(/[^a-z0-9_]/g, "")
       .slice(0, 20);
+  }
+
+  const isDirty =
+    displayName.trim() !== initialName.trim() ||
+    handle.trim() !== initialHandle.trim();
+
+  async function saveIdentity() {
+    setSaveState("saving");
+    setSaveError("");
+
+    // 1. Toujours sauver en localStorage (marche même offline / non auth)
+    setStoredIdentity({
+      displayName: displayName.trim() || undefined,
+      username: handle.trim() || undefined,
+    });
+
+    // 2. Tenter le sync Supabase si user authentifié
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase.from("profiles") as any).upsert({
+          id: user.id,
+          display_name: displayName.trim() || null,
+          username: handle.trim() || null,
+          updated_at: new Date().toISOString(),
+        });
+        if (error) {
+          // Pas bloquant — local save a réussi, on log juste
+          console.warn("[Profile save] Supabase upsert failed:", error.message);
+        }
+      }
+    } catch (e) {
+      // Pas bloquant
+      console.warn("[Profile save] Supabase client unavailable:", e);
+    }
+
+    setInitialName(displayName);
+    setInitialHandle(handle);
+    setSaveState("saved");
+    setTimeout(() => setSaveState("idle"), 2000);
   }
 
   return (
@@ -65,7 +126,7 @@ export default function SettingsPage() {
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value.slice(0, 20))}
-              placeholder="Clem, Marco, Raven…"
+              placeholder="Ton prénom"
               className="mt-1 w-full rounded-xl border border-ink/15 bg-bg-card px-3 py-2.5 font-display text-base font-black text-ink placeholder:text-ink-dim focus:border-lime focus:outline-none"
             />
           </label>
@@ -81,7 +142,7 @@ export default function SettingsPage() {
                 type="text"
                 value={handle}
                 onChange={(e) => setHandle(sanitizeHandle(e.target.value))}
-                placeholder="mulet_gang"
+                placeholder="ton_pseudo"
                 className="w-full rounded-xl border border-ink/15 bg-bg-card py-2.5 pl-8 pr-3 font-mono text-base text-ink placeholder:text-ink-dim focus:border-lime focus:outline-none"
               />
             </div>
@@ -89,6 +150,29 @@ export default function SettingsPage() {
               Visible dans ta team et le leaderboard.
             </span>
           </label>
+
+          {/* Bouton Save */}
+          <button
+            type="button"
+            onClick={saveIdentity}
+            disabled={!isDirty || saveState === "saving"}
+            className={`w-full rounded-xl py-2.5 font-display text-sm font-black uppercase tracking-wider transition ${
+              isDirty && saveState !== "saving"
+                ? "bg-lime text-bg shadow-glow-lime hover:scale-[1.01]"
+                : "bg-lime/30 text-bg/60 cursor-not-allowed"
+            }`}
+          >
+            {saveState === "saving"
+              ? "Enregistrement…"
+              : saveState === "saved"
+              ? "✓ Enregistré"
+              : "Enregistrer"}
+          </button>
+          {saveError && (
+            <div className="rounded-lg bg-mythic/10 px-3 py-2 text-center text-[12px] text-mythic">
+              {saveError}
+            </div>
+          )}
         </div>
       </section>
 
