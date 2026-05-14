@@ -114,6 +114,21 @@ jobs:
           bubblewrap build --skipPwaValidation
           ls -la app/build/outputs/bundle/release/
 
+      - name: Sign .aab with jarsigner (Bubblewrap doesn't sign AAB by default)
+        working-directory: twa
+        run: |
+          AAB=$(find app/build/outputs/bundle/release -name "*.aab" | head -1)
+          echo "Signing: $AAB"
+          jarsigner \
+            -keystore android.keystore \
+            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+            -keypass "${{ secrets.KEY_PASSWORD }}" \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            "$AAB" my-key-alias
+          # Verify signature
+          jarsigner -verify "$AAB" && echo "✓ AAB signed correctly"
+
       - name: Locate built artifacts
         id: artifacts
         working-directory: twa
