@@ -12,6 +12,11 @@ on:
         description: 'Version code (integer, must be > previous Play Store upload)'
         required: true
         default: '8'
+      productionRelease:
+        description: 'Enable pre-public-release fixes (orientation=any, edge-to-edge opt-out). Set to true for v1.0.9+ public launch.'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -75,6 +80,8 @@ jobs:
 
       - name: Patch twa-manifest.json (packageId, key alias, version)
         working-directory: twa
+        env:
+          PRODUCTION_RELEASE: ${{ inputs.productionRelease }}
         run: |
           # Override generated config with our required values
           python3 <<'PYEOF'
@@ -92,6 +99,14 @@ jobs:
           m['host'] = 'esprit-trail.vercel.app'
           m['name'] = 'Esprit Trail'
           m['launcherName'] = 'Esprit Trail'
+
+          # Pre-public-release fixes (Play Console warnings)
+          if os.environ.get('PRODUCTION_RELEASE') == 'true':
+              # Fix Play Console warning #2 — orientation lock on large screens (Android 16+)
+              # Allow rotation so tablets/foldables aren't forced into portrait.
+              m['orientation'] = 'any'
+              print('[PROD] Applied fix: orientation=any (large-screen warning)')
+
           with open('twa-manifest.json', 'w') as f:
               json.dump(m, f, indent=2)
           print(json.dumps(m, indent=2))
@@ -104,6 +119,52 @@ jobs:
           printf "${{ inputs.versionName }}\n${{ inputs.versionCode }}\n" | bubblewrap update || true
           # Verify package ID is correctly written
           grep -r 'applicationId' app/build.gradle | head -3
+
+      - name: Apply pre-public-release Android resource fixes
+        if: ${{ inputs.productionRelease == true }}
+        working-directory: twa
+        run: |
+          # Fix Play Console warning #1 — edge-to-edge enforcement (Android 15+)
+          # TWA wraps a PWA whose CSS already uses safe-area-insets; opt out of
+          # Android's automatic enforcement to keep current rendering.
+          STYLES_DIR="app/src/main/res/values-v31"
+          STYLES_FILE="$STYLES_DIR/styles.xml"
+          mkdir -p "$STYLES_DIR"
+
+          if [ ! -f "$STYLES_FILE" ]; then
+            cat > "$STYLES_FILE" <<'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="Theme.LauncherActivity" parent="Theme.LauncherActivityBase">
+                  <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+              </style>
+          </resources>
+          XMLEOF
+            echo "[PROD] Created $STYLES_FILE with edge-to-edge opt-out"
+          else
+            # Insert the opt-out into existing theme if not already present
+            if ! grep -q "windowOptOutEdgeToEdgeEnforcement" "$STYLES_FILE"; then
+              python3 <<PYEOF
+          import re
+          with open("$STYLES_FILE", 'r') as f:
+              content = f.read()
+          # Insert after first <style ...> tag
+          new = re.sub(
+              r'(<style[^>]*>)',
+              r'\1\n        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>',
+              content, count=1
+          )
+          with open("$STYLES_FILE", 'w') as f:
+              f.write(new)
+          print("[PROD] Patched existing styles.xml with edge-to-edge opt-out")
+          PYEOF
+            else
+              echo "[PROD] styles.xml already contains the opt-out, skipping"
+            fi
+          fi
+
+          echo "--- Final styles.xml ---"
+          cat "$STYLES_FILE"
 
       - name: Build .aab
         working-directory: twa
