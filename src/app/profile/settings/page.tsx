@@ -308,9 +308,14 @@ export default function SettingsPage() {
         <div className="text-[10px] font-mono text-ink-dim">
           Esprit Trail v0.4.0 · Build {new Date().toISOString().slice(0, 10)}
         </div>
-        <button className="mt-3 text-[11px] font-mono text-peach hover:text-peach-glow">
-          Se déconnecter
-        </button>
+        <form action="/auth/signout" method="post" className="mt-3">
+          <button
+            type="submit"
+            className="text-[11px] font-mono text-peach hover:text-peach-glow"
+          >
+            Se déconnecter
+          </button>
+        </form>
       </section>
     </main>
   );

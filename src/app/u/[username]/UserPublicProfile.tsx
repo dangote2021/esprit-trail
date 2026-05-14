@@ -275,7 +275,7 @@ export default function UserPublicProfile({ username }: { username: string }) {
 
           <div className="grid grid-cols-2 gap-2">
             <Link
-              href="/ranking"
+              href="/leaderboard"
               className="rounded-2xl border border-violet/30 bg-gradient-to-br from-violet/10 to-bg-card p-4 hover:border-violet/50 transition"
             >
               <div className="flex items-center gap-2">
@@ -297,7 +297,7 @@ export default function UserPublicProfile({ username }: { username: string }) {
             </Link>
 
             <Link
-              href="/ranking?tab=utmb"
+              href="/leaderboard?tab=utmb"
               className="rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-bg-card p-4 hover:border-cyan/50 transition"
             >
               <div className="flex items-center gap-2">

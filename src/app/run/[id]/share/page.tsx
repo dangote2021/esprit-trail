@@ -24,6 +24,40 @@ export default function RunSharePage() {
   const id = params?.id as string;
   const run = MY_RUNS.find((r) => r.id === id);
   const [template, setTemplate] = useState<Template>("pulse");
+  const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  async function copyCaption() {
+    if (!run) return;
+    try {
+      await navigator.clipboard.writeText(captionFor(run, template));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // fallback silencieux
+    }
+  }
+
+  async function shareLink() {
+    if (!run) return;
+    const url =
+      typeof window !== "undefined" ? `${window.location.origin}/run/${run.id}` : "";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: run.title || "Ma sortie", url });
+        return;
+      } catch {
+        // user cancelled or unsupported
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 1800);
+    } catch {
+      // ignore
+    }
+  }
 
   if (!run) {
     return (
@@ -115,26 +149,45 @@ export default function RunSharePage() {
 
       {/* Share actions */}
       <section className="space-y-2">
-        <button className="w-full rounded-xl bg-lime py-3.5 font-black uppercase tracking-wider text-bg shadow-glow-lime transition hover:scale-[1.01]">
-          📸 Sauvegarder le visuel
+        <button
+          type="button"
+          disabled
+          className="w-full rounded-xl bg-lime/50 py-3.5 font-black uppercase tracking-wider text-bg/70 cursor-not-allowed"
+        >
+          📸 Sauvegarder le visuel (bientôt)
         </button>
         <div className="grid grid-cols-3 gap-2">
-          <button className="rounded-xl border border-ink/10 bg-bg-card/60 p-3 text-center hover:border-peach/40 transition">
+          <button
+            type="button"
+            disabled
+            className="rounded-xl border border-ink/10 bg-bg-card/40 p-3 text-center opacity-60 cursor-not-allowed"
+          >
             <div className="text-xl">📱</div>
             <div className="text-[10px] font-mono text-ink-muted">Story IG</div>
+            <div className="text-[9px] font-mono text-peach mt-0.5">bientôt</div>
           </button>
-          <button className="rounded-xl border border-ink/10 bg-bg-card/60 p-3 text-center hover:border-peach/40 transition">
+          <button
+            type="button"
+            disabled
+            className="rounded-xl border border-ink/10 bg-bg-card/40 p-3 text-center opacity-60 cursor-not-allowed"
+          >
             <div className="text-xl">🎵</div>
             <div className="text-[10px] font-mono text-ink-muted">TikTok</div>
+            <div className="text-[9px] font-mono text-peach mt-0.5">bientôt</div>
           </button>
-          <button className="rounded-xl border border-ink/10 bg-bg-card/60 p-3 text-center hover:border-peach/40 transition">
+          <button
+            type="button"
+            onClick={shareLink}
+            className="rounded-xl border border-ink/10 bg-bg-card/60 p-3 text-center hover:border-lime/40 transition"
+          >
             <div className="text-xl">🔗</div>
-            <div className="text-[10px] font-mono text-ink-muted">Lien</div>
+            <div className="text-[10px] font-mono text-ink-muted">
+              {linkCopied ? "Copié !" : "Lien"}
+            </div>
           </button>
         </div>
         <div className="rounded-xl border border-cyan/20 bg-cyan/5 p-3 text-[11px] text-ink-muted">
-          💡 Astuce : sur mobile, le partage ouvre directement ta story Insta/TikTok
-          avec la vidéo animée de ta trace GPS.
+          💡 Le lien marche déjà ; les exports Story IG / TikTok arrivent bientôt.
         </div>
       </section>
 
@@ -148,11 +201,19 @@ export default function RunSharePage() {
             {captionFor(run, template)}
           </p>
           <div className="flex gap-2 pt-2">
-            <button className="rounded-md bg-violet/20 px-2 py-1 text-[10px] font-mono font-bold text-violet hover:bg-violet/30">
-              📋 Copier
+            <button
+              type="button"
+              onClick={copyCaption}
+              className="rounded-md bg-violet/20 px-2 py-1 text-[10px] font-mono font-bold text-violet hover:bg-violet/30"
+            >
+              {copied ? "✓ Copié !" : "📋 Copier"}
             </button>
-            <button className="rounded-md border border-ink/15 px-2 py-1 text-[10px] font-mono text-ink-muted hover:text-violet">
-              🎲 Autre suggestion
+            <button
+              type="button"
+              disabled
+              className="rounded-md border border-ink/15 px-2 py-1 text-[10px] font-mono text-ink-muted/60 cursor-not-allowed"
+            >
+              🎲 Autre (bientôt)
             </button>
           </div>
         </div>

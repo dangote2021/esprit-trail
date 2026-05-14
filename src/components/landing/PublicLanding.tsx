@@ -551,7 +551,7 @@ export default function PublicLanding({
             À propos
           </Link>
           <span>·</span>
-          <Link href="/privacy" className="hover:text-ink">
+          <Link href="/legal/privacy" className="hover:text-ink">
             Confidentialité
           </Link>
           <span>·</span>

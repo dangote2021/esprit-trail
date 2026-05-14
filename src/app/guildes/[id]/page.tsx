@@ -47,7 +47,12 @@ export default function GuildeDetailPage({
           Team · {guilde.location}
         </div>
         {guilde.iAmMember && (
-          <button className="rounded-lg border border-ink/15 px-2 py-1 text-[10px] font-mono text-ink-muted hover:text-peach">
+          <button
+            type="button"
+            disabled
+            title="Paramètres team (bientôt)"
+            className="rounded-lg border border-ink/10 px-2 py-1 text-[10px] font-mono text-ink-muted/50 cursor-not-allowed"
+          >
             ⚙️
           </button>
         )}
@@ -99,12 +104,18 @@ export default function GuildeDetailPage({
               Complète
             </div>
           ) : (
-            <button className="rounded-xl bg-peach px-5 py-2 text-[12px] font-mono font-black uppercase text-bg shadow-glow-peach hover:scale-[1.02] transition">
+            <button
+              type="button"
+              disabled
+              className="rounded-xl bg-peach/60 px-5 py-2 text-[12px] font-mono font-black uppercase text-bg/80 cursor-not-allowed"
+              title="Bientôt"
+            >
               {guilde.joinRule === "open"
                 ? "Rejoindre"
                 : guilde.joinRule === "request"
                 ? "Demander"
                 : "Sur invitation"}
+              <span className="ml-1 text-[9px] opacity-75">· bientôt</span>
             </button>
           )}
         </div>
@@ -273,19 +284,34 @@ export default function GuildeDetailPage({
       {guilde.iAmMember && (
         <section className="space-y-2">
           <div className="grid grid-cols-2 gap-2">
-            <button className="rounded-xl border border-cyan/30 bg-cyan/5 p-3 text-left hover:bg-cyan/10 transition">
+            <button
+              type="button"
+              disabled
+              className="rounded-xl border border-cyan/20 bg-cyan/5 p-3 text-left opacity-70 cursor-not-allowed"
+              title="Bientôt"
+            >
               <div className="text-xl">💬</div>
               <div className="mt-1 text-sm font-bold">Chat de team</div>
-              <div className="text-[10px] text-ink-muted">3 messages non lus</div>
+              <div className="text-[10px] text-peach">bientôt</div>
             </button>
-            <button className="rounded-xl border border-lime/30 bg-lime/5 p-3 text-left hover:bg-lime/10 transition">
+            <button
+              type="button"
+              disabled
+              className="rounded-xl border border-lime/20 bg-lime/5 p-3 text-left opacity-70 cursor-not-allowed"
+              title="Bientôt"
+            >
               <div className="text-xl">🗓️</div>
               <div className="mt-1 text-sm font-bold">Sorties groupées</div>
-              <div className="text-[10px] text-ink-muted">2 prévues cette sem.</div>
+              <div className="text-[10px] text-peach">bientôt</div>
             </button>
           </div>
-          <button className="w-full rounded-xl border border-peach/20 bg-bg-card/40 p-3 text-xs font-mono text-peach hover:bg-peach/5 transition">
-            📢 Proposer un nouveau défi de team
+          <button
+            type="button"
+            disabled
+            className="w-full rounded-xl border border-peach/20 bg-bg-card/40 p-3 text-xs font-mono text-peach/60 cursor-not-allowed"
+            title="Bientôt"
+          >
+            📢 Proposer un nouveau défi de team · bientôt
           </button>
         </section>
       )}

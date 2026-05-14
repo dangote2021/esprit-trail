@@ -400,9 +400,10 @@ export default function ConversationThread({
         <div className="mx-auto max-w-lg px-3 py-2 flex items-end gap-2">
           <button
             type="button"
-            className="rounded-full border border-ink/15 bg-bg-raised/60 p-2 text-ink-muted hover:text-lime hover:border-lime/40 transition"
-            aria-label="Joindre un spot, une course ou un plan nutri"
-            title="Joindre"
+            disabled
+            className="rounded-full border border-ink/10 bg-bg-raised/40 p-2 text-ink-muted/40 cursor-not-allowed"
+            aria-label="Joindre (bientôt)"
+            title="Joindre un spot ou une course — bientôt"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
               <path d="M12 5v14M5 12h14" />

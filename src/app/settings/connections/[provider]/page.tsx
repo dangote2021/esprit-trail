@@ -11,6 +11,7 @@ import {
   timeSinceSync,
 } from "@/lib/data/connections";
 import type { WatchBrand } from "@/lib/types";
+import StravaConnectedActions from "@/components/connections/StravaConnectedActions";
 
 export function generateStaticParams() {
   return PROVIDERS.map((p) => ({ provider: p.id }));
@@ -171,22 +172,30 @@ export default function ProviderDetailPage({
           </p>
         </section>
       ) : (
-        <section className="space-y-3">
-          <button
-            type="button"
-            className="w-full rounded-xl bg-lime py-3 font-display text-base font-black uppercase tracking-wider text-bg shadow-glow-lime"
-          >
-            🔄 Re-synchroniser maintenant
-          </button>
-          <button
-            type="button"
-            className="w-full rounded-xl border-2 border-mythic/40 bg-mythic/5 py-3 font-display text-sm font-black uppercase tracking-wider text-mythic transition hover:bg-mythic/10"
-          >
-            Déconnecter {provider.name}
-          </button>
-          <p className="text-center text-[11px] text-ink-muted">
-            En te déconnectant, on supprime toutes les données importées depuis {provider.name} (RGPD).
-          </p>
+        <section>
+          {provider.id === "strava" ? (
+            <StravaConnectedActions />
+          ) : (
+            <div className="space-y-3">
+              <button
+                type="button"
+                disabled
+                className="w-full rounded-xl bg-lime/40 py-3 font-display text-base font-black uppercase tracking-wider text-bg/60 cursor-not-allowed"
+              >
+                🔄 Re-synchroniser maintenant (bientôt)
+              </button>
+              <button
+                type="button"
+                disabled
+                className="w-full rounded-xl border-2 border-mythic/20 bg-mythic/5 py-3 font-display text-sm font-black uppercase tracking-wider text-mythic/60 cursor-not-allowed"
+              >
+                Déconnecter {provider.name} (bientôt)
+              </button>
+              <p className="text-center text-[11px] text-ink-muted">
+                En te déconnectant, on supprime toutes les données importées depuis {provider.name} (RGPD).
+              </p>
+            </div>
+          )}
         </section>
       )}
 

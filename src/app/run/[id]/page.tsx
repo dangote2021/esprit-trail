@@ -234,9 +234,12 @@ export default function RunDetailPage({ params }: { params: { id: string } }) {
         )}
 
         {/* Partage */}
-        <button className="w-full rounded-xl bg-lime py-3 text-sm font-black uppercase tracking-wider text-bg shadow-glow-lime hover:scale-[1.01] transition">
+        <Link
+          href={`/run/${run.id}/share`}
+          className="block w-full rounded-xl bg-lime py-3 text-center text-sm font-black uppercase tracking-wider text-bg shadow-glow-lime hover:scale-[1.01] transition"
+        >
           📤 Partager cette sortie
-        </button>
+        </Link>
       </div>
     </main>
   );
