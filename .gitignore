@@ -32,3 +32,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.keystore-base64.txt
