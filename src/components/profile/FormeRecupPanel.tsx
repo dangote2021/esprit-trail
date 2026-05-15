@@ -107,13 +107,20 @@ function PanelInner() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-2 mb-3">
-        {/* VO2max */}
-        <div className="rounded-xl bg-white/80 border border-ink/10 p-3">
+        {/* VO2max — honnêteté : c'est une estimation, on l'assume */}
+        <div className="rounded-xl bg-white/80 border border-ink/10 p-3 group relative">
           <div
-            className="text-[9px] font-mono font-bold uppercase tracking-wider"
+            className="flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-wider"
             style={{ color: "#185fa5" }}
           >
-            VO₂max estimé
+            VO₂max
+            <span
+              className="inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full text-[8px] font-bold"
+              style={{ background: "rgba(24,95,165,0.15)", color: "#185fa5" }}
+              title="Estimation à la louche basée sur ta charge de fond + ta régularité. Pas du gold lab — quand on aura les vraies données vVO₂max via Strava, on remplacera. En attendant ça donne une idée des tendances."
+            >
+              ?
+            </span>
           </div>
           <div className="mt-1 flex items-baseline gap-1.5">
             <div
@@ -129,7 +136,9 @@ function PanelInner() {
               {vo2.delta30j >= 0 ? "▲" : "▼"} {Math.abs(vo2.delta30j)}
             </div>
           </div>
-          <div className="text-[10px] text-ink-muted mt-0.5">depuis 30j</div>
+          <div className="text-[10px] text-ink-muted mt-0.5 italic">
+            estimé · à la louche
+          </div>
         </div>
 
         {/* Fraîcheur TSB */}

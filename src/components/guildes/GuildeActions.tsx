@@ -9,31 +9,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Guilde } from "@/lib/types";
+import {
+  getStoredMembership as loadMembership,
+  setStoredMembership as saveMembership,
+  dispatchMembershipChange,
+} from "@/lib/guilde-membership";
 
-const LS_MEMBERSHIP_KEY = "esprit_guilde_membership";
 const LS_DEFIS_KEY = "esprit_guilde_defis";
 
-type Membership = Record<string, "member" | "pending">;
 type ProposedDefi = {
   guildeId: string;
   title: string;
   target: string;
   proposedAt: string;
 };
-
-function loadMembership(): Membership {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(localStorage.getItem(LS_MEMBERSHIP_KEY) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function saveMembership(m: Membership) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(LS_MEMBERSHIP_KEY, JSON.stringify(m));
-}
 
 function loadDefis(): ProposedDefi[] {
   if (typeof window === "undefined") return [];
@@ -66,14 +55,19 @@ export function GuildeJoinButton({ guilde }: { guilde: Guilde }) {
       saveMembership(m);
       setState("member");
       setBumped(true);
-      setTimeout(() => window.location.reload(), 800);
+      // Dispatch event pour que le compteur de membres s'anime (pulse + "+1")
+      dispatchMembershipChange(guilde.id, "member");
+      // Pas de reload — l'event fait le job, ça reste fluide
     } else if (guilde.joinRule === "request") {
       m[guilde.id] = "pending";
       saveMembership(m);
       setState("pending");
       setBumped(true);
+      dispatchMembershipChange(guilde.id, "pending");
     } else {
-      alert("Cette team est sur invitation uniquement. Demande à un capitaine de t'inviter !");
+      alert(
+        "Cette team est sur invitation uniquement. Demande à un capitaine de t'inviter — un message direct fait l'affaire.",
+      );
     }
   }
 
@@ -112,14 +106,27 @@ export function GuildeJoinButton({ guilde }: { guilde: Guilde }) {
 // ====== SETTINGS BUTTON (membre, dans le header) ======
 export function GuildeSettingsButton({ guilde }: { guilde: Guilde }) {
   const [open, setOpen] = useState(false);
+  const [armed, setArmed] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
 
-  function leave() {
-    if (!confirm(`Quitter ${guilde.name} ? Tu pourras rejoindre plus tard si la team t'accepte.`)) return;
+  // Le bouton Quitter passe en "armé" au premier clic. Pour quitter pour de
+  // vrai, l'utilisateur doit taper QUITTER (case insensitive) dans l'input qui
+  // apparaît — pattern Github / Linear pour les actions destructrices. Stop
+  // les clics accidentels et lent un peu pour faire réfléchir.
+
+  function reset() {
+    setArmed(false);
+    setConfirmText("");
+  }
+
+  function leaveForReal() {
+    if (confirmText.trim().toUpperCase() !== "QUITTER") return;
     const m = loadMembership();
     delete m[guilde.id];
     saveMembership(m);
     setOpen(false);
-    setTimeout(() => (window.location.href = "/guildes"), 300);
+    reset();
+    setTimeout(() => (window.location.href = "/guildes"), 200);
   }
 
   return (
@@ -133,7 +140,13 @@ export function GuildeSettingsButton({ guilde }: { guilde: Guilde }) {
         ⚙️
       </button>
       {open && (
-        <Modal onClose={() => setOpen(false)} title={`Team · ${guilde.name}`}>
+        <Modal
+          onClose={() => {
+            setOpen(false);
+            reset();
+          }}
+          title={`Team · ${guilde.name}`}
+        >
           <div className="space-y-3">
             <div className="rounded-lg border border-ink/10 bg-bg-raised/40 p-3 text-[12px] text-ink-muted">
               <strong className="text-ink">Capitaine</strong> :{" "}
@@ -146,15 +159,54 @@ export function GuildeSettingsButton({ guilde }: { guilde: Guilde }) {
                 ? "sur demande"
                 : "sur invitation"}
             </div>
-            <button
-              type="button"
-              onClick={leave}
-              className="w-full rounded-xl border-2 border-mythic/40 bg-mythic/5 py-3 font-display text-sm font-black uppercase tracking-wider text-mythic hover:bg-mythic/10"
-            >
-              Quitter cette team
-            </button>
+
+            {!armed ? (
+              <button
+                type="button"
+                onClick={() => setArmed(true)}
+                className="w-full rounded-xl border-2 border-mythic/40 bg-mythic/5 py-3 font-display text-sm font-black uppercase tracking-wider text-mythic hover:bg-mythic/10"
+              >
+                Quitter cette team
+              </button>
+            ) : (
+              <div className="rounded-xl border-2 border-mythic/50 bg-mythic/5 p-3 space-y-2">
+                <p className="text-[12px] text-mythic font-mono leading-snug">
+                  ⚠️ Action définitive. Tape{" "}
+                  <strong className="font-display font-black">QUITTER</strong>{" "}
+                  pour confirmer.
+                </p>
+                <input
+                  type="text"
+                  value={confirmText}
+                  onChange={(e) => setConfirmText(e.target.value)}
+                  placeholder="QUITTER"
+                  autoFocus
+                  className="w-full rounded-lg border border-mythic/30 bg-white/60 px-3 py-2 font-mono text-sm uppercase tracking-wider focus:border-mythic focus:outline-none"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={reset}
+                    className="flex-1 rounded-lg border border-ink/15 py-2 text-[11px] font-mono font-bold uppercase text-ink-muted hover:bg-bg-card/40"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="button"
+                    onClick={leaveForReal}
+                    disabled={confirmText.trim().toUpperCase() !== "QUITTER"}
+                    className="flex-1 rounded-lg bg-mythic py-2 text-[11px] font-mono font-black uppercase text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Quitter pour de bon
+                  </button>
+                </div>
+              </div>
+            )}
+
             <p className="text-center text-[11px] text-ink-muted">
-              Les paramètres avancés (renommer, kicker, changer la règle) sont réservés aux capitaines.
+              {armed
+                ? "Si tu changes d'avis dans 10 min, redemande à la team."
+                : "Les paramètres avancés (renommer, kicker, changer la règle) sont réservés aux capitaines."}
             </p>
           </div>
         </Modal>

@@ -6,6 +6,7 @@ import {
   GuildeSettingsButton,
   GuildeMemberActions,
 } from "@/components/guildes/GuildeActions";
+import GuildeMemberCount from "@/components/guildes/GuildeMemberCount";
 
 export default function GuildeDetailPage({
   params,
@@ -86,10 +87,11 @@ export default function GuildeDetailPage({
             <div className="text-[10px] font-mono text-ink-dim uppercase">
               Membres
             </div>
-            <div className="font-display text-xl font-black">
-              {guilde.memberCount}{" "}
-              <span className="text-ink-dim text-sm">/ {guilde.maxMembers}</span>
-            </div>
+            <GuildeMemberCount
+              guildeId={guilde.id}
+              baseCount={guilde.memberCount}
+              maxMembers={guilde.maxMembers}
+            />
           </div>
           {guilde.iAmMember ? (
             <div className="rounded-xl border border-lime/40 bg-lime/10 px-3 py-2 text-[11px] font-mono font-bold uppercase text-lime">

@@ -168,8 +168,8 @@ export default function StatRadarEditable({
               <input
                 type="range"
                 min={20}
-                max={99}
-                step={1}
+                max={100}
+                step={5}
                 value={stats[s.key]}
                 onChange={(e) => updateStat(s.key, parseInt(e.target.value, 10))}
                 className="mt-1 w-full accent-lime"
