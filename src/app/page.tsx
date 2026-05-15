@@ -8,6 +8,8 @@ import RunStartCTA from "@/components/run/RunStartCTA";
 import BibIcon from "@/components/ui/BibIcon";
 import GutTrainingIcon from "@/components/ui/GutTrainingIcon";
 import InviteFriendsCard from "@/components/invite/InviteFriendsCard";
+import AddRunFAB from "@/components/layout/AddRunFAB";
+import DailyQuestHero from "@/components/home/DailyQuestHero";
 import { MY_BADGES, MY_RUNS } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
 import { BADGES, getBadge } from "@/lib/data/badges";
@@ -76,6 +78,9 @@ export default async function HomePage({
           </Link>
         </div>
       </header>
+
+      {/* Quête du jour — hero saillant, retour panel Lola */}
+      <DailyQuestHero />
 
       {/* CTA — Lance une sortie + modale Strava au 1er clic */}
       <RunStartCTA />
@@ -449,6 +454,8 @@ export default async function HomePage({
           </div>
         </div>
       </Link>
+      {/* FAB Ajouter sortie — retour panel Théo, 28 : "pourquoi il est pas là ?" */}
+      <AddRunFAB />
     </main>
   );
 }

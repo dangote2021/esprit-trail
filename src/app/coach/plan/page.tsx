@@ -292,6 +292,38 @@ function CoachPlanInner() {
               </div>
             </div>
 
+            {/* Charge totale cumulée — retour panel test Théo */}
+            <div className="mt-2 rounded-xl border-2 border-peach/30 bg-gradient-to-br from-peach/15 via-bg-card to-bg p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+                    Charge totale de la prépa
+                  </div>
+                  <div className="mt-1 flex items-baseline gap-4">
+                    <div>
+                      <span className="font-display text-2xl font-black text-peach">
+                        {plan.plan.reduce((s, w) => s + w.weeklyKm, 0)}
+                      </span>
+                      <span className="ml-0.5 text-[11px] font-mono text-ink-muted">km</span>
+                    </div>
+                    <div>
+                      <span className="font-display text-2xl font-black text-violet">
+                        {plan.plan
+                          .reduce((s, w) => s + w.weeklyElevation, 0)
+                          .toLocaleString("fr")}
+                      </span>
+                      <span className="ml-0.5 text-[11px] font-mono text-ink-muted">m D+</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-3xl opacity-60">🔋</div>
+              </div>
+              <div className="mt-1 text-[10px] font-mono text-ink-dim">
+                Le total que tu vas avaler d&apos;ici la course. Lisse-le et
+                hydrate, le reste suit.
+              </div>
+            </div>
+
             <div className="mt-3 text-[9px] font-mono text-ink-dim">
               Source : {plan.source}
             </div>
