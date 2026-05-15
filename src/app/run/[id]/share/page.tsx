@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { MY_RUNS, ME } from "@/lib/data/me";
+import { downloadRunImage, shareRunImage } from "@/lib/run-share-image";
+import { getStoredIdentity } from "@/lib/identity";
 
 type Template = "pulse" | "classic" | "gamer" | "sobre";
 
@@ -56,6 +58,79 @@ export default function RunSharePage() {
       setTimeout(() => setLinkCopied(false), 1800);
     } catch {
       // ignore
+    }
+  }
+
+  // Identité réelle (localStorage) si dispo, sinon fallback ME mock — évite de
+  // partager "Traileur / @traileur_demo" pour un user qui a configuré son profil.
+  function getAuthorForShare() {
+    const stored = getStoredIdentity();
+    return {
+      authorName: stored.displayName || ME.displayName,
+      authorUsername: stored.username || ME.username,
+      authorAvatar: ME.avatar,
+    };
+  }
+
+  const [imgBusy, setImgBusy] = useState<null | "save" | "story" | "tiktok">(null);
+  const [imgFeedback, setImgFeedback] = useState<string>("");
+
+  async function handleSaveVisual() {
+    if (!run || imgBusy) return;
+    setImgBusy("save");
+    setImgFeedback("");
+    try {
+      const author = getAuthorForShare();
+      await downloadRunImage({
+        title: run.title || "Ma sortie",
+        distance: run.distance,
+        elevation: run.elevation,
+        duration: run.duration,
+        date: run.date,
+        location: run.location,
+        ...author,
+      }, `esprit-trail-${run.id}.png`);
+      setImgFeedback("Image sauvée dans tes téléchargements 📸");
+    } catch (e) {
+      setImgFeedback(e instanceof Error ? e.message : "Le rendu a planté");
+    } finally {
+      setImgBusy(null);
+      setTimeout(() => setImgFeedback(""), 3000);
+    }
+  }
+
+  async function handleStoryShare(kind: "story" | "tiktok") {
+    if (!run || imgBusy) return;
+    setImgBusy(kind);
+    setImgFeedback("");
+    try {
+      const author = getAuthorForShare();
+      const result = await shareRunImage(
+        {
+          title: run.title || "Ma sortie",
+          distance: run.distance,
+          elevation: run.elevation,
+          duration: run.duration,
+          date: run.date,
+          location: run.location,
+          ...author,
+        },
+        kind === "story" ? "Ma sortie sur Esprit Trail" : "Ma sortie Esprit Trail",
+      );
+      if (result === "shared") {
+        setImgFeedback("Partagé · ouvre ton app de partage 🎉");
+      } else if (result === "downloaded") {
+        setImgFeedback(
+          kind === "story"
+            ? "Téléchargée — colle-la dans ta story Insta"
+            : "Téléchargée — uploade-la dans TikTok",
+        );
+      }
+    } catch (e) {
+      setImgFeedback(e instanceof Error ? e.message : "Le rendu a planté");
+    } finally {
+      setImgBusy(null);
+      setTimeout(() => setImgFeedback(""), 3500);
     }
   }
 
@@ -151,29 +226,34 @@ export default function RunSharePage() {
       <section className="space-y-2">
         <button
           type="button"
-          disabled
-          className="w-full rounded-xl bg-lime/50 py-3.5 font-black uppercase tracking-wider text-bg/70 cursor-not-allowed"
+          onClick={handleSaveVisual}
+          disabled={imgBusy !== null}
+          className="w-full rounded-xl bg-lime py-3.5 font-black uppercase tracking-wider text-bg shadow-glow-lime active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-wait"
         >
-          📸 Sauvegarder le visuel (bientôt)
+          {imgBusy === "save" ? "Rendu en cours…" : "📸 Sauvegarder le visuel"}
         </button>
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
-            disabled
-            className="rounded-xl border border-ink/10 bg-bg-card/40 p-3 text-center opacity-60 cursor-not-allowed"
+            onClick={() => handleStoryShare("story")}
+            disabled={imgBusy !== null}
+            className="rounded-xl border border-ink/10 bg-bg-card/60 p-3 text-center transition hover:border-peach/40 disabled:opacity-60 disabled:cursor-wait"
           >
             <div className="text-xl">📱</div>
-            <div className="text-[10px] font-mono text-ink-muted">Story IG</div>
-            <div className="text-[9px] font-mono text-peach mt-0.5">bientôt</div>
+            <div className="text-[10px] font-mono text-ink-muted">
+              {imgBusy === "story" ? "…" : "Story IG"}
+            </div>
           </button>
           <button
             type="button"
-            disabled
-            className="rounded-xl border border-ink/10 bg-bg-card/40 p-3 text-center opacity-60 cursor-not-allowed"
+            onClick={() => handleStoryShare("tiktok")}
+            disabled={imgBusy !== null}
+            className="rounded-xl border border-ink/10 bg-bg-card/60 p-3 text-center transition hover:border-peach/40 disabled:opacity-60 disabled:cursor-wait"
           >
             <div className="text-xl">🎵</div>
-            <div className="text-[10px] font-mono text-ink-muted">TikTok</div>
-            <div className="text-[9px] font-mono text-peach mt-0.5">bientôt</div>
+            <div className="text-[10px] font-mono text-ink-muted">
+              {imgBusy === "tiktok" ? "…" : "TikTok"}
+            </div>
           </button>
           <button
             type="button"
@@ -186,8 +266,14 @@ export default function RunSharePage() {
             </div>
           </button>
         </div>
+        {imgFeedback && (
+          <div className="rounded-lg bg-lime/10 border border-lime/30 p-2 text-center text-[12px] font-mono text-lime">
+            {imgFeedback}
+          </div>
+        )}
         <div className="rounded-xl border border-cyan/20 bg-cyan/5 p-3 text-[11px] text-ink-muted">
-          💡 Le lien marche déjà ; les exports Story IG / TikTok arrivent bientôt.
+          💡 Sur mobile, le partage s&apos;ouvre direct dans Insta/TikTok. Sur
+          desktop, l&apos;image est téléchargée — colle-la dans ta story.
         </div>
       </section>
 

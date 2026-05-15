@@ -13,7 +13,7 @@ import { useState } from "react";
 import { TRAINING_SPOTS } from "@/lib/data/training-spots";
 import { RACES } from "@/lib/data/races";
 
-type Tab = "spot" | "race" | "plan";
+type Tab = "spot" | "race" | "plan" | "position";
 
 const PLANS = [
   { id: "ultra-trail", emoji: "🏔️", title: "Plan Ultra-Trail 100K+", desc: "12 semaines de prépa, nutri incluse" },
@@ -30,10 +30,37 @@ export default function AttachSheet({
   onAttach: (token: string, label: string) => void;
 }) {
   const [tab, setTab] = useState<Tab>("spot");
+  const [gpsState, setGpsState] = useState<"idle" | "fetching" | "denied" | "error">("idle");
+  const [gpsError, setGpsError] = useState<string>("");
 
   function pick(token: string, label: string) {
     onAttach(token, label);
     onClose();
+  }
+
+  function sendPosition() {
+    if (!("geolocation" in navigator)) {
+      setGpsState("error");
+      setGpsError("Le navigateur galère sur la géoloc.");
+      return;
+    }
+    setGpsState("fetching");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(5);
+        const lng = pos.coords.longitude.toFixed(5);
+        pick(`[[attach:position:${lat},${lng}]]`, `📍 Ma position`);
+      },
+      (err) => {
+        setGpsState(err.code === err.PERMISSION_DENIED ? "denied" : "error");
+        setGpsError(
+          err.code === err.PERMISSION_DENIED
+            ? "T'as bloqué la géoloc dans le navigateur."
+            : "Le GPS galère. Réessaie en plein air.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 },
+    );
   }
 
   return (
@@ -65,12 +92,13 @@ export default function AttachSheet({
             { id: "spot" as const, label: "🗺️ Spot" },
             { id: "race" as const, label: "🏁 Course" },
             { id: "plan" as const, label: "📋 Plan" },
+            { id: "position" as const, label: "📍 Ici" },
           ].map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
-              className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-mono font-bold transition ${
+              className={`flex-1 rounded-lg px-2 py-1.5 text-[11px] font-mono font-bold transition ${
                 tab === t.id
                   ? "bg-peach text-bg shadow-glow-peach"
                   : "text-ink-muted hover:text-ink"
@@ -138,6 +166,55 @@ export default function AttachSheet({
                 </div>
               </button>
             ))}
+
+          {tab === "position" && (
+            <div className="space-y-3 py-2">
+              <div className="rounded-xl border border-ink/10 bg-bg-card/60 p-4">
+                <div className="text-3xl text-center mb-2">📍</div>
+                <div className="text-center text-sm font-bold mb-1">
+                  Partage ta position
+                </div>
+                <p className="text-center text-[12px] text-ink-muted leading-relaxed mb-3">
+                  Pratique pour se retrouver sur un point de RDV avant une sortie.
+                  La position est partagée à l&apos;instant T, pas en temps réel.
+                </p>
+                {gpsState === "idle" && (
+                  <button
+                    type="button"
+                    onClick={sendPosition}
+                    className="w-full rounded-xl bg-lime py-3 font-display text-sm font-black uppercase tracking-wider text-bg shadow-glow-lime"
+                  >
+                    🛰️ Capter ma position
+                  </button>
+                )}
+                {gpsState === "fetching" && (
+                  <div className="rounded-xl border border-lime/30 bg-lime/5 p-3 text-center text-[12px] font-mono text-lime">
+                    📡 Accroche du GPS…
+                  </div>
+                )}
+                {(gpsState === "denied" || gpsState === "error") && (
+                  <div className="space-y-2">
+                    <div className="rounded-xl border border-mythic/30 bg-mythic/5 p-3 text-center text-[12px] text-mythic">
+                      {gpsError}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGpsState("idle");
+                        setGpsError("");
+                      }}
+                      className="w-full rounded-xl border border-ink/15 py-2 text-[11px] font-mono font-bold uppercase text-ink-muted"
+                    >
+                      Réessayer
+                    </button>
+                  </div>
+                )}
+              </div>
+              <p className="text-center text-[10px] font-mono text-ink-dim">
+                On n&apos;envoie qu&apos;une position ponctuelle. Pas de tracking continu, pas de stockage côté serveur.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -148,7 +225,8 @@ export default function AttachSheet({
 
 export function renderMessageWithAttachments(body: string): React.ReactNode[] {
   // Splits "Hey check [[attach:spot:xxx]] cool" → ["Hey check ", <Card/>, " cool"]
-  const regex = /\[\[attach:(spot|race|plan):([a-zA-Z0-9-_]+)\]\]/g;
+  // Pour les positions, l'id contient une virgule (lat,lng) — pattern différent
+  const regex = /\[\[attach:(spot|race|plan|position):([a-zA-Z0-9-_.,]+)\]\]/g;
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -198,6 +276,13 @@ function AttachmentCard({ kind, id }: { kind: Tab; id: string }) {
       emoji = p.emoji;
       href = "/coach";
     }
+  } else if (kind === "position") {
+    // id = "lat,lng" → ouvre Google Maps avec un pin
+    const [lat, lng] = id.split(",");
+    label = "Ma position";
+    sub = `${lat}, ${lng}`;
+    emoji = "📍";
+    href = `https://www.google.com/maps?q=${lat},${lng}`;
   }
 
   const inner = (
@@ -214,8 +299,15 @@ function AttachmentCard({ kind, id }: { kind: Tab; id: string }) {
   );
 
   if (href) {
+    const isExternal = href.startsWith("http");
     return (
-      <a href={href} className="block hover:opacity-80" onClick={(e) => e.stopPropagation()}>
+      <a
+        href={href}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        className="block hover:opacity-80"
+        onClick={(e) => e.stopPropagation()}
+      >
         {inner}
       </a>
     );
