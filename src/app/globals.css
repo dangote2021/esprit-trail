@@ -10,14 +10,25 @@
 
 html,
 body {
-  /* Esprit Trail — Alpine Light : crème naturel + texte vert forêt */
-  background: #f0e6c8;
+  /* Esprit Trail — Alpine Light : dégradé sunset subtil (crème → pêche très pâle)
+     Le tester voulait plus de "vie" sans fluo. Dégradé fixé sur viewport pour
+     ne pas répéter quand on scrolle. */
+  background:
+    linear-gradient(
+      178deg,
+      #f0e6c8 0%,
+      #f0e6c8 32%,
+      #f3e4bd 64%,
+      #f6dfae 100%
+    );
+  background-attachment: fixed;
   color: #1b4332;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Texture papier kraft très subtile sur le fond — vibe magazine outdoor */
+/* Texture papier kraft très subtile sur le fond — vibe magazine outdoor.
+   Garde le grain sur tout le sunset dégradé pour conserver le look "papier". */
 body::before {
   content: "";
   position: fixed;
@@ -28,6 +39,26 @@ body::before {
   background-size: 3px 3px;
   opacity: 0.7;
   mix-blend-mode: multiply;
+}
+
+/* Halos d'accent fixés sur la page — apportent du mouvement coloré quand on scrolle */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      circle at 80% 12%,
+      rgba(247, 127, 0, 0.07) 0%,
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 12% 88%,
+      rgba(132, 169, 140, 0.10) 0%,
+      transparent 38%
+    );
 }
 body > * {
   position: relative;

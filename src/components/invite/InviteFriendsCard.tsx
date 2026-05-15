@@ -153,29 +153,51 @@ export default function InviteFriendsCard({
   // Version full pour la home
   return (
     <>
-      <section className="relative overflow-hidden rounded-3xl border-2 border-lime/40 bg-gradient-to-br from-lime/15 via-peach/10 to-bg p-5 card-chunky">
-        <div className="pointer-events-none absolute -right-4 -top-4 text-[100px] opacity-[0.1] leading-none">
+      <section
+        className="relative overflow-hidden rounded-3xl border-2 border-violet/40 p-5 card-chunky"
+        style={{
+          // Dégradé "bonus social" : violet doux → violet profond, distinct du
+          // vert nature des autres sections + contrasté avec le fond crème.
+          background:
+            "linear-gradient(135deg, rgba(199,125,255,0.18) 0%, rgba(157,78,221,0.10) 45%, rgba(254,250,224,0) 100%)",
+        }}
+      >
+        {/* Halo subtil top-right pour le ressenti "premium" (cf. OFF Races) */}
+        <div
+          className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-50"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(199,125,255,0.45) 0%, transparent 65%)",
+          }}
+        />
+        <div className="pointer-events-none absolute -right-4 -top-4 text-[100px] opacity-[0.08] leading-none">
           🎟️
         </div>
 
         <div className="relative flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-lime text-bg card-chunky wobble shadow-glow-lime">
+          <div
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-bg card-chunky wobble"
+            style={{
+              background:
+                "linear-gradient(135deg, #c77dff 0%, #5a189a 100%)",
+              boxShadow: "0 4px 14px rgba(90,24,154,0.35)",
+            }}
+          >
             <span className="text-3xl">🎟️</span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="inline-flex items-center gap-1.5 rounded-md bg-lime/20 text-lime px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider">
-              <span className="h-1.5 w-1.5 rounded-full bg-lime animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 rounded-md bg-violet/20 text-violet px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider">
+              <span className="h-1.5 w-1.5 rounded-full bg-violet animate-pulse" />
               Parrainage · Maximise tes chances
             </div>
-            <div className="mt-1 font-display text-xl font-black leading-tight text-lime">
-              Invite tes potos
+            <div className="mt-1 font-display text-xl font-black leading-tight text-violet">
+              Invite ta crew
             </div>
             <p className="text-xs text-ink-muted mt-1 leading-relaxed">
               Chaque poto qui rejoint l&apos;app via ton lien =
               <strong className="text-ink"> +1 chance</strong> ajoutée dans
-              l&apos;urne du tirage des dossards. Plus tu en invites,
-              <strong className="text-ink"> plus tes chances grimpent</strong> —
-              sans garantie de gain.
+              l&apos;urne du tirage des dossards. Plus vous êtes, plus vous
+              gagnez 🎟️ — <strong className="text-ink">sans garantie de gain</strong>.
             </p>
           </div>
         </div>
@@ -188,7 +210,7 @@ export default function InviteFriendsCard({
                 <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
                   Chances ajoutées au tirage
                 </div>
-                <div className="font-display text-3xl font-black text-lime leading-none mt-0.5">
+                <div className="font-display text-3xl font-black text-violet leading-none mt-0.5">
                   +{bonusTickets}
                   <span className="text-base text-ink-dim ml-1">
                     🎟️
@@ -199,24 +221,28 @@ export default function InviteFriendsCard({
                 <div className="text-[10px] font-mono text-ink-dim">
                   Prochain palier
                 </div>
-                <div className="font-display text-base font-black text-peach">
+                <div className="font-display text-base font-black text-violet">
                   {invitesSent}/{nextMilestone}
                 </div>
               </div>
             </div>
-            {/* Bar */}
+            {/* Bar — dégradé violet qui s'intensifie */}
             <div className="h-2 w-full overflow-hidden rounded-full bg-bg-raised">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-lime to-peach transition-all"
-                style={{ width: `${progress}%` }}
+                className="h-full rounded-full transition-all"
+                style={{
+                  width: `${progress}%`,
+                  background:
+                    "linear-gradient(90deg, #c77dff 0%, #7b2cbf 60%, #3c096c 100%)",
+                }}
               />
             </div>
-            {/* Milestones */}
+            {/* Milestones — paliers contrastés qui prennent en intensité */}
             <div className="grid grid-cols-3 gap-1 text-[9px] font-mono pt-1">
               <div
                 className={`rounded-md p-1.5 text-center ${
                   invitesSent >= 3
-                    ? "bg-lime/15 text-lime"
+                    ? "bg-violet/15 text-violet border border-violet/30"
                     : "bg-bg-raised/60 text-ink-dim"
                 }`}
               >
@@ -225,23 +251,35 @@ export default function InviteFriendsCard({
               </div>
               <div
                 className={`rounded-md p-1.5 text-center ${
-                  invitesSent >= 5
-                    ? "bg-peach/15 text-peach"
-                    : "bg-bg-raised/60 text-ink-dim"
+                  invitesSent >= 5 ? "text-white shadow-md" : "bg-bg-raised/60 text-ink-dim"
                 }`}
+                style={
+                  invitesSent >= 5
+                    ? {
+                        background:
+                          "linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)",
+                      }
+                    : undefined
+                }
               >
                 <div className="font-black">5 potos</div>
-                <div className="opacity-70">Chances ×2 au tirage</div>
+                <div className="opacity-80">Chances ×2 au tirage</div>
               </div>
               <div
                 className={`rounded-md p-1.5 text-center ${
-                  invitesSent >= 10
-                    ? "bg-violet/15 text-violet"
-                    : "bg-bg-raised/60 text-ink-dim"
+                  invitesSent >= 10 ? "text-white shadow-md" : "bg-bg-raised/60 text-ink-dim"
                 }`}
+                style={
+                  invitesSent >= 10
+                    ? {
+                        background:
+                          "linear-gradient(135deg, #7b2cbf 0%, #3c096c 100%)",
+                      }
+                    : undefined
+                }
               >
                 <div className="font-black">10 potos</div>
-                <div className="opacity-70">Chances ×3 au tirage</div>
+                <div className="opacity-80">Chances ×3 au tirage</div>
               </div>
             </div>
             <p className="text-[9px] text-ink-dim pt-1 leading-relaxed">
@@ -255,7 +293,12 @@ export default function InviteFriendsCard({
 
         <button
           onClick={handleShare}
-          className="relative mt-4 block w-full rounded-xl bg-lime py-3 text-center font-display font-black uppercase tracking-wider text-bg shadow-glow-lime btn-chunky tap-bounce"
+          className="relative mt-4 block w-full rounded-xl py-3 text-center font-display font-black uppercase tracking-wider text-white btn-chunky tap-bounce"
+          style={{
+            background:
+              "linear-gradient(135deg, #9d4edd 0%, #5a189a 100%)",
+            boxShadow: "0 4px 14px rgba(90,24,154,0.35)",
+          }}
         >
           🚀 Inviter un poto
         </button>

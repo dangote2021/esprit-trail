@@ -5,6 +5,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCardClient from "@/components/profile/ProfileHeroCardClient";
 import StravaConnectionStatus from "@/components/profile/StravaConnectionStatus";
 import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
+import FormeRecupPanel from "@/components/profile/FormeRecupPanel";
 import StatRadarEditable from "@/components/profile/StatRadarEditable";
 import TotemPicker from "@/components/profile/TotemPicker";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
@@ -169,6 +170,9 @@ export default function ProfilePage() {
         </div>
       </section>
       </ConfiguredProfileOnly>
+
+      {/* Forme & Récup — VO₂max, fraîcheur TSB, charge */}
+      <FormeRecupPanel />
 
       {/* Accès Ranking — apparaît juste sous les onglets UTMB et ITRA */}
       <Link
