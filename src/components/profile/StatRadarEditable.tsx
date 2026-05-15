@@ -1,15 +1,32 @@
 "use client";
 
 // ====== StatRadarEditable ======
-// Affiche le radar hexagonal FIFA-style des forces/faiblesses + sliders
-// d'auto-évaluation. Override stocké en localStorage (esprit_stats_override).
-// L'utilisateur peut ajuster ses stats lui-même (sondage personnel).
+// Affiche un radar hexagonal FIFA-style avec 2 onglets :
+//   • Terrain — endurance, montée, technicité, roulant, mental, descente.
+//     Auto-évaluable par sliders (sondage perso, override localStorage).
+//   • Physio — HRV, sommeil, charge aiguë, charge fond, fraîcheur, régularité.
+//     Lecture seule (alimenté par Strava — sera live quand brancher backend).
+//
+// Retour Marco (32, panel test) : "6 axes c'est peut-être un peu fouillis.
+// Vous pourriez splitter Forme physio vs Tech terrain en 2 radars distincts ?"
 
 import { useEffect, useState } from "react";
 import { StatRadar, statsToRadar, type RadarAxis } from "@/components/ui/StatRadar";
 import type { TrailerStats } from "@/lib/types";
+import { ME } from "@/lib/data/me";
 
 const KEY = "esprit_stats_override";
+
+type RadarTab = "terrain" | "physio";
+
+const PHYSIO_AXES: { key: keyof NonNullable<typeof ME.physio>; label: string; longLabel: string; accent: RadarAxis["accent"] }[] = [
+  { key: "hrv", label: "HRV", longLabel: "Variabilité card.", accent: "cyan" },
+  { key: "sleep", label: "Sommeil", longLabel: "Sommeil", accent: "violet" },
+  { key: "acuteLoad", label: "Aigu", longLabel: "Charge aiguë (7j)", accent: "peach" },
+  { key: "chronicLoad", label: "Fond", longLabel: "Charge fond (28j)", accent: "lime" },
+  { key: "freshness", label: "Frais", longLabel: "Fraîcheur (TSB)", accent: "gold" },
+  { key: "regularity", label: "Régul.", longLabel: "Régularité", accent: "mythic" },
+];
 
 const STAT_LABELS: { key: keyof TrailerStats; label: string; color: string }[] = [
   { key: "endurance", label: "Endurance", color: "#f77f00" },
@@ -47,6 +64,7 @@ export default function StatRadarEditable({
   const [hydrated, setHydrated] = useState(false);
   const [stats, setStats] = useState<TrailerStats>(baseStats);
   const [editMode, setEditMode] = useState(false);
+  const [tab, setTab] = useState<RadarTab>("terrain");
 
   useEffect(() => {
     setHydrated(true);
@@ -70,32 +88,84 @@ export default function StatRadarEditable({
     }
   }
 
-  const axes: RadarAxis[] = statsToRadar(stats);
-  const overall = Math.round(
-    axes.reduce((s, a) => s + a.value, 0) / axes.length,
-  );
+  const terrainAxes: RadarAxis[] = statsToRadar(stats);
+  // Physio axes — depuis ME.physio (read-only). Tous les champs sont dans la
+  // même échelle 0-100 donc on les map direct sur le radar.
+  const physio = ME.physio;
+  const physioAxes: RadarAxis[] = physio
+    ? PHYSIO_AXES.map((p) => ({
+        key: p.key,
+        label: p.label,
+        longLabel: p.longLabel,
+        value: physio[p.key],
+        accent: p.accent,
+      }))
+    : [];
+
+  const axes = tab === "terrain" ? terrainAxes : physioAxes;
+  const overall = axes.length
+    ? Math.round(axes.reduce((s, a) => s + a.value, 0) / axes.length)
+    : 0;
 
   return (
     <section className="rounded-2xl bg-bg-card p-4 card-chunky">
       <div className="flex items-center justify-between mb-3">
         <div className="text-[11px] font-black uppercase tracking-widest text-ink-muted">
-          Forces & faiblesses
+          {tab === "terrain" ? "Forces & faiblesses" : "Forme & physio"}
         </div>
+        {tab === "terrain" && (
+          <button
+            onClick={() => setEditMode((v) => !v)}
+            className={`rounded-md px-2.5 py-1 text-[10px] font-mono font-black uppercase tracking-wider transition ${
+              editMode
+                ? "bg-lime text-bg"
+                : "border border-lime/40 text-lime hover:bg-lime/10"
+            }`}
+          >
+            {editMode ? "✓ Terminé" : "✎ Auto-évaluer"}
+          </button>
+        )}
+      </div>
+
+      {/* Onglets Terrain / Physio — retour Marco panel test */}
+      <div className="mb-3 flex gap-1 rounded-xl bg-bg-raised/50 p-1">
         <button
-          onClick={() => setEditMode((v) => !v)}
-          className={`rounded-md px-2.5 py-1 text-[10px] font-mono font-black uppercase tracking-wider transition ${
-            editMode
-              ? "bg-lime text-bg"
-              : "border border-lime/40 text-lime hover:bg-lime/10"
+          type="button"
+          onClick={() => {
+            setTab("terrain");
+            setEditMode(false);
+          }}
+          className={`flex-1 rounded-lg px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition ${
+            tab === "terrain"
+              ? "bg-cyan/15 text-cyan border border-cyan/40"
+              : "text-ink-muted hover:text-ink"
           }`}
         >
-          {editMode ? "✓ Terminé" : "✎ Auto-évaluer"}
+          🏔️ Terrain
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setTab("physio");
+            setEditMode(false);
+          }}
+          className={`flex-1 rounded-lg px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition ${
+            tab === "physio"
+              ? "bg-violet/15 text-violet border border-violet/40"
+              : "text-ink-muted hover:text-ink"
+          }`}
+        >
+          🫀 Physio
         </button>
       </div>
 
       <div className="flex items-center justify-center relative">
-        {/* Radar SVG */}
-        <StatRadar axes={axes} size={240} accent="cyan" />
+        {/* Radar SVG — accent change selon l'onglet */}
+        <StatRadar
+          axes={axes}
+          size={240}
+          accent={tab === "terrain" ? "cyan" : "violet"}
+        />
 
         {/* Note globale FIFA-style au centre */}
         <div
@@ -112,10 +182,12 @@ export default function StatRadarEditable({
         </div>
       </div>
 
-      {/* Sous-titre explicatif sous le radar (F3 panel test) */}
+      {/* Sous-titre explicatif sous le radar */}
       <p className="mt-2 text-center text-[10px] font-mono text-ink-dim leading-relaxed">
-        Note moyenne pondérée sur tes 6 attributs trail.
-        {hydrated && (
+        {tab === "terrain"
+          ? "Note moyenne pondérée sur tes 6 attributs trail."
+          : "Stats physio remontées depuis Strava (HRV, sommeil, charge, fraîcheur)."}
+        {hydrated && tab === "terrain" && (
           <span className="block">
             Catégorie :{" "}
             <strong className="text-ink-muted">
@@ -126,6 +198,20 @@ export default function StatRadarEditable({
                   : overall >= 55
                     ? "🥾 Intermédiaire"
                     : "🌱 Débutant"}
+            </strong>
+          </span>
+        )}
+        {hydrated && tab === "physio" && (
+          <span className="block">
+            Forme générale :{" "}
+            <strong className="text-ink-muted">
+              {overall >= 75
+                ? "💪 Excellente"
+                : overall >= 60
+                  ? "✓ Bonne"
+                  : overall >= 45
+                    ? "⚠️ À surveiller"
+                    : "🩹 Récup obligatoire"}
             </strong>
           </span>
         )}
@@ -148,8 +234,8 @@ export default function StatRadarEditable({
         ))}
       </div>
 
-      {/* Mode édition : sliders pour auto-évaluation */}
-      {hydrated && editMode && (
+      {/* Mode édition : sliders pour auto-évaluation (Terrain uniquement) */}
+      {hydrated && editMode && tab === "terrain" && (
         <div className="mt-4 space-y-3 rounded-xl border-2 border-lime/30 bg-lime/5 p-3">
           <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
             Ajuste tes points forts / faibles

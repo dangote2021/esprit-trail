@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import CookieBanner from "@/components/layout/CookieBanner";
 import IOSInstallBanner from "@/components/pwa/IOSInstallBanner";
 import StorageMigrationGate from "@/components/layout/StorageMigrationGate";
+import PwaBackGuard from "@/components/layout/PwaBackGuard";
 import ToastHost from "@/components/ui/Toast";
 import { LangProvider } from "@/lib/i18n/LangProvider";
 import { getServerLang } from "@/lib/i18n/server";
@@ -157,6 +158,7 @@ export default function RootLayout({
           <IOSInstallBanner />
           <StorageMigrationGate />
           <ToastHost />
+          <PwaBackGuard />
         </LangProvider>
       </body>
     </html>
