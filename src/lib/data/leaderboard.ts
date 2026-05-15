@@ -14,7 +14,7 @@ export const LEADERBOARD_FRIENDS_WEEKLY_KM: LeaderboardEntry[] = [
     user: { id: "me", username: "traileur_demo", avatar: "🦊", level: 9, title: "Traileur" },
     value: 62.5,
     change: 2,
-    isYou: true,
+    isYou: false,
   },
   {
     rank: 3,
@@ -66,7 +66,7 @@ export const LEADERBOARD_REGION_WEEKLY_DPLUS: LeaderboardEntry[] = [
     user: { id: "me", username: "traileur_demo", avatar: "🦊", level: 9, title: "Traileur" },
     value: 2840,
     change: 12,
-    isYou: true,
+    isYou: false,
   },
 ];
 
@@ -94,7 +94,7 @@ export const LEADERBOARD_WORLD_SEASON_XP: LeaderboardEntry[] = [
     user: { id: "me", username: "traileur_demo", avatar: "🦊", level: 9, title: "Traileur" },
     value: 7420,
     change: 42,
-    isYou: true,
+    isYou: false,
   },
 ];
 
@@ -116,7 +116,7 @@ export const LEADERBOARD_ITRA: LeaderboardEntry[] = [
   // ... gap ...
   { rank: 4287,  user: { id: "u-mat",   username: "mat_trail",       avatar: "🐺", level: 14, title: "Chasseur de cols" }, value: 612, change: 4 },
   { rank: 4321,  user: { id: "u-louise",username: "louise.run",      avatar: "🦊", level: 13, title: "Grimpeuse" },        value: 605, change: -2 },
-  { rank: 4356,  user: { id: "me",      username: "traileur_demo",   avatar: "🦊", level: 9, title: "Traileur" },          value: 598, change: 12, isYou: true },
+  { rank: 4356,  user: { id: "me",      username: "traileur_demo",   avatar: "🦊", level: 9, title: "Traileur" },          value: 598, change: 12, isYou: false },
   { rank: 4398,  user: { id: "u-tom",   username: "tom.runner",      avatar: "🦅", level: 11, title: "Grimpeur" },          value: 589, change: 0 },
   { rank: 4445,  user: { id: "u-marc",  username: "marcoulons",       avatar: "🦌", level: 10, title: "Traileur" },         value: 581, change: -3 },
 ];
@@ -135,7 +135,7 @@ export const LEADERBOARD_UTMB: LeaderboardEntry[] = [
   // ... gap ...
   { rank: 6789,  user: { id: "u-mat",   username: "mat_trail",       avatar: "🐺", level: 14, title: "Chasseur de cols" }, value: 624, change: 8 },
   { rank: 6852,  user: { id: "u-louise",username: "louise.run",      avatar: "🦊", level: 13, title: "Grimpeuse" },        value: 615, change: -4 },
-  { rank: 6924,  user: { id: "me",      username: "traileur_demo",   avatar: "🦊", level: 9, title: "Traileur" },          value: 605, change: 18, isYou: true },
+  { rank: 6924,  user: { id: "me",      username: "traileur_demo",   avatar: "🦊", level: 9, title: "Traileur" },          value: 605, change: 18, isYou: false },
   { rank: 6987,  user: { id: "u-tom",   username: "tom.runner",      avatar: "🦅", level: 11, title: "Grimpeur" },          value: 597, change: 0 },
   { rank: 7045,  user: { id: "u-marc",  username: "marcoulons",       avatar: "🦌", level: 10, title: "Traileur" },         value: 588, change: -1 },
 ];

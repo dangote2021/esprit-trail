@@ -129,8 +129,8 @@ export const GUILDES: Guilde[] = [
     },
     joinRule: "request",
     vibe: ["Montagne", "Sorties longues", "Grosse ambiance"],
-    iAmMember: true,
-    iAmCaptain: true,
+    iAmMember: false,
+    iAmCaptain: false,
   },
   {
     id: "g-ultra-girls",

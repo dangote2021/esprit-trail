@@ -4,6 +4,7 @@ import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCardClient from "@/components/profile/ProfileHeroCardClient";
 import StravaConnectionStatus from "@/components/profile/StravaConnectionStatus";
+import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
 import StatRadarEditable from "@/components/profile/StatRadarEditable";
 import TotemPicker from "@/components/profile/TotemPicker";
 import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
@@ -107,7 +108,8 @@ export default function ProfilePage() {
       {/* Bloc PlayerHUD supprimé — la carte Hero suffit pour identifier le profil */}
       {/* Bloc Character customization retiré — on garde le profil propre, photo perso */}
 
-      {/* UTMB + ITRA */}
+      {/* UTMB + ITRA — masqué pour profils vierges (sinon affiche des scores fictifs) */}
+      <ConfiguredProfileOnly>
       <section className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-bg-card p-4">
           <div className="flex items-center gap-2">
@@ -166,6 +168,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </section>
+      </ConfiguredProfileOnly>
 
       {/* Accès Ranking — apparaît juste sous les onglets UTMB et ITRA */}
       <Link

@@ -219,7 +219,10 @@ export default function SettingsPage() {
           Connexion Strava
         </div>
         <div className="rounded-2xl border border-ink/10 bg-bg-card/60 p-4">
-          <div className="flex items-center gap-3">
+          <Link
+            href="/settings/connections/strava"
+            className="flex items-center gap-3 hover:opacity-90 transition"
+          >
             <div
               className="flex h-12 w-12 items-center justify-center rounded-xl font-display text-lg font-black text-white"
               style={{ backgroundColor: "#fc4c02" }}
@@ -228,33 +231,14 @@ export default function SettingsPage() {
             </div>
             <div className="flex-1">
               <div className="font-display text-base font-black">Strava</div>
-              <div className="text-[11px] font-mono text-lime">✓ Sync active</div>
-            </div>
-            <Link
-              href="/settings/connections/strava"
-              className="rounded-lg border border-ink/15 px-3 py-1.5 text-[10px] font-mono font-bold uppercase text-ink-muted hover:border-lime/40 hover:text-lime"
-            >
-              Gérer
-            </Link>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-3">
-              <div className="text-[10px] font-mono font-bold uppercase text-cyan">
-                UTMB Index
-              </div>
-              <div className="mt-1 font-display text-2xl font-black text-cyan">
-                {ME.connections.utmb?.runnerIndex ?? "—"}
+              <div className="text-[11px] font-mono text-ink-muted">
+                Configurer la connexion
               </div>
             </div>
-            <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-3">
-              <div className="text-[10px] font-mono font-bold uppercase text-violet">
-                ITRA
-              </div>
-              <div className="mt-1 font-display text-2xl font-black text-violet">
-                {ME.connections.itra.performanceIndex}
-              </div>
-            </div>
-          </div>
+            <span className="rounded-lg border border-ink/15 px-3 py-1.5 text-[10px] font-mono font-bold uppercase text-ink-muted">
+              Gérer →
+            </span>
+          </Link>
         </div>
       </section>
 
