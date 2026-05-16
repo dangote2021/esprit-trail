@@ -107,25 +107,25 @@ export function GuildeJoinButton({ guilde }: { guilde: Guilde }) {
 export function GuildeSettingsButton({ guilde }: { guilde: Guilde }) {
   const [open, setOpen] = useState(false);
   const [armed, setArmed] = useState(false);
-  const [confirmText, setConfirmText] = useState("");
 
-  // Le bouton Quitter passe en "armé" au premier clic. Pour quitter pour de
-  // vrai, l'utilisateur doit taper QUITTER (case insensitive) dans l'input qui
-  // apparaît — pattern Github / Linear pour les actions destructrices. Stop
-  // les clics accidentels et lent un peu pour faire réfléchir.
+  // 2-step confirm : 1er clic arme le bouton (turn rouge plein + label change),
+  // 2e clic dans les 5s confirme. Moins hostile que "tape QUITTER" tout en
+  // évitant les clics accidentels. Retour panel Lola : "j'ai eu l'impression
+  // qu'on me grondait".
 
-  function reset() {
-    setArmed(false);
-    setConfirmText("");
-  }
+  // Reset si user attend trop longtemps
+  useEffect(() => {
+    if (!armed) return;
+    const t = setTimeout(() => setArmed(false), 5000);
+    return () => clearTimeout(t);
+  }, [armed]);
 
   function leaveForReal() {
-    if (confirmText.trim().toUpperCase() !== "QUITTER") return;
     const m = loadMembership();
     delete m[guilde.id];
     saveMembership(m);
     setOpen(false);
-    reset();
+    setArmed(false);
     setTimeout(() => (window.location.href = "/guildes"), 200);
   }
 
@@ -143,7 +143,7 @@ export function GuildeSettingsButton({ guilde }: { guilde: Guilde }) {
         <Modal
           onClose={() => {
             setOpen(false);
-            reset();
+            setArmed(false);
           }}
           title={`Team · ${guilde.name}`}
         >
@@ -160,52 +160,21 @@ export function GuildeSettingsButton({ guilde }: { guilde: Guilde }) {
                 : "sur invitation"}
             </div>
 
-            {!armed ? (
-              <button
-                type="button"
-                onClick={() => setArmed(true)}
-                className="w-full rounded-xl border-2 border-mythic/40 bg-mythic/5 py-3 font-display text-sm font-black uppercase tracking-wider text-mythic hover:bg-mythic/10"
-              >
-                Quitter cette team
-              </button>
-            ) : (
-              <div className="rounded-xl border-2 border-mythic/50 bg-mythic/5 p-3 space-y-2">
-                <p className="text-[12px] text-mythic font-mono leading-snug">
-                  ⚠️ Action définitive. Tape{" "}
-                  <strong className="font-display font-black">QUITTER</strong>{" "}
-                  pour confirmer.
-                </p>
-                <input
-                  type="text"
-                  value={confirmText}
-                  onChange={(e) => setConfirmText(e.target.value)}
-                  placeholder="QUITTER"
-                  autoFocus
-                  className="w-full rounded-lg border border-mythic/30 bg-white/60 px-3 py-2 font-mono text-sm uppercase tracking-wider focus:border-mythic focus:outline-none"
-                />
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={reset}
-                    className="flex-1 rounded-lg border border-ink/15 py-2 text-[11px] font-mono font-bold uppercase text-ink-muted hover:bg-bg-card/40"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="button"
-                    onClick={leaveForReal}
-                    disabled={confirmText.trim().toUpperCase() !== "QUITTER"}
-                    className="flex-1 rounded-lg bg-mythic py-2 text-[11px] font-mono font-black uppercase text-white disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    Quitter pour de bon
-                  </button>
-                </div>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => (armed ? leaveForReal() : setArmed(true))}
+              className={`w-full rounded-xl py-3 font-display text-sm font-black uppercase tracking-wider transition ${
+                armed
+                  ? "bg-mythic text-white shadow-md"
+                  : "border-2 border-mythic/40 bg-mythic/5 text-mythic hover:bg-mythic/10"
+              }`}
+            >
+              {armed ? "Confirme — je quitte" : "Quitter cette team"}
+            </button>
 
             <p className="text-center text-[11px] text-ink-muted">
               {armed
-                ? "Si tu changes d'avis dans 10 min, redemande à la team."
+                ? "Sûr ? Re-clique pour confirmer · ça s'annule tout seul dans 5s."
                 : "Les paramètres avancés (renommer, kicker, changer la règle) sont réservés aux capitaines."}
             </p>
           </div>

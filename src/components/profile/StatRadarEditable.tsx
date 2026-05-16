@@ -128,6 +128,11 @@ export default function StatRadarEditable({
       </div>
 
       {/* Onglets Terrain / Physio — retour Marco panel test */}
+      {tab === "physio" && (
+        <div className="mb-2 rounded-md bg-violet/5 border border-violet/15 px-2 py-1 text-[10px] font-mono text-violet/80 text-center">
+          🔒 Stats remontées via Strava · non modifiables
+        </div>
+      )}
       <div className="mb-3 flex gap-1 rounded-xl bg-bg-raised/50 p-1">
         <button
           type="button"

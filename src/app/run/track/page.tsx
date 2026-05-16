@@ -57,8 +57,61 @@ export default function RunTrackPage() {
   const points = useRef<Point[]>([]);
   const watchId = useRef<number | null>(null);
   const tickInterval = useRef<number | null>(null);
+  // Wake lock pour éviter que l'écran s'éteigne pendant la sortie — retour
+  // panel Sam : "le chrono se gèle quand l'écran s'éteint sur Pixel 7".
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const wakeLockRef = useRef<any>(null);
 
-  // Chrono tick
+  // Wake lock : on garde l'écran allumé tant que la sortie est active.
+  // Re-acquisition automatique au retour de visibilité (iOS perd le lock
+  // quand on switche d'app).
+  useEffect(() => {
+    let cancelled = false;
+
+    async function acquire() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const wl = (navigator as any).wakeLock;
+      if (!wl?.request) return; // pas supporté (Safari iOS < 16.4)
+      try {
+        const lock = await wl.request("screen");
+        if (cancelled) {
+          lock.release?.();
+          return;
+        }
+        wakeLockRef.current = lock;
+      } catch {
+        /* ignore, on continue sans wake lock */
+      }
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible" && state === "active") {
+        acquire();
+      }
+    }
+
+    if (state === "active") {
+      acquire();
+      document.addEventListener("visibilitychange", onVisibilityChange);
+    }
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (wakeLockRef.current) {
+        try {
+          wakeLockRef.current.release?.();
+        } catch {
+          /* ignore */
+        }
+        wakeLockRef.current = null;
+      }
+    };
+  }, [state]);
+
+  // Chrono tick — utilise Date.now() (pas un compteur incrémenté), donc
+  // même si la tab est mise en veille et que l'interval saute, on
+  // récupère le temps correct au prochain tick.
   useEffect(() => {
     if (state === "active") {
       tickInterval.current = window.setInterval(() => {
@@ -80,8 +133,27 @@ export default function RunTrackPage() {
       setError("Pas de GPS dispo sur ce device. Bascule en saisie manuelle.");
       return;
     }
+    let firstTimeout: number | null = null;
+    let hasFirstFix = false;
+
+    // Message pédago si pas de fix au bout de 8s (probablement en intérieur)
+    firstTimeout = window.setTimeout(() => {
+      if (!hasFirstFix) {
+        setError(
+          "Pas encore de signal GPS — tu es à l'intérieur ? Sors ou place-toi près d'une fenêtre, ça va venir.",
+        );
+      }
+    }, 8000);
+
     watchId.current = navigator.geolocation.watchPosition(
       (pos) => {
+        hasFirstFix = true;
+        if (firstTimeout) {
+          window.clearTimeout(firstTimeout);
+          firstTimeout = null;
+        }
+        // Clear l'éventuel message pédago dès qu'on a un fix
+        setError("");
         setPermission("granted");
         const pt: Point = {
           lat: pos.coords.latitude,
@@ -105,16 +177,24 @@ export default function RunTrackPage() {
         points.current.push(pt);
       },
       (err) => {
+        if (firstTimeout) {
+          window.clearTimeout(firstTimeout);
+          firstTimeout = null;
+        }
         setPermission(err.code === err.PERMISSION_DENIED ? "denied" : "unknown");
         setError(
           err.code === err.PERMISSION_DENIED
             ? "T'as bloqué la géoloc — sans GPS on peut pas tracker. Active-la dans les réglages du navigateur."
-            : "Le GPS galère. Réessaie en plein air, pas dans un trou.",
+            : "Le GPS n'arrive pas à se caler. Vérifie que tu es à l'extérieur, puis réessaie.",
         );
       },
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 8000 },
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 },
     );
     return () => {
+      if (firstTimeout) {
+        window.clearTimeout(firstTimeout);
+        firstTimeout = null;
+      }
       if (watchId.current !== null) {
         navigator.geolocation.clearWatch(watchId.current);
         watchId.current = null;
@@ -335,9 +415,11 @@ export default function RunTrackPage() {
 
 function titleFromDuration(seconds: number): string {
   const h = seconds / 3600;
+  // Pas de dévalo — chaque sortie compte, débutant ou pas (retour Inès panel)
   if (h > 8) return "Aventure de zinzin";
   if (h > 4) return "Sortie longue";
   if (h > 2) return "Belle sortie";
-  if (h > 1) return "Sortie moyenne";
-  return "Petite sortie";
+  if (h > 1) return "Bonne séance";
+  if (h > 0.5) return "Belle séance"; // anciennement "petite sortie"
+  return "Footing du jour";
 }

@@ -46,8 +46,7 @@ export default function DailyQuestHero() {
 
         <div className="flex-1 min-w-0">
           <div className="inline-flex items-center gap-1.5 rounded-md bg-lime/25 text-lime px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider">
-            <span className="h-1.5 w-1.5 rounded-full bg-lime animate-pulse" />
-            Quête du jour
+            🎯 Quête du jour
           </div>
           <div className="mt-1 font-display text-xl font-black leading-tight text-ink">
             {q.title}
