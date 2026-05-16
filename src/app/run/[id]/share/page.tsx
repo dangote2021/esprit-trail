@@ -88,6 +88,7 @@ export default function RunSharePage() {
         duration: run.duration,
         date: run.date,
         location: run.location,
+        polyline: run.polyline ?? null,
         ...author,
       }, `esprit-trail-${run.id}.png`);
       setImgFeedback("Image sauvée dans tes téléchargements 📸");
@@ -113,6 +114,7 @@ export default function RunSharePage() {
           duration: run.duration,
           date: run.date,
           location: run.location,
+          polyline: run.polyline ?? null,
           ...author,
         },
         kind === "story" ? "Ma sortie sur Esprit Trail" : "Ma sortie Esprit Trail",

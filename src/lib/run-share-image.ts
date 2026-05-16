@@ -7,6 +7,8 @@
 // Renvoie un Blob PNG. À charger soit en download (URL.createObjectURL +
 // anchor.click), soit en navigator.share({ files: [...] }) pour partage natif.
 
+import { decodePolyline } from "@/lib/manual-runs";
+
 export type RunForShare = {
   title: string;
   distance: number; // km
@@ -17,6 +19,9 @@ export type RunForShare = {
   authorName: string;
   authorUsername: string;
   authorAvatar?: string; // emoji
+  /** Google-encoded polyline (Strava / tracker GPS natif). Optionnel —
+   *  si présent, on dessine la trace en silhouette stylée. */
+  polyline?: string | null;
 };
 
 function fmtDuration(s: number): string {
@@ -71,6 +76,11 @@ export async function renderRunShareImage(run: RunForShare): Promise<Blob> {
   halo2.addColorStop(1, "rgba(132,169,140,0)");
   ctx.fillStyle = halo2;
   ctx.fillRect(0, 0, W, H);
+
+  // Trace GPS en silhouette stylée (si polyline dispo)
+  if (run.polyline) {
+    drawPolyline(ctx, run.polyline, W, H);
+  }
 
   ctx.textBaseline = "top";
   ctx.textAlign = "left";
@@ -187,6 +197,113 @@ export async function renderRunShareImage(run: RunForShare): Promise<Blob> {
       );
     }
   });
+}
+
+/**
+ * Dessine la trace GPS comme silhouette stylée — orange Esprit Trail avec
+ * léger glow. La trace est normalisée pour remplir une zone centrale du
+ * canvas (zone "stats") en respectant le ratio géographique réel.
+ */
+function drawPolyline(
+  ctx: CanvasRenderingContext2D,
+  encoded: string,
+  W: number,
+  H: number,
+) {
+  let pts: [number, number][];
+  try {
+    pts = decodePolyline(encoded);
+  } catch {
+    return;
+  }
+  if (pts.length < 2) return;
+
+  // Bounding box géographique
+  let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+  for (const [lat, lng] of pts) {
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+  }
+  const latSpan = Math.max(1e-6, maxLat - minLat);
+  const lngSpan = Math.max(1e-6, maxLng - minLng);
+  // Cosinus latitude pour compenser la distorsion Mercator simpliste
+  const cosLat = Math.cos(((minLat + maxLat) / 2) * Math.PI / 180);
+  const aspectGeo = (lngSpan * cosLat) / latSpan;
+
+  // Zone d'affichage de la trace : centrée verticalement, marge 100 latérale
+  const padX = 100;
+  const padY = 540; // sous le titre, au-dessus des stats
+  const maxW = W - 2 * padX;
+  const maxH = 600;
+
+  let drawW = maxW;
+  let drawH = maxW / aspectGeo;
+  if (drawH > maxH) {
+    drawH = maxH;
+    drawW = maxH * aspectGeo;
+  }
+
+  const offsetX = (W - drawW) / 2;
+  const offsetY = padY + (maxH - drawH) / 2;
+
+  function project(lat: number, lng: number): [number, number] {
+    const x = offsetX + ((lng - minLng) / lngSpan) * drawW;
+    // Inverser Y pour avoir le nord en haut
+    const y = offsetY + (1 - (lat - minLat) / latSpan) * drawH;
+    return [x, y];
+  }
+
+  ctx.save();
+
+  // Glow extérieur
+  ctx.lineWidth = 18;
+  ctx.strokeStyle = "rgba(247,127,0,0.18)";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const [x, y] = project(pts[i][0], pts[i][1]);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Trace principale
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = "#f77f00";
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const [x, y] = project(pts[i][0], pts[i][1]);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Marqueurs début (vert) et fin (rouge) — small dots
+  const [sx, sy] = project(pts[0][0], pts[0][1]);
+  const [ex, ey] = project(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+
+  ctx.fillStyle = "#2d6a4f";
+  ctx.beginPath();
+  ctx.arc(sx, sy, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.arc(sx, sy, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#bc4749";
+  ctx.beginPath();
+  ctx.arc(ex, ey, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.arc(ex, ey, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
 }
 
 function wrapText(

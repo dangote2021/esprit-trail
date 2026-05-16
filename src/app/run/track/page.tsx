@@ -12,7 +12,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { saveManualRun, guessTerrain } from "@/lib/manual-runs";
+import { saveManualRun, guessTerrain, encodePolyline } from "@/lib/manual-runs";
 
 type Point = {
   lat: number;
@@ -233,6 +233,11 @@ export default function RunTrackPage() {
   function save() {
     const id = `r-${Date.now()}`;
     const km = Math.round(distance * 100) / 100;
+    // Encode la trace GPS au format Google polyline pour le visuel de partage
+    const polyline =
+      points.current.length > 1
+        ? encodePolyline(points.current.map((p) => ({ lat: p.lat, lng: p.lng })))
+        : undefined;
     saveManualRun({
       id,
       date: new Date(startTime.current).toISOString(),
@@ -243,6 +248,7 @@ export default function RunTrackPage() {
       terrain: guessTerrain(km, elevation),
       source: "tracker",
       notes: `Trace GPS · ${points.current.length} points`,
+      polyline,
     });
     router.push(`/profile`);
   }
