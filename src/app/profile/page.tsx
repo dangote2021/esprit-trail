@@ -1,35 +1,29 @@
 import Link from "next/link";
 import BadgeCard from "@/components/ui/BadgeCard";
-import StatTile from "@/components/ui/StatTile";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCardClient from "@/components/profile/ProfileHeroCardClient";
 import StravaConnectionStatus from "@/components/profile/StravaConnectionStatus";
 import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
 import FormeRecupPanel from "@/components/profile/FormeRecupPanel";
 import ManualRunsList from "@/components/profile/ManualRunsList";
+import ProfileStatsSections from "@/components/profile/ProfileStatsSections";
 import StatRadarEditable from "@/components/profile/StatRadarEditable";
 import TotemPicker from "@/components/profile/TotemPicker";
-import { ME, MY_BADGES, MY_RUNS, MY_LOOT } from "@/lib/data/me";
+import { ME, MY_BADGES, MY_LOOT } from "@/lib/data/me";
 import { getBadge } from "@/lib/data/badges";
-import { RARITY_STYLES, TITLES, levelFromXp } from "@/lib/types";
+import { RARITY_STYLES } from "@/lib/types";
 import WishlistRaces from "@/components/profile/WishlistRaces";
 import BestResults from "@/components/profile/BestResults";
 
-function formatKm(n: number) {
-  return n.toLocaleString("fr", { maximumFractionDigits: 1 });
-}
-
-function thisWeekStats(runs: typeof MY_RUNS) {
-  const now = new Date();
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - 7);
-  const weekRuns = runs.filter((r) => new Date(r.date) >= weekStart);
-  return {
-    distance: weekRuns.reduce((s, r) => s + r.distance, 0),
-    elevation: weekRuns.reduce((s, r) => s + r.elevation, 0),
-    runs: weekRuns.length,
-  };
-}
+// Baseline neutre du radar : un profil neuf s'auto-évalue lui-même,
+// on ne lui montre pas les stats d'un traileur fictif.
+const NEUTRAL_STATS = {
+  endurance: 50,
+  vitesse: 50,
+  technique: 50,
+  mental: 50,
+  grimpe: 50,
+};
 
 export default function ProfilePage() {
   const badges = MY_BADGES
@@ -41,13 +35,6 @@ export default function ProfilePage() {
       return order.indexOf(a.rarity) - order.indexOf(b.rarity);
     })
     .slice(0, 6);
-
-  // Stats de la semaine (rapatriées depuis la home)
-  const weekStats = thisWeekStats(MY_RUNS);
-
-  // Prochain palier de titre (rapatrié depuis la home)
-  const userLevel = levelFromXp(ME.xp);
-  const nextTitle = TITLES.find((t) => t.minLevel > userLevel);
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-6">
@@ -72,45 +59,21 @@ export default function ProfilePage() {
         </Link>
       </header>
 
-      {/* ===== Carte Panini moderne : cover + avatar circle + nom + stats ===== */}
+      {/* ===== Carte hero : cover + avatar + nom + stats RÉELLES ===== */}
       <ProfileHeroCardClient
-        displayName={ME.displayName}
-        username={ME.username}
+        displayName=""
+        username=""
         fallbackEmoji={ME.avatar}
-        tagline={ME.profile?.biggestRace ? `Best : ${ME.profile.biggestRace}` : undefined}
-        stats={[
-          {
-            label: "km/sem",
-            value: Math.round(
-              (MY_RUNS.slice(0, 7).reduce((s, r) => s + r.distance, 0) || 0),
-            ),
-            color: "lime",
-          },
-          {
-            label: "D+ total",
-            value: MY_RUNS.reduce((s, r) => s + r.elevation, 0).toLocaleString(
-              "fr",
-            ),
-            color: "peach",
-          },
-          {
-            label: "UTMB",
-            value: ME.connections.utmb?.runnerIndex ?? "—",
-            color: "cyan",
-          },
-        ]}
       />
 
-      {/* ===== Best Results — 3 courses mythiques user-editable ===== */}
+      {/* ===== Best Results — 3 courses mythiques, saisies par le user ===== */}
       <BestResults />
 
-      {/* ===== Forces & faiblesses — radar hexagonal FIFA-style + auto-évaluation ===== */}
-      <StatRadarEditable baseStats={ME.profile!.stats} />
+      {/* ===== Forces & faiblesses — radar auto-évaluable (baseline neutre) ===== */}
+      <StatRadarEditable baseStats={NEUTRAL_STATS} />
 
-      {/* Bloc PlayerHUD supprimé — la carte Hero suffit pour identifier le profil */}
-      {/* Bloc Character customization retiré — on garde le profil propre, photo perso */}
-
-      {/* UTMB + ITRA — masqué pour profils vierges (sinon affiche des scores fictifs) */}
+      {/* UTMB + ITRA — visible uniquement pour les profils avec activité réelle
+          (sinon on afficherait des index fictifs à un compte fraîchement créé) */}
       <ConfiguredProfileOnly>
       <section className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-bg-card p-4">
@@ -172,13 +135,16 @@ export default function ProfilePage() {
       </section>
       </ConfiguredProfileOnly>
 
-      {/* Forme & Récup — VO₂max, fraîcheur TSB, charge */}
+      {/* Forme & Récup — VO₂max, fraîcheur TSB, charge (gated activité réelle) */}
       <FormeRecupPanel />
 
-      {/* Sorties enregistrées (manuelles + tracker) — éditables */}
+      {/* Sorties enregistrées (manuelles + tracker) — éditables, données réelles */}
       <ManualRunsList />
 
-      {/* Accès Ranking — apparaît juste sous les onglets UTMB et ITRA */}
+      {/* Stats — semaine + saison, calculées sur les vraies sorties */}
+      <ProfileStatsSections />
+
+      {/* Accès Ranking */}
       <Link
         href="/leaderboard"
         className="flex items-center gap-3 rounded-2xl border-2 border-gold/30 bg-gradient-to-r from-gold/10 via-bg-card to-peach/5 p-4 hover:border-gold/60 transition"
@@ -200,7 +166,7 @@ export default function ProfilePage() {
         <span className="font-display text-xl text-gold shrink-0">→</span>
       </Link>
 
-      {/* ===== Totem animal — cosmétique facultatif (juste au-dessus de Strava) ===== */}
+      {/* ===== Totem animal — cosmétique facultatif ===== */}
       <TotemPicker />
 
       {/* Sync Strava */}
@@ -209,168 +175,59 @@ export default function ProfilePage() {
         <StravaConnectionStatus />
       </section>
 
-      {/* Rythme de la semaine — déplacé depuis la home */}
-      <section className="space-y-3">
-        <SectionHeader eyebrow="Rythme" title="Cette semaine" />
-        <div className="grid grid-cols-4 gap-2">
-          <StatTile label="Km sem." value={formatKm(weekStats.distance)} unit="km" accent="lime" />
-          <StatTile label="D+ sem." value={formatKm(weekStats.elevation)} unit="m" accent="peach" />
-          <StatTile label="Sorties" value={weekStats.runs} accent="cyan" />
-          <StatTile label="ITRA" value={ME.connections.itra.performanceIndex} accent="violet" />
-        </div>
-      </section>
-
-      {/* Prochain titre — déplacé depuis la home */}
-      {nextTitle && (
-        <section className="space-y-2">
-          <SectionHeader eyebrow="Prochain palier" title={`« ${nextTitle.title} »`} />
-          <div className="rounded-xl border border-ink/10 bg-gradient-to-r from-bg-card/60 to-transparent p-4 flex items-center gap-3">
-            <div className="text-3xl opacity-50">{nextTitle.emoji}</div>
-            <div className="flex-1">
-              <div className="text-[10px] font-mono text-ink-dim uppercase">
-                LVL {nextTitle.minLevel} requis
-              </div>
-              <div className="text-xs font-bold text-ink-muted">
-                Tu y es presque : encore <strong className="text-lime">{nextTitle.minLevel - userLevel} levels</strong>.
-              </div>
-            </div>
-            <div className="text-[10px] font-mono text-lime">
-              +{nextTitle.minLevel - userLevel} LVL
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Wishlist courses (auto-syncée depuis /race/[id]) */}
       <WishlistRaces />
 
-      {/* Stats saison */}
-      <section className="space-y-3">
-        <SectionHeader eyebrow="Stats" title="Saison en cours" />
-        <div className="grid grid-cols-3 gap-2">
-          <StatTile label="Distance" value={ME.stats.totalDistance} unit="km" accent="lime" />
-          <StatTile
-            label="D+"
-            value={(ME.stats.totalElevation / 1000).toFixed(1)}
-            unit="K m"
-            accent="peach"
+      {/* Top badges — visible uniquement pour les profils avec activité réelle */}
+      <ConfiguredProfileOnly>
+        <section className="space-y-3">
+          <SectionHeader
+            eyebrow="Trophées"
+            title="Meilleurs trophées"
+            href="/badges"
+            linkLabel={`Voir tous (${badges.length})`}
           />
-          <StatTile label="Sorties" value={ME.stats.totalRuns} accent="cyan" />
-          <StatTile
-            label="Plus long"
-            value={ME.stats.longestRun}
-            unit="km"
-            accent="violet"
-          />
-          <StatTile
-            label="Altitude max"
-            value={ME.stats.highestElevation}
-            unit="m"
-            accent="gold"
-          />
-          <StatTile
-            label="Plus gros D+"
-            value={ME.stats.biggestDrop}
-            unit="m"
-            accent="peach"
-          />
-        </div>
-      </section>
+          <div className="grid grid-cols-3 gap-3">
+            {topBadges.map((b) => (
+              <BadgeCard key={b.id} badge={b} size="sm" />
+            ))}
+          </div>
+        </section>
+      </ConfiguredProfileOnly>
 
-      {/* Top badges */}
-      <section className="space-y-3">
-        <SectionHeader
-          eyebrow="Trophées"
-          title="Meilleurs trophées"
-          href="/badges"
-          linkLabel={`Voir tous (${badges.length})`}
-        />
-        <div className="grid grid-cols-3 gap-3">
-          {topBadges.map((b) => (
-            <BadgeCard key={b.id} badge={b} size="sm" />
-          ))}
-        </div>
-      </section>
-
-      {/* Inventaire loot */}
-      <section className="space-y-3">
-        <SectionHeader eyebrow="Inventaire" title="Mon loot" />
-        <div className="space-y-2">
-          {MY_LOOT.map((loot) => {
-            const style = RARITY_STYLES[loot.rarity];
-            return (
-              <div
-                key={loot.id}
-                className={`flex items-center gap-3 rounded-xl border p-3 ${style.color}`}
-              >
-                <div className="text-3xl">{loot.icon}</div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <div className="font-display text-sm font-black">
-                      {loot.name}
+      {/* Inventaire loot — visible uniquement pour les profils avec activité réelle */}
+      <ConfiguredProfileOnly>
+        <section className="space-y-3">
+          <SectionHeader eyebrow="Inventaire" title="Mon loot" />
+          <div className="space-y-2">
+            {MY_LOOT.map((loot) => {
+              const style = RARITY_STYLES[loot.rarity];
+              return (
+                <div
+                  key={loot.id}
+                  className={`flex items-center gap-3 rounded-xl border p-3 ${style.color}`}
+                >
+                  <div className="text-3xl">{loot.icon}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <div className="font-display text-sm font-black">
+                        {loot.name}
+                      </div>
+                      <span className={`text-[9px] font-mono uppercase ${style.text}`}>
+                        {style.label}
+                      </span>
                     </div>
-                    <span className={`text-[9px] font-mono uppercase ${style.text}`}>
-                      {style.label}
-                    </span>
+                    <div className="text-[11px] text-ink-muted">{loot.description}</div>
                   </div>
-                  <div className="text-[11px] text-ink-muted">{loot.description}</div>
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">
+                    {loot.type}
+                  </div>
                 </div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-ink-muted">
-                  {loot.type}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Historique runs */}
-      <section className="space-y-3">
-        <SectionHeader
-          eyebrow="Historique"
-          title="Toutes mes sorties"
-          linkLabel={`${MY_RUNS.length} total`}
-        />
-        <div className="space-y-2">
-          {MY_RUNS.map((run) => (
-            <Link
-              key={run.id}
-              href={`/run/${run.id}`}
-              className="flex items-center gap-3 rounded-xl border border-ink/10 bg-bg-card/60 p-3 hover:border-lime/30 transition"
-            >
-              <div className="text-2xl">
-                {run.terrain === "alpine"
-                  ? "🏔️"
-                  : run.terrain === "mountain"
-                  ? "⛰️"
-                  : run.terrain === "hilly"
-                  ? "🌲"
-                  : run.terrain === "technical"
-                  ? "🪨"
-                  : "➖"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-bold">{run.title}</div>
-                <div className="flex gap-2 text-[11px] font-mono text-ink-muted">
-                  <span>
-                    {new Date(run.date).toLocaleDateString("fr", {
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </span>
-                  <span>•</span>
-                  <span>{run.distance} km</span>
-                  <span>•</span>
-                  <span>{run.elevation} D+</span>
-                </div>
-              </div>
-              <div className="text-[11px] font-mono font-bold text-lime">
-                +{run.xpEarned}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+              );
+            })}
+          </div>
+        </section>
+      </ConfiguredProfileOnly>
     </main>
   );
 }

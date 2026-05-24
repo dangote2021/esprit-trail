@@ -2,20 +2,23 @@
 
 // ====== ProfileHeroCardClient ======
 // Wrapper client autour de ProfileHeroCard qui lit l'identité réelle
-// (localStorage + Supabase profiles) pour ne PAS afficher de mock data
-// aux nouveaux utilisateurs.
+// (localStorage + Supabase profiles) ET les vraies stats (sorties
+// enregistrées). Aucune donnée mock n'est affichée : un profil neuf
+// montre 0 partout, pas les chiffres d'un traileur fictif.
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProfileHeroCard from "./ProfileHeroCard";
 import { getStoredIdentity } from "@/lib/identity";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { loadProfileAgg, type ProfileAgg } from "@/lib/profile-stats";
 
 type Props = React.ComponentProps<typeof ProfileHeroCard>;
 
 export default function ProfileHeroCardClient(props: Props) {
   const [displayName, setDisplayName] = useState<string | undefined>(undefined);
   const [username, setUsername] = useState<string | undefined>(undefined);
+  const [agg, setAgg] = useState<ProfileAgg | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -23,6 +26,7 @@ export default function ProfileHeroCardClient(props: Props) {
     const stored = getStoredIdentity();
     if (stored.displayName) setDisplayName(stored.displayName);
     if (stored.username) setUsername(stored.username);
+    setAgg(loadProfileAgg());
     setReady(true);
 
     // 2. Sync depuis Supabase si dispo
@@ -76,12 +80,24 @@ export default function ProfileHeroCardClient(props: Props) {
     );
   }
 
-  // Sinon on rend ProfileHeroCard avec les vraies valeurs
+  // Stats RÉELLES calculées depuis les sorties enregistrées (0 si profil neuf)
+  const realStats: Props["stats"] = [
+    { label: "km/sem", value: agg ? agg.weekDistance : 0, color: "lime" },
+    {
+      label: "D+ total",
+      value: agg ? agg.totalElevation.toLocaleString("fr") : 0,
+      color: "peach",
+    },
+    { label: "Sorties", value: agg ? agg.totalRuns : 0, color: "cyan" },
+  ];
+
   return (
     <ProfileHeroCard
       {...props}
       displayName={displayName || props.displayName}
       username={username || props.username}
+      tagline={undefined}
+      stats={realStats}
     />
   );
 }

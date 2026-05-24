@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { StatRadar, statsToRadar, type RadarAxis } from "@/components/ui/StatRadar";
 import type { TrailerStats } from "@/lib/types";
 import { ME } from "@/lib/data/me";
+import { useProfileState } from "@/lib/use-profile-state";
 
 const KEY = "esprit_stats_override";
 
@@ -64,7 +65,14 @@ export default function StatRadarEditable({
   const [hydrated, setHydrated] = useState(false);
   const [stats, setStats] = useState<TrailerStats>(baseStats);
   const [editMode, setEditMode] = useState(false);
-  const [tab, setTab] = useState<RadarTab>("terrain");
+  const [rawTab, setTab] = useState<RadarTab>("terrain");
+
+  // L'onglet Physio (HRV, sommeil, charge…) n'a pas encore de source de
+  // données réelle. On ne le propose qu'aux profils avec activité réelle ;
+  // un profil neuf ne voit que l'auto-évaluation Terrain (pas de chiffres
+  // physio fictifs).
+  const showPhysio = useProfileState() === "configured";
+  const tab: RadarTab = showPhysio ? rawTab : "terrain";
 
   useEffect(() => {
     setHydrated(true);
@@ -133,36 +141,38 @@ export default function StatRadarEditable({
           🔒 Stats remontées via Strava · non modifiables
         </div>
       )}
-      <div className="mb-3 flex gap-1 rounded-xl bg-bg-raised/50 p-1">
-        <button
-          type="button"
-          onClick={() => {
-            setTab("terrain");
-            setEditMode(false);
-          }}
-          className={`flex-1 rounded-lg px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition ${
-            tab === "terrain"
-              ? "bg-cyan/15 text-cyan border border-cyan/40"
-              : "text-ink-muted hover:text-ink"
-          }`}
-        >
-          🏔️ Terrain
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setTab("physio");
-            setEditMode(false);
-          }}
-          className={`flex-1 rounded-lg px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition ${
-            tab === "physio"
-              ? "bg-violet/15 text-violet border border-violet/40"
-              : "text-ink-muted hover:text-ink"
-          }`}
-        >
-          🫀 Physio
-        </button>
-      </div>
+      {showPhysio && (
+        <div className="mb-3 flex gap-1 rounded-xl bg-bg-raised/50 p-1">
+          <button
+            type="button"
+            onClick={() => {
+              setTab("terrain");
+              setEditMode(false);
+            }}
+            className={`flex-1 rounded-lg px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition ${
+              tab === "terrain"
+                ? "bg-cyan/15 text-cyan border border-cyan/40"
+                : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            🏔️ Terrain
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setTab("physio");
+              setEditMode(false);
+            }}
+            className={`flex-1 rounded-lg px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition ${
+              tab === "physio"
+                ? "bg-violet/15 text-violet border border-violet/40"
+                : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            🫀 Physio
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center justify-center relative">
         {/* Radar SVG — accent change selon l'onglet */}

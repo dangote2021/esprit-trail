@@ -1,46 +1,65 @@
 "use client";
 
-// ====== useIsBlankProfile ======
-// Détecte si l'utilisateur courant est "neuf" (pas encore configuré son
-// profil). Sert à masquer tous les blocs qui afficheraient du mock data
-// (ME.stats, MY_RUNS, ME.connections, etc.) comme s'il s'agissait des
-// données réelles du user.
+// ====== useProfileState ======
+// Détecte si l'utilisateur courant a une activité RÉELLE sur Esprit Trail.
+//
+// Le but : ne jamais afficher de mock data (VO₂max fictif, index UTMB
+// hardcodé, badges/loot d'exemple, stats de saison bidon) comme s'il
+// s'agissait des vraies données du user.
+//
+// IMPORTANT — pourquoi on ne se base PAS sur le prénom/pseudo :
+//   L'onboarding renseigne le prénom dès la création du compte. Donc
+//   "a un prénom" ≠ "a une activité". Un profil fraîchement créé a un
+//   prénom mais zéro sortie : il doit rester VIERGE.
+//   On se base donc sur la présence d'au moins une sortie réelle
+//   enregistrée (esprit_manual_runs : saisie manuelle ou tracker GPS).
 //
 // Logique :
-//   - SSR / pré-hydratation : on retourne "loading" pour éviter le flash
-//     du mock data côté serveur.
-//   - Après hydratation : on lit localStorage `esprit_identity`. Si pas
-//     de displayName ni username → profil vierge.
+//   - SSR / pré-hydratation : "loading" pour éviter le flash de mock data.
+//   - Après hydratation : "configured" (= profil actif) si ≥ 1 sortie
+//     réelle, sinon "blank".
 
 import { useEffect, useState } from "react";
-import { getStoredIdentity } from "./identity";
+import { loadManualRuns } from "./manual-runs";
 
+// "configured" conservé pour compat — sémantiquement = "profil actif".
 export type ProfileState = "loading" | "blank" | "configured";
+
+function readState(): ProfileState {
+  try {
+    return loadManualRuns().length > 0 ? "configured" : "blank";
+  } catch {
+    return "blank";
+  }
+}
 
 export function useProfileState(): ProfileState {
   const [state, setState] = useState<ProfileState>("loading");
 
   useEffect(() => {
-    const id = getStoredIdentity();
-    setState(id.displayName || id.username ? "configured" : "blank");
+    setState(readState());
 
-    // Si l'identité est modifiée ailleurs (ex: settings page), on réagit
+    function refresh() {
+      setState(readState());
+    }
+    // Réagit aux changements de sorties (autre onglet ou même session)
     function handleStorage(e: StorageEvent) {
-      if (e.key === "esprit_identity") {
-        const next = getStoredIdentity();
-        setState(next.displayName || next.username ? "configured" : "blank");
-      }
+      if (e.key === "esprit_manual_runs" || e.key === null) refresh();
     }
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    window.addEventListener("esprit:runs", refresh);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("esprit:runs", refresh);
+    };
   }, []);
 
   return state;
 }
 
 /**
- * Convenience hook : retourne true SEULEMENT après hydratation et si
- * l'utilisateur n'a pas configuré son profil.
+ * true SEULEMENT après hydratation et si l'utilisateur n'a aucune
+ * activité réelle (profil vierge fraîchement créé).
  */
 export function useIsBlankProfile(): boolean {
   return useProfileState() === "blank";

@@ -11,16 +11,15 @@ import AddRunFAB from "@/components/layout/AddRunFAB";
 import HomeTrainingZone from "@/components/home/HomeTrainingZone";
 import PotosFeed from "@/components/home/PotosFeed";
 import FollowSuggestions from "@/components/home/FollowSuggestions";
-import { MY_BADGES, MY_RUNS } from "@/lib/data/me";
+import RecentRuns from "@/components/home/RecentRuns";
+import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
+import { MY_BADGES } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
 import { BADGES, getBadge } from "@/lib/data/badges";
 import { RACES } from "@/lib/data/races";
 import { GUILDES } from "@/lib/data/guildes";
 import { getSupabaseUser } from "@/lib/supabase/server";
 
-function formatKm(n: number) {
-  return n.toLocaleString("fr", { maximumFractionDigits: 1 });
-}
 function formatDate(iso: string) {
   const d = new Date(iso);
   return d.toLocaleDateString("fr", { day: "numeric", month: "short" });
@@ -47,7 +46,6 @@ export default async function HomePage({
 
   const dailyQuests = questsForPeriod("daily");
   const weeklyQuests = questsForPeriod("weekly").slice(0, 2);
-  const recentRuns = MY_RUNS.slice(0, 3);
   const nextRace = RACES.filter((r) => new Date(r.date) > new Date())
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
 
@@ -227,59 +225,8 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* Dernières sorties */}
-      <section className="space-y-3">
-        <SectionHeader
-          eyebrow="Replay"
-          title="Tes dernières sorties"
-          href="/profile"
-          linkLabel="Historique"
-        />
-        <div className="space-y-2">
-          {recentRuns.map((run) => (
-            <Link
-              key={run.id}
-              href={`/run/${run.id}`}
-              className="flex items-center gap-3 rounded-2xl bg-bg-card p-3 card-chunky card-pressable tap-bounce transition hover:-translate-y-0.5"
-            >
-              <div className="text-3xl">
-                {run.terrain === "alpine"
-                  ? "🏔️"
-                  : run.terrain === "mountain"
-                  ? "⛰️"
-                  : run.terrain === "hilly"
-                  ? "🌲"
-                  : run.terrain === "technical"
-                  ? "🪨"
-                  : "➖"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-black">{run.title}</div>
-                <div className="flex gap-2 text-[11px] text-ink-muted">
-                  <span>{formatDate(run.date)}</span>
-                  <span className="text-ink-dim">·</span>
-                  <span>{formatKm(run.distance)} km</span>
-                  <span className="text-ink-dim">·</span>
-                  <span>{run.elevation} D+</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="inline-flex items-center gap-1 rounded-full bg-lime px-2 py-0.5 text-[11px] font-display font-black text-bg">
-                  +{run.xpEarned} XP
-                </div>
-                <div className="mt-0.5 font-mono text-[10px] text-ink-muted">
-                  {run.avgPace}
-                </div>
-                {run.badgesUnlocked.length > 0 && (
-                  <div className="mt-0.5 text-[11px] font-display text-gold">
-                    🏅 {run.badgesUnlocked.length}
-                  </div>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Dernières sorties — vraies sorties enregistrées (manuel + tracker) */}
+      <RecentRuns />
 
       {/* Follow tes potos de trail — descendu sous l'historique pour ne pas
           spammer le haut de page. Apparait après que l'utilisateur a vu son
@@ -388,20 +335,23 @@ export default async function HomePage({
         );
       })()}
 
-      {/* Derniers badges */}
+      {/* Derniers badges — visible uniquement pour les profils avec activité
+          réelle (un compte fraîchement créé n'a rien débloqué) */}
       {lastBadges.length > 0 && (
-        <section className="space-y-3">
-          <SectionHeader
-            eyebrow="Collection"
-            title="Tes derniers trophées"
-            href="/badges"
-          />
-          <div className="grid grid-cols-3 gap-3">
-            {lastBadges.map((b) => (
-              <BadgeCard key={b.id} badge={b} size="sm" />
-            ))}
-          </div>
-        </section>
+        <ConfiguredProfileOnly>
+          <section className="space-y-3">
+            <SectionHeader
+              eyebrow="Collection"
+              title="Tes derniers trophées"
+              href="/badges"
+            />
+            <div className="grid grid-cols-3 gap-3">
+              {lastBadges.map((b) => (
+                <BadgeCard key={b.id} badge={b} size="sm" />
+              ))}
+            </div>
+          </section>
+        </ConfiguredProfileOnly>
       )}
 
       {/* Prochains objectifs */}
