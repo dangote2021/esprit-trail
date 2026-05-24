@@ -17,8 +17,14 @@
 // comme "ton VO₂max" à un nouveau testeur, ce qui est exactement le bug
 // que l'audit P0 a flaggé.
 
+import { useEffect, useState } from "react";
 import ConfiguredProfileOnly from "./ConfiguredProfileOnly";
 import { ME } from "@/lib/data/me";
+import {
+  loadTrainingState,
+  daysSince,
+  type TrainingStateInfo,
+} from "@/lib/training-state";
 
 type Physio = NonNullable<typeof ME.physio>;
 
@@ -47,10 +53,61 @@ function estimateVo2max(physio: Physio): { value: number; delta30j: number } {
 
 function PanelInner() {
   const physio = ME.physio;
+  // Lecture du training-state (bloc vs pause vs actif) — la lecture coach et le
+  // gros titre sont nuancés en fonction (panel Manon : "en bloc je sais que je
+  // serai dans le rouge, ne me stresse pas" ; Camille : "en pause je veux pas
+  // qu'on me pousse à courir").
+  const [ts, setTs] = useState<TrainingStateInfo>(() => loadTrainingState());
+  useEffect(() => {
+    const onChange = (e: Event) => {
+      const detail = (e as CustomEvent).detail as TrainingStateInfo | undefined;
+      if (detail) setTs(detail);
+      else setTs(loadTrainingState());
+    };
+    // Recharge en cas de modif via setTrainingState() (autre composant)
+    window.addEventListener("esprit:trainingstate", onChange);
+    // Aussi en cas de changement dans un autre onglet
+    window.addEventListener("storage", onChange);
+    return () => {
+      window.removeEventListener("esprit:trainingstate", onChange);
+      window.removeEventListener("storage", onChange);
+    };
+  }, []);
+
   if (!physio) return null;
 
   const fresh = freshnessLabel(physio.freshness);
   const vo2 = estimateVo2max(physio);
+
+  // Override copy/couleur selon l'état d'entraînement.
+  // - "block" : on tempère les alertes — la charge lourde est volontaire.
+  // - "pause" : on retire complètement le ton "il faut récupérer", on adoucit.
+  const days = daysSince(ts.since);
+  const ctxOverride =
+    ts.state === "block"
+      ? {
+          title: "T'es en bloc — c'est normal d'être dans le dur",
+          coach:
+            days > 0
+              ? `Bloc lancé il y a ${days}j. La fatigue est attendue. Reste à l'écoute des signaux forts (sommeil, douleurs).`
+              : "Bloc d'entraînement en cours. La fatigue est attendue. Reste à l'écoute des signaux forts (sommeil, douleurs).",
+          badge: "BLOC",
+          badgeBg: "linear-gradient(135deg, #ffb47a 0%, #c1654a 100%)",
+        }
+      : ts.state === "pause"
+        ? {
+            title:
+              days > 0
+                ? `Tu es en pause depuis ${days}j — repose-toi tranquille`
+                : "Tu es en pause — repose-toi tranquille",
+            coach:
+              ts.reason && ts.reason.length > 0
+                ? `Pause notée : ${ts.reason}. Pas d'alerte sur la fraîcheur tant que t'es en pause. Reviens quand t'es prêt.`
+                : "Pas d'alerte sur la fraîcheur tant que t'es en pause. Reviens quand t'es prêt.",
+            badge: "PAUSE",
+            badgeBg: "linear-gradient(135deg, #b5d4f4 0%, #185fa5 100%)",
+          }
+        : null;
 
   return (
     <section
@@ -76,7 +133,9 @@ function PanelInner() {
             className="font-display text-lg font-black leading-tight mt-0.5"
             style={{ color: "#0c447c" }}
           >
-            {fresh.label === "Très frais" || fresh.label === "Frais"
+            {ctxOverride
+              ? ctxOverride.title
+              : fresh.label === "Très frais" || fresh.label === "Frais"
               ? "Tu peux pousser cette semaine"
               : fresh.label === "Fatigué"
               ? "Lève le pied 2 jours"
@@ -84,18 +143,21 @@ function PanelInner() {
           </div>
         </div>
         <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-base font-black text-white shadow-md"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-[10px] font-black text-white shadow-md"
           style={{
-            background:
-              fresh.label === "Très frais" || fresh.label === "Frais"
-                ? "linear-gradient(135deg, #95d5b2 0%, #2d6a4f 100%)"
-                : fresh.label === "Fatigué"
-                ? "linear-gradient(135deg, #f0997b 0%, #d85a30 100%)"
-                : "linear-gradient(135deg, #e24b4a 0%, #791f1f 100%)",
+            background: ctxOverride
+              ? ctxOverride.badgeBg
+              : fresh.label === "Très frais" || fresh.label === "Frais"
+              ? "linear-gradient(135deg, #95d5b2 0%, #2d6a4f 100%)"
+              : fresh.label === "Fatigué"
+              ? "linear-gradient(135deg, #f0997b 0%, #d85a30 100%)"
+              : "linear-gradient(135deg, #e24b4a 0%, #791f1f 100%)",
           }}
-          aria-label={`Forme : ${fresh.label}`}
+          aria-label={ctxOverride ? `État : ${ctxOverride.badge}` : `Forme : ${fresh.label}`}
         >
-          {fresh.label === "Très frais"
+          {ctxOverride
+            ? ctxOverride.badge
+            : fresh.label === "Très frais"
             ? "A+"
             : fresh.label === "Frais"
             ? "A"
@@ -224,17 +286,26 @@ function PanelInner() {
       <div
         className="rounded-lg p-2.5 text-[11px] leading-snug"
         style={{
-          background:
-            fresh.label === "Très frais" || fresh.label === "Frais"
+          background: ctxOverride
+            ? ts.state === "block"
+              ? "rgba(255,180,122,0.22)"
+              : "rgba(181,212,244,0.30)"
+            : fresh.label === "Très frais" || fresh.label === "Frais"
               ? "rgba(149,213,178,0.25)"
               : fresh.label === "Fatigué"
               ? "rgba(240,153,123,0.25)"
               : "rgba(226,75,74,0.20)",
-          borderLeft: `3px solid ${fresh.color}`,
+          borderLeft: `3px solid ${
+            ctxOverride
+              ? ts.state === "block"
+                ? "#c1654a"
+                : "#185fa5"
+              : fresh.color
+          }`,
           color: "#1b4332",
         }}
       >
-        <strong>Lecture coach :</strong> {fresh.coach}
+        <strong>Lecture coach :</strong> {ctxOverride ? ctxOverride.coach : fresh.coach}
       </div>
     </section>
   );

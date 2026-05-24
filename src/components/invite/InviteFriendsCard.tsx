@@ -170,9 +170,60 @@ export default function InviteFriendsCard({
               "radial-gradient(circle, rgba(199,125,255,0.45) 0%, transparent 65%)",
           }}
         />
-        <div className="pointer-events-none absolute -right-4 -top-4 text-[100px] opacity-[0.08] leading-none">
-          🎟️
-        </div>
+        {/* Illustration "crew de traileurs sur une crête" — 3 silhouettes
+            qui montent une côte. Beaucoup plus parlant qu'un emoji ticket
+            pour un encart "Invite ton crew". SVG inline pour rester léger. */}
+        <svg
+          viewBox="0 0 200 120"
+          className="pointer-events-none absolute -right-6 -top-3 h-24 w-40 opacity-[0.16]"
+          aria-hidden="true"
+        >
+          {/* Ligne de crête + petite montée à droite */}
+          <path
+            d="M 0 95 L 60 80 L 110 65 L 160 50 L 200 30"
+            fill="none"
+            stroke="#5a189a"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+          {/* Petits cailloux sur le sentier */}
+          <circle cx="40" cy="92" r="1.5" fill="#5a189a" />
+          <circle cx="85" cy="76" r="1.2" fill="#5a189a" />
+          <circle cx="135" cy="60" r="1.4" fill="#5a189a" />
+          {/* Runner 1 — en tête (le plus haut, dégradé violet profond) */}
+          <g transform="translate(155, 32)">
+            <circle cx="0" cy="-2" r="3" fill="#3c096c" />
+            <path
+              d="M 0 1 L -2 9 L -3 16 M 0 1 L 2 9 L 4 15 M -3 5 L 4 4"
+              fill="none"
+              stroke="#3c096c"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </g>
+          {/* Runner 2 — milieu */}
+          <g transform="translate(105, 47)">
+            <circle cx="0" cy="-2" r="3" fill="#5a189a" />
+            <path
+              d="M 0 1 L -3 8 L -2 16 M 0 1 L 3 9 L 2 16 M -3 5 L 4 4"
+              fill="none"
+              stroke="#5a189a"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </g>
+          {/* Runner 3 — derrière */}
+          <g transform="translate(55, 62)">
+            <circle cx="0" cy="-2" r="3" fill="#7b2cbf" />
+            <path
+              d="M 0 1 L -2 9 L -3 16 M 0 1 L 3 8 L 4 16 M -3 5 L 4 4"
+              fill="none"
+              stroke="#7b2cbf"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </g>
+        </svg>
 
         <div className="relative flex items-start gap-4">
           <div
@@ -183,7 +234,7 @@ export default function InviteFriendsCard({
               boxShadow: "0 4px 14px rgba(90,24,154,0.35)",
             }}
           >
-            <span className="text-3xl">🎟️</span>
+            <span className="text-3xl">🤘</span>
           </div>
           <div className="flex-1 min-w-0">
             <div className="inline-flex items-center gap-1.5 rounded-md bg-violet/20 text-violet px-2 py-0.5 text-[9px] font-mono font-black uppercase tracking-wider">
@@ -191,7 +242,7 @@ export default function InviteFriendsCard({
               Parrainage · Maximise tes chances
             </div>
             <div className="mt-1 font-display text-xl font-black leading-tight text-violet">
-              Invite ta crew
+              Invite ton crew
             </div>
             <p className="text-xs text-ink-muted mt-1 leading-relaxed">
               Chaque poto qui rejoint l&apos;app via ton lien =

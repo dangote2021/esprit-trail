@@ -5,6 +5,12 @@ import Link from "next/link";
 import { ME } from "@/lib/data/me";
 import { getStoredIdentity, setStoredIdentity } from "@/lib/identity";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import {
+  loadTrainingState,
+  setTrainingState,
+  daysSince,
+  type TrainingState,
+} from "@/lib/training-state";
 
 export default function SettingsPage() {
   // Simulé — pas de persistence pour le MVP
@@ -21,6 +27,58 @@ export default function SettingsPage() {
     friends: true,
     races: false,
   });
+
+  // Réglages de confidentialité — persistés en localStorage (clé esprit_privacy).
+  // profilePublic : le profil est visible des autres traileurs.
+  // hideGpsHome : floute les traces GPS dans un rayon de 500 m autour du domicile.
+  const [privacy, setPrivacy] = useState({
+    profilePublic: true,
+    hideGpsHome: true,
+  });
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem("esprit_privacy");
+      if (raw) {
+        const p = JSON.parse(raw);
+        setPrivacy({
+          profilePublic: p.profilePublic ?? true,
+          hideGpsHome: p.hideGpsHome ?? true,
+        });
+      }
+    } catch {/* ignore */}
+  }, []);
+  function togglePrivacy(key: "profilePublic" | "hideGpsHome") {
+    setPrivacy((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      try {
+        window.localStorage.setItem("esprit_privacy", JSON.stringify(next));
+      } catch {/* ignore */}
+      return next;
+    });
+  }
+
+  // Training state — actif / bloc / pause (cf. lib/training-state.ts).
+  // Initialisé via loadTrainingState() au mount (pas en init useState pour
+  // éviter une hydration mismatch entre SSR et client).
+  const [trainState, setTrainState] = useState<TrainingState>("active");
+  const [trainSince, setTrainSince] = useState<string>("");
+  const [trainReason, setTrainReason] = useState<string>("");
+  const [pauseReasonInput, setPauseReasonInput] = useState<string>("");
+  useEffect(() => {
+    const info = loadTrainingState();
+    setTrainState(info.state);
+    setTrainSince(info.since);
+    setTrainReason(info.reason ?? "");
+    setPauseReasonInput(info.reason ?? "");
+  }, []);
+
+  function applyTrainState(s: TrainingState, reason?: string) {
+    setTrainingState(s, reason);
+    const info = loadTrainingState();
+    setTrainState(info.state);
+    setTrainSince(info.since);
+    setTrainReason(info.reason ?? "");
+  }
 
   // Charge l'identité depuis localStorage au mount (fallback ME)
   useEffect(() => {
@@ -213,6 +271,116 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* ÉTAT D'ENTRAÎNEMENT — actif / bloc / pause */}
+      {/* Demandé par le panel (Manon en bloc spécifique CCC, Camille blessée).
+          L'app adapte ses messages : pas d'alerte "fatigue" en bloc, pas de
+          CTA "prépare ta course" en pause. */}
+      <section className="space-y-3">
+        <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
+          État d&apos;entraînement
+        </div>
+        <div className="rounded-2xl border border-cyan/20 bg-bg-card/60 p-4 space-y-3">
+          <div className="text-xs text-ink-muted">
+            Dis-nous où t&apos;en es. L&apos;app adapte ses conseils et arrête
+            de te stresser quand c&apos;est pas le moment.
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            {(
+              [
+                {
+                  id: "active" as TrainingState,
+                  label: "Actif",
+                  desc: "Entraînement normal",
+                  emoji: "🏃",
+                  color: "lime",
+                },
+                {
+                  id: "block" as TrainingState,
+                  label: "Bloc",
+                  desc: "Charge volontaire",
+                  emoji: "🔥",
+                  color: "peach",
+                },
+                {
+                  id: "pause" as TrainingState,
+                  label: "Pause",
+                  desc: "Blessure / repos",
+                  emoji: "🩹",
+                  color: "cyan",
+                },
+              ] as const
+            ).map((s) => {
+              const active = trainState === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => {
+                    if (s.id === "pause") {
+                      // Ne change pas tout de suite — on attend la raison
+                      // optionnelle saisie en dessous. On bascule quand
+                      // même pour que l'UI reflète l'état immédiatement.
+                      applyTrainState("pause", pauseReasonInput || undefined);
+                    } else {
+                      applyTrainState(s.id);
+                    }
+                  }}
+                  className={`rounded-xl border p-3 text-center transition ${
+                    active
+                      ? s.id === "active"
+                        ? "border-lime bg-lime/10 shadow-glow-lime"
+                        : s.id === "block"
+                          ? "border-peach bg-peach/10 shadow-glow-peach"
+                          : "border-cyan bg-cyan/10 shadow-glow-cyan"
+                      : "border-ink/15 bg-bg-card/60 hover:border-ink/30"
+                  }`}
+                >
+                  <div className="text-xl leading-none">{s.emoji}</div>
+                  <div className="font-display text-sm font-black mt-1">
+                    {s.label}
+                  </div>
+                  <div className="text-[10px] font-mono text-ink-muted">
+                    {s.desc}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Champ raison + meta — uniquement si pause ou block */}
+          {trainState !== "active" && (
+            <div className="space-y-2 pt-1">
+              {trainState === "pause" && (
+                <label className="block">
+                  <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+                    Raison (optionnel)
+                  </span>
+                  <input
+                    type="text"
+                    value={pauseReasonInput}
+                    maxLength={60}
+                    placeholder="ex: tendinite mollet droit"
+                    onChange={(e) => setPauseReasonInput(e.target.value)}
+                    onBlur={() => {
+                      if (pauseReasonInput !== trainReason) {
+                        applyTrainState("pause", pauseReasonInput || undefined);
+                      }
+                    }}
+                    className="mt-1 w-full rounded-xl border border-ink/15 bg-bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-dim focus:border-cyan focus:outline-none"
+                  />
+                </label>
+              )}
+              <div className="text-[11px] font-mono text-ink-muted">
+                {trainState === "block"
+                  ? `Bloc lancé il y a ${daysSince(trainSince)}j · alertes fatigue tempérées`
+                  : `En pause depuis ${daysSince(trainSince)}j · alertes suspendues${trainReason ? ` · ${trainReason}` : ""}`}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* CONNEXIONS — Strava uniquement */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
@@ -308,43 +476,69 @@ export default function SettingsPage() {
           Confidentialité
         </div>
         <div className="space-y-2">
-          <button className="w-full flex items-center justify-between rounded-xl border border-ink/10 bg-bg-card/60 p-3 hover:border-cyan/40 transition">
-            <div className="text-left">
+          {/* Visibilité du profil — toggle public / privé */}
+          <button
+            type="button"
+            onClick={() => togglePrivacy("profilePublic")}
+            aria-pressed={privacy.profilePublic}
+            className="w-full flex items-center gap-3 rounded-xl border border-ink/10 bg-bg-card/60 p-3 hover:border-cyan/40 transition"
+          >
+            <div className="flex-1 text-left">
               <div className="text-sm font-bold">Visibilité du profil</div>
-              <div className="text-[11px] text-ink-muted">Public</div>
-            </div>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="h-4 w-4 text-ink-dim"
-            >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
-          <button className="w-full flex items-center justify-between rounded-xl border border-ink/10 bg-bg-card/60 p-3 hover:border-cyan/40 transition">
-            <div className="text-left">
-              <div className="text-sm font-bold">Cacher les traces GPS sensibles</div>
               <div className="text-[11px] text-ink-muted">
-                Autour de ton domicile (500m)
+                {privacy.profilePublic
+                  ? "Public — visible des autres traileurs"
+                  : "Privé — toi seul vois ton profil"}
               </div>
             </div>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="h-4 w-4 text-ink-dim"
+            <div
+              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+                privacy.profilePublic ? "bg-cyan" : "bg-bg-raised"
+              }`}
             >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
+              <div
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-all ${
+                  privacy.profilePublic ? "left-5" : "left-0.5"
+                }`}
+              />
+            </div>
           </button>
-          <button className="w-full flex items-center justify-between rounded-xl border border-ink/10 bg-bg-card/60 p-3 hover:border-cyan/40 transition">
+
+          {/* Cacher les traces GPS sensibles — toggle */}
+          <button
+            type="button"
+            onClick={() => togglePrivacy("hideGpsHome")}
+            aria-pressed={privacy.hideGpsHome}
+            className="w-full flex items-center gap-3 rounded-xl border border-ink/10 bg-bg-card/60 p-3 hover:border-cyan/40 transition"
+          >
+            <div className="flex-1 text-left">
+              <div className="text-sm font-bold">Cacher les traces GPS sensibles</div>
+              <div className="text-[11px] text-ink-muted">
+                Floute tes traces dans un rayon de 500 m autour de chez toi
+              </div>
+            </div>
+            <div
+              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+                privacy.hideGpsHome ? "bg-cyan" : "bg-bg-raised"
+              }`}
+            >
+              <div
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-all ${
+                  privacy.hideGpsHome ? "left-5" : "left-0.5"
+                }`}
+              />
+            </div>
+          </button>
+
+          {/* Exporter mes données — lien vers la vraie page d'export RGPD */}
+          <Link
+            href="/settings/account"
+            className="w-full flex items-center justify-between rounded-xl border border-ink/10 bg-bg-card/60 p-3 hover:border-cyan/40 transition"
+          >
             <div className="text-left">
               <div className="text-sm font-bold">Exporter mes données</div>
               <div className="text-[11px] text-ink-muted">
-                GPX, JSON, tout est à toi
+                Export JSON RGPD, tout est à toi
               </div>
             </div>
             <svg
@@ -356,7 +550,7 @@ export default function SettingsPage() {
             >
               <path d="M9 18l6-6-6-6" />
             </svg>
-          </button>
+          </Link>
         </div>
       </section>
 

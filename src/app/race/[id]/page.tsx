@@ -4,6 +4,8 @@ import { RACES } from "@/lib/data/races";
 import { ME } from "@/lib/data/me";
 import RaceActions from "./RaceActions";
 import RaceNutritionPlan from "@/components/race/RaceNutritionPlan";
+import RaceParticipants from "@/components/race/RaceParticipants";
+import { participantsForRace } from "@/lib/data/race-participants";
 import DiscoveryBanner from "@/components/layout/DiscoveryBanner";
 import { getSupabaseUser } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site";
@@ -134,6 +136,11 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             )}
             <span className="rounded-md bg-black/65 backdrop-blur px-2 py-0.5 text-[10px] font-mono font-bold text-white">
               📅 {formatDate(race.date)}
+              {race.startTime && (
+                <span className="ml-1 text-peach">
+                  · départ {race.startTime}
+                </span>
+              )}
             </span>
           </div>
           <h1
@@ -376,6 +383,13 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
 
         <DiscoveryBanner />
 
+        {/* Qui d'autre y va ? — section sociale + bouton "j'y serai" */}
+        <RaceParticipants
+          raceId={race.id}
+          raceName={race.name}
+          participants={participantsForRace(race.id)}
+        />
+
         {/* Plan nutrition jour J — preview pour visiteurs non-loggés */}
         <RaceNutritionPlan
           raceName={race.name}
@@ -386,31 +400,93 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
           preview={isPreview}
         />
 
-        {/* Quête préparation — câblé : redirige vers Coach IA pour loggés, signup pour visiteurs */}
+        {/* Plan de prépa — branché direct sur /coach/plan?raceId=.
+            Le plan se génère pré-calibré sur la course (distance, D+, date) :
+            zéro picker d'objectif intermédiaire à se taper. */}
         <div className="rounded-2xl border border-lime/20 bg-gradient-to-br from-lime/5 via-bg-card to-bg p-5">
           <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-lime">
-            Quête de préparation
+            Plan de prépa sur mesure
           </div>
           <h3 className="mt-1 font-display text-lg font-black">
-            Plan d&apos;entraînement Esprit Trail
+            Prépare cette course avec le coach IA
           </h3>
           <p className="mt-1 text-xs text-ink-muted">
-            Active la quête et on génère un plan sur mesure : séances clés,
-            sorties longues, semaines de décharge. Chaque séance validée = XP.
+            Plan calibré sur {race.distance} km / {race.elevation.toLocaleString("fr")} m D+,
+            avec un affûtage qui tombe pile sur le {new Date(race.date).toLocaleDateString("fr", { day: "numeric", month: "long", timeZone: "UTC" })}.
+            Séances clés, sorties longues, semaines de décharge — tout est dedans.
           </p>
+
+          {/* Verdict de faisabilité — combien de semaines de prépa restent,
+              est-ce jouable pour ce format ? (panel test Margaux) */}
+          {(() => {
+            const weeks = Math.floor(daysUntil / 7);
+            // Seuil "prépa idéale" selon le format de course.
+            const idealWeeks =
+              race.distance >= 90 ? 20 : race.distance >= 50 ? 16 : race.distance >= 30 ? 12 : 8;
+            const minWeeks = Math.round(idealWeeks * 0.6);
+            let verdict: { emoji: string; label: string; text: string; color: string };
+            if (daysUntil < 0) {
+              verdict = {
+                emoji: "🏁",
+                label: "Course passée",
+                text: "Cette édition est derrière nous — vise la prochaine.",
+                color: "#7a7a7a",
+              };
+            } else if (weeks >= idealWeeks) {
+              verdict = {
+                emoji: "✅",
+                label: `${weeks} semaines devant toi`,
+                text: "Large pour viser ce format sereinement. Le plan aura toute la place pour construire.",
+                color: "#2d6a4f",
+              };
+            } else if (weeks >= minWeeks) {
+              verdict = {
+                emoji: "⚡",
+                label: `${weeks} semaines — c'est jouable mais serré`,
+                text: "Le plan sera resserré : peu de marge pour les imprévus. Faisable si tu as déjà une base.",
+                color: "#c1654a",
+              };
+            } else {
+              verdict = {
+                emoji: "⏳",
+                label: `${weeks} semaine${weeks > 1 ? "s" : ""} — trop court`,
+                text: `Pour ${race.distance} km, vise plutôt une course dans ${minWeeks}+ semaines. Le coach te génère quand même un plan d'urgence, mais sans promesse.`,
+                color: "#993c1d",
+              };
+            }
+            return (
+              <div
+                className="mt-2 flex items-start gap-2 rounded-lg px-3 py-2"
+                style={{ background: "rgba(0,0,0,0.03)", borderLeft: `3px solid ${verdict.color}` }}
+              >
+                <span className="text-base leading-none">{verdict.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <div
+                    className="text-[11px] font-mono font-black uppercase tracking-wider"
+                    style={{ color: verdict.color }}
+                  >
+                    {verdict.label}
+                  </div>
+                  <div className="text-[11px] text-ink-muted leading-snug mt-0.5">
+                    {verdict.text}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
           {isPreview ? (
             <Link
-              href={`/signup?next=${encodeURIComponent(`/coach?race=${race.id}`)}`}
+              href={`/signup?next=${encodeURIComponent(`/coach/plan?raceId=${race.id}`)}`}
               className="mt-3 block w-full rounded-xl bg-lime py-3 text-center text-sm font-black uppercase tracking-wider text-bg shadow-glow-lime hover:scale-[1.01] transition"
             >
               Crée ton compte pour activer →
             </Link>
           ) : (
             <Link
-              href={`/coach?race=${race.id}`}
+              href={`/coach/plan?raceId=${race.id}`}
               className="mt-3 block w-full rounded-xl bg-lime py-3 text-center text-sm font-black uppercase tracking-wider text-bg shadow-glow-lime hover:scale-[1.01] transition"
             >
-              Activer la quête →
+              🎯 Préparer cette course →
             </Link>
           )}
         </div>

@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { Guilde } from "@/lib/types";
+import type { Guilde } from "@/lib/data/guildes";
 import {
   getStoredMembership as loadMembership,
   setStoredMembership as saveMembership,
@@ -150,7 +150,7 @@ export function GuildeSettingsButton({ guilde }: { guilde: Guilde }) {
           <div className="space-y-3">
             <div className="rounded-lg border border-ink/10 bg-bg-raised/40 p-3 text-[12px] text-ink-muted">
               <strong className="text-ink">Capitaine</strong> :{" "}
-              {guilde.members.find((m) => m.isCaptain)?.username || "—"}
+              {guilde.members.find((m) => m.role === "captain")?.username || "—"}
               <br />
               <strong className="text-ink">Règle</strong> :{" "}
               {guilde.joinRule === "open"

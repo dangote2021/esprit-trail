@@ -84,7 +84,11 @@ Le plan doit inclure une progression en allure spécifique marathon, des séance
 Les coachTips doivent parler de stratégie de course (split négatif, sucre dès 30 min), de pacing, et de la gestion mentale du mur du 30e.`,
 };
 
-type SessionType = "easy" | "long" | "interval" | "hill" | "rest" | "race";
+// Élargi suite au feedback user (variété + renfo systématique) :
+// - tempo / seuil : couvre tempo + seuil + fartlek (notes le détaillent)
+// - strength : renfo musculaire systématique 1×/semaine tous niveaux
+// - interval reste pour fractionné court + pyramidal (notes le détaillent)
+type SessionType = "easy" | "long" | "interval" | "hill" | "tempo" | "strength" | "rest" | "race";
 type Phase = "foundation" | "build" | "peak" | "taper" | "race";
 
 interface PlanSession {
@@ -127,6 +131,34 @@ RÈGLES DE SÉCURITÉ :
 - Semaine de décharge toutes les 3-4 semaines (-25 à -30%)
 - 1 à 2 séances qualité / semaine, pas plus
 - Toujours 1 jour de repos complet minimum
+
+RÈGLES DE MAGNITUDE — IMPÉRATIVES, NE JAMAIS LES VIOLER :
+- Vitesse plausible humaine : 6 à 14 km/h selon intensité. Donc :
+  - Footing facile Z2 : 8-11 km/h → 60 min = 8-11 km MINIMUM. JAMAIS "footing 2 km en 45 min".
+  - Sortie longue : 7-10 km/h → 2h = 14-20 km MINIMUM. JAMAIS "sortie longue 3 km en 2h".
+  - Fractionné (effort + récup) : moyenne 9-12 km/h → 60 min = 9-12 km.
+  - Côtes (montées + descentes) : moyenne 6-9 km/h → 60 min = 6-9 km + 300-500 m D+.
+  - Tempo / seuil : 11-14 km/h → 45 min = 8-10 km.
+- Cohérence hebdo : la somme des distances des sessions de la semaine ≈ weeklyKm (±15%). Si tu écris weeklyKm=50, tu DOIS avoir ~50 km de sessions cumulés.
+- Cohérence ultra : si l'objectif est first-ultra ou utmb-qualif, weeklyKm en peak DOIT atteindre 60-90 km/semaine. Un ultra ne se prépare pas avec 25 km/semaine.
+- Sortie longue : représente 30-45% du volume hebdo. Pour 50 km/sem → SL de 18-22 km. Pour 80 km/sem → SL de 28-32 km.
+- Pour duration : exprime en MINUTES TOTALES (incluant récup pour fractionné). Footing 1h = 60. Sortie longue 2h30 = 150. JAMAIS de fractions absurdes.
+
+VARIÉTÉ DES SÉANCES — OBLIGATOIRE DÈS LA SEMAINE 1 :
+Tu disposes de 8 types : easy, long, interval, hill, tempo, strength, rest, race.
+- "tempo" : tempo (allure soutenue 15-30min Z3), seuil (Z3-Z4 20-40min), fartlek (Z2/Z4 alterné en libre), progressif (allure montante)
+- "interval" : VMA courte (30/30, 400m), VMA longue (1000m, 2000m), pyramidal (200-400-600-800-600-400-200), 30/15 court
+- "hill" : côtes courtes (30s-1min), côtes longues (3-5min), côtes en descente technique
+- "strength" : renforcement musculaire — OBLIGATOIRE 1×/SEMAINE TOUS NIVEAUX
+  - débutant : 30-45 min poids du corps (squat, gainage, fentes, talons-fesses, mollets)
+  - confirmé : 45-60 min, ajout d'haltères modérés (squat goblet, soulevé de terre roumain, presses), pliométrie légère
+  - ultra : 60-75 min, charges + spécifique trail (squat barre, fentes lourdes, pliométrie, gainage long, travail cheville/pied)
+- Varie les types de séance dès la semaine 1. Ne répète JAMAIS la même séance trois semaines de suite. En foundation tu fais déjà du tempo court et des côtes courtes — pas que du Z2.
+
+EXEMPLES DE COHÉRENCE (à respecter) :
+- Plan "first-ultra" S1 (foundation, débutant) : easy 8 km/55 min + strength 45 min + hill 6 km/45 min + long 16 km/2h. Total = 30 km. weeklyKm = 30.
+- Plan "first-ultra" S8 (peak, confirmé) : easy 10 km/60 min + tempo 12 km/65 min + strength 60 min + long 32 km/4h. Total = 54 km. weeklyKm = 54.
+- Plan "first-trail" S1 (foundation, débutant) : easy 6 km/45 min + strength 35 min + long 12 km/1h45. Total = 18 km. weeklyKm = 18.
 
 RÈGLES NUTRITION & GUT TRAINING :
 - Sur 1 trail < 1h : pas de glucides, hydratation libre.
@@ -198,8 +230,8 @@ Génère un plan d'entraînement de ${totalWeeks} semaines. Retourne STRICTEMENT
       "weeklyElevation": 800,
       "sessions": [
         {
-          "type": "easy|long|interval|hill|rest|race",
-          "title": "Titre court percutant",
+          "type": "easy|long|interval|hill|tempo|strength|rest|race",
+          "title": "Titre court percutant (ex : 'Pyramidal 200-400-600', 'Tempo 25min Z3', 'Renfo trail 45min')",
           "duration": 45,
           "distance": 10,
           "elevation": 200,
@@ -215,16 +247,163 @@ Génère un plan d'entraînement de ${totalWeeks} semaines. Retourne STRICTEMENT
 
 Contraintes :
 - Exactement ${totalWeeks} semaines
-- Chaque semaine a entre 3 et 5 sessions
+- Chaque semaine a entre 4 et 6 sessions
 - Au moins 1 session "rest" par semaine
-- "duration" en minutes, "distance" en km, "elevation" en mètres
-- Si pas de distance/elevation pertinente, mets 0
+- TOUJOURS 1 session "strength" par semaine (renfo, charge calibrée par niveau) — sauf race/taper extrême
+- Varie les types interval / hill / tempo entre les semaines (pas la même séance copiée-collée)
+- "duration" en minutes ENTIÈRES, "distance" en km (peut être décimal), "elevation" en mètres entiers
+- Pour "rest" et "strength" : "distance" et "elevation" = 0, pas de course
+- Pour "race" : "distance" et "elevation" = celle de la course (extrait du contexte)
+- weeklyKm = somme des distances des sessions (à ±15%)
+- weeklyElevation = somme des elevations des sessions (à ±15%)
+- VALIDATION INTERNE AVANT DE RENDRE LE JSON : pour chaque session non-rest/strength, vérifie que distance/duration*60 donne une vitesse entre 6 et 14 km/h. Si non, recalcule.
 - "nutritionTip" : progression progressive de la quantité de glucides/h sur la durée du plan, en cohérence avec le gut training. Démarre à 30g/h en foundation, monte par paliers, atteint 80g/h en peak. Sur les sessions "easy" courtes, mentionne juste l'hydratation.`;
 }
 
 interface ClaudeResponse {
   summary?: string;
   plan?: PlanWeek[];
+}
+
+// ====== SANITIZER — Validation/normalisation des valeurs Claude ======
+// L'IA peut renvoyer des conneries du type "footing 2 km en 45 min" qui
+// ruinent la crédibilité du plan. On valide chaque séance et on corrige les
+// magnitudes incohérentes avant d'envoyer au client. Si TROP de violations
+// (> 30 % des séances), on retombe sur le générateur déterministe.
+
+const VITESSE_PAR_TYPE: Record<SessionType, { min: number; max: number; defaut: number }> = {
+  // En km/h
+  easy:     { min: 7,  max: 11, defaut: 9 },
+  long:     { min: 6,  max: 10, defaut: 8 },
+  interval: { min: 9,  max: 13, defaut: 11 },
+  hill:     { min: 5,  max: 9,  defaut: 7 },
+  tempo:    { min: 10, max: 14, defaut: 12 },
+  strength: { min: 0,  max: 0,  defaut: 0 },
+  rest:     { min: 0,  max: 0,  defaut: 0 },
+  race:     { min: 6,  max: 12, defaut: 9 },
+};
+
+/** Sanitize une session : retourne {session, fixed: boolean}. */
+function sanitizeSession(s: PlanSession): { session: PlanSession; fixed: boolean } {
+  const type = s.type;
+  let fixed = false;
+  const out: PlanSession = { ...s };
+
+  // Bornes duration : min 15min (sauf race), max 12h
+  if (typeof out.duration !== "number" || out.duration < 15) {
+    if (type !== "race") {
+      out.duration = 30;
+      fixed = true;
+    }
+  }
+  if (out.duration > 720) {
+    out.duration = 720;
+    fixed = true;
+  }
+
+  // Sessions sans course : distance/elevation = 0
+  if (type === "rest" || type === "strength") {
+    if (out.distance && out.distance > 0) {
+      out.distance = 0;
+      fixed = true;
+    }
+    if (out.elevation && out.elevation > 0) {
+      out.elevation = 0;
+      fixed = true;
+    }
+    return { session: out, fixed };
+  }
+
+  // Sessions de course : validation vitesse vs duration
+  const { min, max, defaut } = VITESSE_PAR_TYPE[type];
+  const hours = out.duration / 60;
+  const distance = out.distance ?? 0;
+  if (hours > 0 && distance > 0) {
+    const vitesse = distance / hours;
+    if (vitesse < min || vitesse > max) {
+      // Distance hors-zone : on recalcule avec la vitesse par défaut
+      out.distance = Math.round(defaut * hours * 10) / 10;
+      fixed = true;
+    }
+  } else if (hours > 0 && distance === 0 && type !== "race") {
+    // Distance manquante : on infère
+    out.distance = Math.round(defaut * hours * 10) / 10;
+    fixed = true;
+  }
+
+  // Elevation : sanity check pour hill (50-200 m D+ par km)
+  if (type === "hill" && out.distance && (!out.elevation || out.elevation < out.distance * 30)) {
+    out.elevation = Math.round(out.distance * 60);
+    fixed = true;
+  }
+  // Cap elevation absurde : > 200 m D+/km c'est de l'alpinisme
+  if (out.elevation && out.distance && out.elevation > out.distance * 200) {
+    out.elevation = Math.round(out.distance * 150);
+    fixed = true;
+  }
+
+  return { session: out, fixed };
+}
+
+/**
+ * Sanitize toute la réponse Claude. Si plus de 30 % des séances sont buggées,
+ * on retourne null et le caller fallback sur le générateur déterministe.
+ */
+function sanitizePlan(plan: PlanWeek[]): PlanWeek[] | null {
+  let totalSessions = 0;
+  let totalFixed = 0;
+  const fixed: PlanWeek[] = [];
+
+  for (const week of plan) {
+    const sessions: PlanSession[] = [];
+    for (const s of week.sessions ?? []) {
+      const { session, fixed: wasFixed } = sanitizeSession(s);
+      totalSessions++;
+      if (wasFixed) totalFixed++;
+      sessions.push(session);
+    }
+
+    // Recalcule weeklyKm / weeklyElevation depuis la somme des sessions
+    // (Claude se trompe souvent sur la totalisation hebdo).
+    const computedKm =
+      Math.round(
+        sessions.reduce((sum, s) => sum + (s.distance ?? 0), 0) * 10,
+      ) / 10;
+    const computedD = sessions.reduce(
+      (sum, s) => sum + (s.elevation ?? 0),
+      0,
+    );
+
+    // Si l'écart avec ce que Claude a annoncé est < 15 %, on garde la valeur
+    // Claude (plus jolie). Sinon on prend notre recalcul.
+    const claimedKm = week.weeklyKm ?? 0;
+    const claimedD = week.weeklyElevation ?? 0;
+    const weeklyKm =
+      claimedKm > 0 && Math.abs(claimedKm - computedKm) / Math.max(claimedKm, 1) < 0.15
+        ? claimedKm
+        : computedKm;
+    const weeklyElevation =
+      claimedD > 0 && Math.abs(claimedD - computedD) / Math.max(claimedD, 1) < 0.15
+        ? claimedD
+        : computedD;
+
+    fixed.push({
+      ...week,
+      sessions,
+      weeklyKm,
+      weeklyElevation,
+    });
+  }
+
+  // Trop d'erreurs : on jette le plan Claude.
+  if (totalSessions > 0 && totalFixed / totalSessions > 0.3) {
+    console.warn(
+      `[Coach IA] Plan Claude rejeté : ${totalFixed}/${totalSessions} séances corrigées (>30%). Fallback local.`,
+    );
+    return null;
+  }
+
+  return fixed;
 }
 
 async function callClaude(prompt: string): Promise<ClaudeResponse | null> {
@@ -298,49 +477,100 @@ function generatePlan(opts: {
     const sessions: PlanSession[] = [];
     const avail = Math.min(5, Math.max(2, weeklyAvailability));
 
+    // Sortie facile Z2 — toujours en S1, distance cohérente avec durée
+    // (45 min ≈ 7 km à 9.3 km/h, magnitude réaliste, plus de "2 km en 45 min")
+    const easyDist = Math.max(5, Math.round(targetKm * 0.25));
     sessions.push({
       type: "easy",
       title: "Footing souple Z2",
-      duration: 45,
-      distance: Math.round(targetKm * 0.25),
+      duration: Math.round((easyDist / 9) * 60),
+      distance: easyDist,
       intensity: "low",
       notes: "Zone 2 — tu peux parler sans forcer",
     });
 
-    if ((phase === "build" || phase === "peak") && avail >= 3) {
-      sessions.push({
-        type: "interval",
-        title: "Fractionné court",
-        duration: 55,
-        distance: Math.round(targetKm * 0.2),
-        intensity: "high",
-        notes: "6x3min Z4 récup 2min Z1",
-      });
+    // VARIÉTÉ : on alterne interval / tempo / fartlek selon la semaine
+    // Plus la même séance copiée-collée sur 5 semaines.
+    if (avail >= 3 && phase !== "race") {
+      const qualityRot = w % 3;
+      if (phase === "foundation") {
+        // Foundation : tempo court ou fartlek (pas de VMA hard)
+        if (qualityRot === 0) {
+          const dist = Math.max(6, Math.round(targetKm * 0.2));
+          sessions.push({
+            type: "tempo",
+            title: "Tempo Z3 progressif",
+            duration: Math.round((dist / 11) * 60),
+            distance: dist,
+            intensity: "moderate",
+            notes: "10min échauffement + 20min en Z3 + 10min retour calme",
+          });
+        } else if (qualityRot === 1) {
+          const dist = Math.max(7, Math.round(targetKm * 0.22));
+          sessions.push({
+            type: "tempo",
+            title: "Fartlek libre",
+            duration: Math.round((dist / 10.5) * 60),
+            distance: dist,
+            intensity: "moderate",
+            notes: "Alterne 2min Z4 / 2min Z2 selon les sensations, 5-6 fois",
+          });
+        } else {
+          const dist = Math.max(6, Math.round(targetKm * 0.2));
+          sessions.push({
+            type: "hill",
+            title: "Côtes courtes Z3",
+            duration: Math.round((dist / 7) * 60),
+            distance: dist,
+            elevation: Math.round(dist * 50),
+            intensity: "moderate",
+            notes: "6×côte 45s allure soutenue, descente récup. Pas la mort.",
+          });
+        }
+      } else if (phase === "build" || phase === "peak") {
+        // Build/peak : VMA + côtes + pyramidal alternés
+        if (qualityRot === 0) {
+          const dist = Math.max(8, Math.round(targetKm * 0.22));
+          sessions.push({
+            type: "interval",
+            title: "VMA 1000m",
+            duration: Math.round((dist / 11) * 60),
+            distance: dist,
+            intensity: "high",
+            notes: "5×1000m Z4 récup 2min trot. Allure 5'/km cible.",
+          });
+        } else if (qualityRot === 1) {
+          const dist = Math.max(8, Math.round(targetKm * 0.22));
+          sessions.push({
+            type: "interval",
+            title: "Pyramidal 200-400-600-800-600-400-200",
+            duration: Math.round((dist / 11) * 60),
+            distance: dist,
+            intensity: "high",
+            notes: "Récup = durée de l'effort en trot Z1",
+          });
+        } else {
+          const dist = Math.max(7, Math.round(targetKm * 0.2));
+          sessions.push({
+            type: "hill",
+            title: "Côtes longues 3min",
+            duration: Math.round((dist / 7.5) * 60),
+            distance: dist,
+            elevation: Math.round(dist * 70),
+            intensity: "high",
+            notes: "5×3min côte Z4 — descente technique en récup active",
+          });
+        }
+      }
     }
 
-    if (
-      (goal === "first-trail" ||
-        goal === "first-ultra" ||
-        goal === "utmb-qualif") &&
-      phase !== "taper" &&
-      avail >= 3
-    ) {
-      sessions.push({
-        type: "hill",
-        title: "Répétitions de côtes",
-        duration: 65,
-        distance: Math.round(targetKm * 0.2),
-        elevation: Math.round(targetD * 0.35),
-        intensity: "high",
-        notes: "6x côte 1min en Z4 — descente en récup",
-      });
-    }
-
+    // SORTIE LONGUE : 35-45% du volume hebdo, vitesse 7-9 km/h
+    const longDist = Math.max(10, Math.round(targetKm * 0.4));
     sessions.push({
       type: "long",
       title: phase === "peak" ? "Sortie longue terrain" : "Sortie longue",
-      duration: phase === "peak" ? 180 : 120,
-      distance: Math.round(targetKm * 0.45),
+      duration: Math.round((longDist / (phase === "peak" ? 7.5 : 8.5)) * 60),
+      distance: longDist,
       elevation: Math.round(targetD * 0.6),
       intensity: "moderate",
       notes:
@@ -348,6 +578,30 @@ function generatePlan(opts: {
           ? "Simule les conditions de course — ravito, textile, allure"
           : "Allure aisance — endurance fondamentale",
     });
+
+    // RENFO MUSCULAIRE — OBLIGATOIRE tous les niveaux (feedback user)
+    // Charge calibrée : débutant = poids du corps, confirmé = haltères modérés,
+    // ultra = barres + pliométrie. Pas en taper extrême ni race.
+    if (phase !== "race" && !(phase === "taper" && w === totalWeeks - 1)) {
+      const strengthMin =
+        goal === "utmb-qualif" || goal === "first-ultra"
+          ? 60
+          : goal === "first-trail" || goal === "improve-marathon"
+            ? 45
+            : 35;
+      sessions.push({
+        type: "strength",
+        title: "Renfo trail",
+        duration: strengthMin,
+        intensity: "moderate",
+        notes:
+          goal === "utmb-qualif" || goal === "first-ultra"
+            ? "Squat barre, fentes lourdes, pliométrie, gainage 5min, travail cheville/pied. 4 séries."
+            : goal === "improve-marathon"
+              ? "Squat goblet, soulevé de terre roumain, presses, gainage 3min. 3-4 séries."
+              : "Poids du corps : squats, fentes, gainage 2min, talons-fesses, mollets. 3 séries.",
+      });
+    }
 
     if (phase === "race") {
       sessions.push({
@@ -480,7 +734,15 @@ export async function POST(req: NextRequest) {
     const terrain = body.constraints?.terrain;
     const freeText = body.freeText;
     const targetDate = body.targetDate;
-    const totalWeeks = WEEKS_BY_GOAL[goal];
+    // Si l'utilisateur vient de /race/[id]?raceId=, on passe explicitement
+    // le nombre de semaines de prépa restant (clampé 4-24 côté client). On
+    // override sinon le default WEEKS_BY_GOAL — sinon une course dans 6
+    // semaines reçoit un plan de 16 semaines, et le taper ne tombe pas.
+    const explicitWeeks =
+      typeof body.constraints?.totalWeeks === "number"
+        ? Math.max(4, Math.min(24, body.constraints.totalWeeks))
+        : null;
+    const totalWeeks = explicitWeeks ?? WEEKS_BY_GOAL[goal];
 
     // 1. Tentative Claude IA
     const prompt = buildUserPrompt({
@@ -499,15 +761,22 @@ export async function POST(req: NextRequest) {
     const claudeResult = await callClaude(prompt);
 
     if (claudeResult?.plan && Array.isArray(claudeResult.plan)) {
-      return NextResponse.json({
-        ok: true,
-        goal,
-        totalWeeks: claudeResult.plan.length,
-        generatedAt: new Date().toISOString(),
-        source: "claude-sonnet-4.6",
-        summary: claudeResult.summary,
-        plan: claudeResult.plan,
-      });
+      // Filet de sécurité : on valide/normalise chaque séance avant de
+      // renvoyer au client. Cf. feedback user "footing 2 km en 45 min".
+      const sanitized = sanitizePlan(claudeResult.plan);
+      if (sanitized) {
+        return NextResponse.json({
+          ok: true,
+          goal,
+          totalWeeks: sanitized.length,
+          generatedAt: new Date().toISOString(),
+          source: "claude-sonnet-4.6",
+          summary: claudeResult.summary,
+          plan: sanitized,
+        });
+      }
+      // Si plus de 30 % des séances ont été corrigées, on rejette
+      // complètement le plan Claude et on retombe sur le générateur local.
     }
 
     // 2. Fallback local déterministe

@@ -101,7 +101,7 @@ export default function GuildeSortiesPage() {
     const all = loadAll();
     let list = all[guilde.id];
     if (!list || list.length === 0) {
-      const cap = guilde.members.find((m) => m.isCaptain) || guilde.members[0];
+      const cap = guilde.members.find((m) => m.role === "captain") || guilde.members[0];
       list = seedFor(guilde.id, cap?.username || "Cap");
       all[guilde.id] = list;
       saveAll(all);

@@ -85,7 +85,7 @@ export default function GuildeChatPage() {
     const all = loadAll();
     let convo = all[guilde.id];
     if (!convo || convo.length === 0) {
-      const cap = guilde.members.find((m) => m.isCaptain) || guilde.members[0];
+      const cap = guilde.members.find((m) => m.role === "captain") || guilde.members[0];
       convo = seedFor(guilde.id, cap?.username || "Cap", cap?.avatar || "🏔️");
       all[guilde.id] = convo;
       saveAll(all);

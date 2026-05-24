@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import NutritionPlan from "@/components/coach/NutritionPlan";
+import MatosByDistance from "@/components/coach/MatosByDistance";
+import NutritionFundamentals from "@/components/coach/NutritionFundamentals";
 
 type Goal =
   | "specific-trail"
@@ -315,6 +317,14 @@ export default function CoachHubPage() {
 
       {/* Nutrition & gut training */}
       <NutritionPlan />
+
+      {/* Fondamentaux nutrition — critères pour choisir gel / iso / vraie food
+          (feedback user "donnez-moi les critères pratiques") */}
+      <NutritionFundamentals />
+
+      {/* Matos selon la distance — checklist par tranche (feedback user
+          "le rouleau de PQ qui sauve la sortie") */}
+      <MatosByDistance />
     </main>
   );
 }

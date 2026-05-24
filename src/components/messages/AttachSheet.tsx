@@ -10,7 +10,7 @@
 // au render et les remplace par <AttachmentCard>.
 
 import { useState } from "react";
-import { TRAINING_SPOTS } from "@/lib/data/training-spots";
+import { TRAINING_SPOTS, TERRAIN_META } from "@/lib/data/training-spots";
 import { RACES } from "@/lib/data/races";
 
 type Tab = "spot" | "race" | "plan" | "position";
@@ -121,11 +121,11 @@ export default function AttachSheet({
                 }
                 className="flex w-full items-start gap-3 rounded-xl border border-ink/10 bg-bg-card/60 p-3 text-left hover:border-peach/40 transition"
               >
-                <div className="text-2xl">{s.emoji || "🗺️"}</div>
+                <div className="text-2xl">{TERRAIN_META[s.terrain]?.emoji || "🗺️"}</div>
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-sm truncate">{s.name}</div>
                   <div className="text-[11px] text-ink-muted truncate">
-                    {s.location} · {s.distance_km}km · {s.elevation_m}m D+
+                    {s.region} · {s.distance}km · {s.elevation}m D+
                   </div>
                 </div>
               </button>
@@ -256,8 +256,8 @@ function AttachmentCard({ kind, id }: { kind: Tab; id: string }) {
     const s = TRAINING_SPOTS.find((x) => x.id === id);
     if (s) {
       label = s.name;
-      sub = `${s.location} · ${s.distance_km}km`;
-      emoji = s.emoji || "🗺️";
+      sub = `${s.region} · ${s.distance}km`;
+      emoji = TERRAIN_META[s.terrain]?.emoji || "🗺️";
       href = `/spots/${s.id}`;
     }
   } else if (kind === "race") {

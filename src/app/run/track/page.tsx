@@ -50,6 +50,9 @@ export default function RunTrackPage() {
   const [elevation, setElevation] = useState(0);
   const [permission, setPermission] = useState<"unknown" | "granted" | "denied">("unknown");
   const [error, setError] = useState<string>("");
+  // Édition titre/notes avant save (panel Quentin)
+  const [finalTitle, setFinalTitle] = useState("");
+  const [finalNotes, setFinalNotes] = useState("");
 
   const startTime = useRef<number>(0);
   const pauseAt = useRef<number>(0);
@@ -227,6 +230,11 @@ export default function RunTrackPage() {
 
   function stop() {
     if (state === "idle") return;
+    // Pré-remplit titre + notes au passage en "done" (l'utilisateur peut
+    // éditer avant de save). Retour panel Quentin.
+    if (!finalTitle) setFinalTitle(titleFromDuration(elapsed));
+    if (!finalNotes)
+      setFinalNotes(`Trace GPS · ${points.current.length} points`);
     setState("done");
   }
 
@@ -241,13 +249,13 @@ export default function RunTrackPage() {
     saveManualRun({
       id,
       date: new Date(startTime.current).toISOString(),
-      title: titleFromDuration(elapsed),
+      title: finalTitle.trim() || titleFromDuration(elapsed),
       distance: km,
       elevation: Math.round(elevation),
       duration: elapsed,
       terrain: guessTerrain(km, elevation),
       source: "tracker",
-      notes: `Trace GPS · ${points.current.length} points`,
+      notes: finalNotes.trim() || undefined,
       polyline,
     });
     router.push(`/profile`);
@@ -392,7 +400,32 @@ export default function RunTrackPage() {
           </div>
         )}
         {state === "done" && (
-          <div className="space-y-2">
+          <div className="space-y-3 rounded-2xl border border-ink/10 bg-bg-card/60 p-3">
+            {/* Édition titre + notes avant save */}
+            <label className="block">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+                Titre
+              </span>
+              <input
+                type="text"
+                value={finalTitle}
+                onChange={(e) => setFinalTitle(e.target.value.slice(0, 80))}
+                placeholder={titleFromDuration(elapsed)}
+                className="mt-1 w-full rounded-xl border border-ink/15 bg-bg-card px-3 py-2 text-sm font-display font-bold focus:border-lime focus:outline-none"
+              />
+            </label>
+            <label className="block">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+                Notes (optionnel)
+              </span>
+              <textarea
+                value={finalNotes}
+                onChange={(e) => setFinalNotes(e.target.value.slice(0, 280))}
+                placeholder="Sensations, météo, repas avant, anecdote…"
+                rows={2}
+                className="mt-1 w-full rounded-xl border border-ink/15 bg-bg-card px-3 py-2 text-sm resize-none focus:border-lime focus:outline-none"
+              />
+            </label>
             <button
               onClick={save}
               className="w-full rounded-2xl bg-lime py-4 font-display text-base font-black uppercase tracking-wider text-bg shadow-glow-lime"

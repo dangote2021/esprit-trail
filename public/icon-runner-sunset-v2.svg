@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 1024 1024"
+  width="1024"
+  height="1024"
+  shape-rendering="geometricPrecision"
+  aria-label="Esprit Trail — Runner Sunset"
+>
+  <title>Esprit Trail — Runner Sunset</title>
+
+  <!-- ===== Palette ===== -->
+  <defs>
+    <!-- Ciel : crème chaud → ambre -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF1C9" />
+      <stop offset="60%" stop-color="#FFE5A0" />
+      <stop offset="100%" stop-color="#FFD668" />
+    </linearGradient>
+    <!-- Soleil : jaune saturé légèrement gradient -->
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFE898" />
+      <stop offset="60%" stop-color="#FFC833" />
+      <stop offset="100%" stop-color="#F2A82C" />
+    </radialGradient>
+    <!-- Montagnes arrière-plan : ambre clair -->
+    <linearGradient id="mountainBack" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E69A2E" />
+      <stop offset="100%" stop-color="#C4791E" />
+    </linearGradient>
+    <!-- Montagnes mid-ground : orange brûlé -->
+    <linearGradient id="mountainMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B65A1A" />
+      <stop offset="100%" stop-color="#8C3F0E" />
+    </linearGradient>
+    <!-- Premier plan : brun très foncé presque charbon -->
+    <linearGradient id="foreground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3A1F08" />
+      <stop offset="100%" stop-color="#1F0F03" />
+    </linearGradient>
+    <!-- Silhouette runner : brun chaud -->
+    <linearGradient id="runnerBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5C2F0D" />
+      <stop offset="100%" stop-color="#3A1F08" />
+    </linearGradient>
+    <!-- Clip pour les coins arrondis style icône iOS -->
+    <clipPath id="iconMask">
+      <rect x="0" y="0" width="1024" height="1024" rx="180" ry="180" />
+    </clipPath>
+  </defs>
+
+  <!-- Tout est clippé en rounded square pour rendu icône -->
+  <g clip-path="url(#iconMask)">
+
+    <!-- ===== Ciel ===== -->
+    <rect x="0" y="0" width="1024" height="1024" fill="url(#sky)" />
+
+    <!-- ===== Stries de nuages horizontaux subtils ===== -->
+    <g opacity="0.4" fill="#FFFFFF">
+      <ellipse cx="180" cy="180" rx="220" ry="14" />
+      <ellipse cx="780" cy="240" rx="180" ry="10" />
+      <ellipse cx="350" cy="290" rx="160" ry="8" />
+      <ellipse cx="850" cy="380" rx="140" ry="7" />
+      <ellipse cx="120" cy="420" rx="110" ry="6" />
+    </g>
+
+    <!-- ===== Soleil central ===== -->
+    <circle cx="490" cy="420" r="320" fill="url(#sun)" />
+    <!-- Halo léger -->
+    <circle cx="490" cy="420" r="340" fill="none" stroke="#FFE898" stroke-width="6" opacity="0.4" />
+
+    <!-- ===== Montagnes arrière-plan (chaîne floue derrière le soleil) ===== -->
+    <path
+      d="M 0 620
+         L 90 540
+         L 180 580
+         L 280 500
+         L 390 560
+         L 500 480
+         L 620 540
+         L 740 470
+         L 870 530
+         L 1024 490
+         L 1024 720
+         L 0 720
+         Z"
+      fill="url(#mountainBack)"
+      opacity="0.7"
+    />
+
+    <!-- ===== Montagnes mid-ground (chaîne plus marquée) ===== -->
+    <path
+      d="M 0 740
+         L 130 640
+         L 260 700
+         L 400 600
+         L 540 680
+         L 680 590
+         L 830 660
+         L 970 590
+         L 1024 620
+         L 1024 820
+         L 0 820
+         Z"
+      fill="url(#mountainMid)"
+    />
+
+    <!-- ===== Mid-ground secondaire (vallées intermédiaires) ===== -->
+    <path
+      d="M 0 800
+         L 180 740
+         L 340 790
+         L 520 730
+         L 700 770
+         L 880 720
+         L 1024 760
+         L 1024 900
+         L 0 900
+         Z"
+      fill="#7A2F09"
+      opacity="0.55"
+    />
+
+    <!-- ===== Crête principale (sommet droit, le runner grimpe dessus) ===== -->
+    <path
+      d="M 380 1024
+         L 540 760
+         L 700 580
+         L 820 480
+         L 920 540
+         L 1024 620
+         L 1024 1024
+         Z"
+      fill="url(#foreground)"
+    />
+
+    <!-- Détails crête : crevasses et accents -->
+    <g fill="#FFC833" opacity="0.18">
+      <path d="M 700 580 L 720 720 L 740 700 L 750 820 L 710 900 Z" />
+      <path d="M 820 480 L 830 600 L 850 580 L 870 700 Z" />
+    </g>
+    <g fill="#FFFFFF" opacity="0.08">
+      <path d="M 600 700 L 620 760 L 640 750 L 660 820 L 630 870 Z" />
+    </g>
+
+    <!-- ===== Premier plan : versant sombre côté gauche avec sapins ===== -->
+    <path
+      d="M 0 1024
+         L 0 760
+         L 60 720
+         L 140 760
+         L 230 720
+         L 330 800
+         L 380 920
+         L 380 1024
+         Z"
+      fill="url(#foreground)"
+    />
+
+    <!-- Sapins silhouette (3 sapins coin bas-gauche) -->
+    <g fill="#0F0801">
+      <!-- Sapin 1 (le plus grand, à gauche) -->
+      <path d="M 75 980 L 55 920 L 70 920 L 50 870 L 65 870 L 45 810 L 60 810 L 40 750 L 75 690 L 110 750 L 90 810 L 105 810 L 85 870 L 100 870 L 80 920 L 95 920 L 75 980 Z" />
+      <!-- Sapin 2 (moyen) -->
+      <path d="M 175 1000 L 160 950 L 170 950 L 155 910 L 165 910 L 150 870 L 175 820 L 200 870 L 185 910 L 195 910 L 180 950 L 190 950 L 175 1000 Z" />
+      <!-- Sapin 3 (petit, vers la crête) -->
+      <path d="M 290 970 L 280 935 L 287 935 L 275 905 L 285 905 L 295 875 L 315 905 L 305 905 L 313 935 L 300 935 L 290 970 Z" />
+    </g>
+
+    <!-- Petits sapins lointains sur la crête droite -->
+    <g fill="#1F0F03" opacity="0.6">
+      <path d="M 660 590 L 655 575 L 660 565 L 665 575 L 660 590 Z" />
+      <path d="M 600 650 L 595 632 L 600 620 L 605 632 L 600 650 Z" />
+      <path d="M 540 700 L 535 685 L 540 675 L 545 685 L 540 700 Z" />
+    </g>
+
+    <!-- ===== Le runner — silhouette dynamique, mid-stride sur la crête ===== -->
+    <!-- Position : sur la crête, centré sur l'axe horizontal mais légèrement à droite -->
+    <!-- Corps en mouvement : penché en avant, jambes écartées, bras balancés -->
+
+    <g transform="translate(420, 280)">
+
+      <!-- Sac à dos (derrière le tronc) -->
+      <path
+        d="M 130 80
+           Q 120 70 110 75
+           L 105 85
+           L 100 130
+           Q 100 145 110 150
+           L 145 155
+           Q 160 150 158 130
+           L 155 100
+           Q 152 80 140 78
+           Z"
+        fill="#A06030"
+      />
+      <!-- Bretelles -->
+      <path
+        d="M 115 80 Q 110 100 115 130"
+        stroke="#5C2F0D"
+        stroke-width="4"
+        fill="none"
+      />
+      <!-- Compartiment haut du sac -->
+      <rect x="115" y="85" width="38" height="18" fill="#C4791E" opacity="0.6" />
+
+      <!-- Tronc / torse (penché avant) -->
+      <path
+        d="M 145 90
+           L 175 95
+           L 200 130
+           L 195 170
+           L 175 195
+           L 145 195
+           L 125 170
+           L 130 130
+           Z"
+        fill="url(#runnerBody)"
+      />
+
+      <!-- T-shirt manche : épaule arrière visible -->
+      <path
+        d="M 130 130
+           L 115 145
+           L 110 160
+           L 115 170
+           L 130 165
+           Z"
+        fill="url(#runnerBody)"
+      />
+
+      <!-- Bras avant (qui balance vers l'avant en haut) -->
+      <path
+        d="M 195 130
+           L 215 110
+           L 230 90
+           L 240 80
+           L 245 75
+           L 250 75
+           L 248 85
+           L 240 95
+           L 235 110
+           L 220 135
+           L 200 150
+           Z"
+        fill="url(#runnerBody)"
+      />
+      <!-- Poignet / montre détail -->
+      <rect x="240" y="76" width="10" height="6" fill="#1F0F03" />
+
+      <!-- Bras arrière (qui balance vers l'arrière en bas) -->
+      <path
+        d="M 130 150
+           L 110 175
+           L 90 200
+           L 80 220
+           L 72 235
+           L 65 240
+           L 62 235
+           L 70 220
+           L 80 200
+           L 95 175
+           L 115 160
+           Z"
+        fill="url(#runnerBody)"
+      />
+      <!-- Montre poignet arrière -->
+      <rect x="62" y="232" width="10" height="6" fill="#1F0F03" />
+
+      <!-- Tête -->
+      <ellipse cx="170" cy="65" rx="32" ry="38" fill="#5C2F0D" />
+
+      <!-- Casquette (cap) — visière + dôme -->
+      <!-- Dôme -->
+      <path
+        d="M 138 50
+           Q 138 30 170 28
+           Q 202 30 202 50
+           L 202 60
+           L 138 60
+           Z"
+        fill="#1F0F03"
+      />
+      <!-- Visière (vers la droite, sens course) -->
+      <path
+        d="M 202 55
+           L 235 50
+           L 240 60
+           L 205 65
+           Z"
+        fill="#1F0F03"
+      />
+
+      <!-- Nuque visible sous casquette -->
+      <path
+        d="M 142 70
+           L 145 90
+           L 155 95
+           L 152 75
+           Z"
+        fill="#3A1F08"
+      />
+
+      <!-- Cuisse avant (jambe droite, en montée) -->
+      <path
+        d="M 175 195
+           L 210 235
+           L 225 280
+           L 215 295
+           L 195 285
+           L 175 245
+           Z"
+        fill="url(#runnerBody)"
+      />
+
+      <!-- Tibia / mollet avant -->
+      <path
+        d="M 215 295
+           L 235 340
+           L 250 380
+           L 245 395
+           L 230 395
+           L 220 360
+           L 205 320
+           Z"
+        fill="url(#runnerBody)"
+      />
+
+      <!-- Chaussure avant -->
+      <path
+        d="M 230 395
+           L 270 405
+           L 285 410
+           L 290 420
+           L 275 425
+           L 245 422
+           L 225 418
+           L 220 410
+           Z"
+        fill="#1F0F03"
+      />
+      <!-- Semelle (lime accent — petit clin d'oeil) -->
+      <path
+        d="M 225 420
+           L 290 422
+           L 290 426
+           L 225 424
+           Z"
+        fill="#3A1F08"
+      />
+
+      <!-- Cuisse arrière (jambe gauche, en extension) -->
+      <path
+        d="M 130 195
+           L 105 235
+           L 80 275
+           L 60 295
+           L 50 290
+           L 60 270
+           L 90 230
+           L 115 195
+           Z"
+        fill="url(#runnerBody)"
+      />
+
+      <!-- Tibia / mollet arrière -->
+      <path
+        d="M 60 295
+           L 35 320
+           L 18 345
+           L 10 360
+           L 5 355
+           L 15 335
+           L 35 310
+           L 50 290
+           Z"
+        fill="url(#runnerBody)"
+      />
+
+      <!-- Chaussure arrière (au sol, à la pointe) -->
+      <path
+        d="M 5 355
+           L -20 360
+           L -28 358
+           L -25 365
+           L -5 372
+           L 18 368
+           L 25 358
+           Z"
+        fill="#1F0F03"
+      />
+
+      <!-- Ombre subtile sous le runner sur la crête -->
+      <ellipse cx="130" cy="430" rx="180" ry="8" fill="#000000" opacity="0.35" />
+
+    </g>
+
+    <!-- ===== Vignettage subtil bord-de-cadre pour donner de la profondeur ===== -->
+    <rect x="0" y="0" width="1024" height="1024" fill="url(#sky)" opacity="0" />
+    <radialGradient id="vignette" cx="50%" cy="50%" r="75%">
+      <stop offset="60%" stop-color="#000000" stop-opacity="0" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.25" />
+    </radialGradient>
+    <rect x="0" y="0" width="1024" height="1024" fill="url(#vignette)" />
+
+  </g>
+</svg>

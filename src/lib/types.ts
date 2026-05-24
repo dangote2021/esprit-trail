@@ -134,6 +134,10 @@ export interface Run {
   lootDropped: LootItem[];
   // Carte
   polylinePreview?: string; // emoji art or SVG path
+  /** Google polyline encodée — utilisée par le tracker live et l'image
+   *  de partage pour redessiner la trace. Optionnel : les sorties Strava
+   *  importées n'en ont pas forcément. */
+  polyline?: string | null;
 }
 
 // ====== BADGES ======
@@ -186,6 +190,9 @@ export interface Race {
   location: string;
   country: string;
   date: string; // ISO
+  /** Heure de départ "HH:mm" (heure locale du lieu de la course).
+   *  Retour panel Manon : "C'est la première info que je cherche pour préparer." */
+  startTime?: string;
   distance: number; // km — format principal (le plus long en général)
   elevation: number; // m D+ — format principal
   category: RaceCategory;

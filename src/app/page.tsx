@@ -4,12 +4,13 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import TQLogo from "@/components/ui/TQLogo";
 import BadgeCard from "@/components/ui/BadgeCard";
 import PublicLanding from "@/components/landing/PublicLanding";
-import RunStartCTA from "@/components/run/RunStartCTA";
 import BibIcon from "@/components/ui/BibIcon";
 import GutTrainingIcon from "@/components/ui/GutTrainingIcon";
 import InviteFriendsCard from "@/components/invite/InviteFriendsCard";
 import AddRunFAB from "@/components/layout/AddRunFAB";
-import DailyQuestHero from "@/components/home/DailyQuestHero";
+import HomeTrainingZone from "@/components/home/HomeTrainingZone";
+import PotosFeed from "@/components/home/PotosFeed";
+import FollowSuggestions from "@/components/home/FollowSuggestions";
 import { MY_BADGES, MY_RUNS } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
 import { BADGES, getBadge } from "@/lib/data/badges";
@@ -79,20 +80,18 @@ export default async function HomePage({
         </div>
       </header>
 
-      {/* Quête du jour — hero saillant, retour panel Lola */}
-      <DailyQuestHero />
+      {/* Zone entraînement — quête du jour + CTA sortie, OU encart calme
+          si l'utilisateur est en pause (panel test Bruno) */}
+      <HomeTrainingZone />
 
-      {/* CTA — Lance une sortie + modale Strava au 1er clic */}
-      <RunStartCTA />
+      {/* Activité des potos — feed compact (item 5 P1 panel test) */}
+      <PotosFeed />
 
       {/* OFF RACES — feature phare, mise en avant */}
       <Link
         href="/races?tab=off"
         className="relative block overflow-hidden rounded-3xl border-2 border-peach bg-gradient-to-br from-peach/25 via-violet/15 to-bg p-5 btn-chunky tap-bounce card-shine"
       >
-        <div className="pointer-events-none absolute -right-6 -top-6 text-[120px] opacity-[0.12] leading-none">
-          🏴‍☠️
-        </div>
         <div className="relative flex items-center gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-peach text-bg card-chunky wobble">
             <span className="text-3xl">🏴‍☠️</span>
@@ -125,9 +124,6 @@ export default async function HomePage({
         href="/challenges/loto"
         className="relative block overflow-hidden rounded-3xl border-2 border-lime bg-gradient-to-br from-lime/20 via-peach/10 to-bg p-5 btn-chunky tap-bounce card-shine"
       >
-        <div className="pointer-events-none absolute -right-8 -top-4 opacity-[0.15] rotate-12">
-          <BibIcon size={140} number="033" bibColor="#F0E6C8" numberColor="#1B4332" pinColor="#F77F00" />
-        </div>
         <div className="relative flex items-center gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-lime card-chunky wobble overflow-hidden">
             <BibIcon size={52} number="01" bibColor="#FFFFFF" numberColor="#0B1D0E" pinColor="#1B4332" />
@@ -284,6 +280,11 @@ export default async function HomePage({
           ))}
         </div>
       </section>
+
+      {/* Follow tes potos de trail — descendu sous l'historique pour ne pas
+          spammer le haut de page. Apparait après que l'utilisateur a vu son
+          activité, donc dans un contexte "ok et toi qui d'autre tu suis ?" */}
+      <FollowSuggestions />
 
       {/* Next race teaser */}
       {nextRace && (

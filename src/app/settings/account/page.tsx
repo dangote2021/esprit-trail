@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   description: "Gérer ton compte Esprit Trail : email, export, suppression.",
 };
 
+// Page protégée par auth : on ne veut surtout pas la pré-rendre au build
+// (le client Supabase n'a pas les env vars en build statique, et de toutes
+// façons cette page change selon le user connecté).
+export const dynamic = "force-dynamic";
+
 export default async function AccountPage() {
   const supabase = await getSupabaseServerClient();
   const {

@@ -8,6 +8,10 @@ import { useEffect, useMemo, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ME, MY_RUNS } from "@/lib/data/me";
+import { RACES } from "@/lib/data/races";
+import type { Race } from "@/lib/types";
+import HeartRateZones from "@/components/coach/HeartRateZones";
+import { loadHr, bpmRangeForIntensity, type HrData } from "@/lib/hr-zones";
 
 type Goal =
   | "specific-trail"
@@ -20,7 +24,7 @@ type Goal =
   | "custom";
 
 type ApiSession = {
-  type: "easy" | "long" | "interval" | "hill" | "rest" | "race";
+  type: "easy" | "long" | "interval" | "hill" | "tempo" | "strength" | "rest" | "race";
   title: string;
   duration: number;
   distance?: number;
@@ -70,6 +74,8 @@ const TYPE_META: Record<
   long: { label: "Sortie longue", color: "text-peach border-peach/30 bg-peach/5", icon: "🏃" },
   interval: { label: "Fractionné", color: "text-lime border-lime/30 bg-lime/5", icon: "⚡" },
   hill: { label: "Côtes / D+", color: "text-violet border-violet/30 bg-violet/5", icon: "⛰️" },
+  tempo: { label: "Tempo / Seuil", color: "text-gold border-gold/30 bg-gold/5", icon: "🎯" },
+  strength: { label: "Renfo", color: "text-violet border-violet/30 bg-violet/5", icon: "💪" },
   rest: { label: "Repos", color: "text-ink-muted border-ink/20 bg-bg-card/40", icon: "😌" },
   race: { label: "Course !", color: "text-mythic border-mythic/40 bg-mythic/5", icon: "🏁" },
 };
@@ -123,34 +129,137 @@ function computeLevelFromMe() {
   return { weeklyKm, weeklyElevation, longestRun };
 }
 
+type UserLevel = "debutant" | "confirme" | "ultra";
+
+const LEVEL_LABELS: Record<UserLevel, { label: string; tagline: string; volMul: number; specBlock: string }> = {
+  debutant: {
+    label: "Débutant",
+    tagline: "Premier trail ou retour après pause",
+    volMul: 0.7,
+    specBlock: "Plan progressif avec footings doux, intensité limitée, longues sorties courtes. Pas de séances spécifiques côtes ou descente technique au début.",
+  },
+  confirme: {
+    label: "Confirmé",
+    tagline: "Tu cours régulièrement, t'as déjà fait quelques courses",
+    volMul: 1.0,
+    specBlock: "Plan équilibré avec base aérobie + séances spécifiques (côtes, seuil, sortie longue). Volume hebdo soutenu.",
+  },
+  ultra: {
+    label: "Ultra",
+    tagline: "Ultra-traileur, gros volumes, blocs costauds",
+    volMul: 1.4,
+    specBlock: "Plan avancé : blocs spécifiques (côtes répétées, descente technique, double sortie, nutrition embarquée), gros volume hebdo, semaine de rappel régulière, périodisation explicite (base → spécifique → affûtage).",
+  },
+};
+
+const LEVEL_KEY = "esprit_coach_user_level";
+
+/**
+ * Dérive un Goal cohérent à partir d'une course wishlist.
+ * Heuristique simple basée sur la distance — ça permet au bouton
+ * "Préparer cette course" de ne pas avoir à demander à l'user de
+ * choisir un objectif qui colle déjà à la course.
+ */
+function goalFromRace(race: Race): Goal {
+  if (race.distance >= 90) return "utmb-qualif";
+  if (race.distance >= 50) return "first-ultra";
+  if (race.distance >= 30) return "specific-trail";
+  return "first-trail";
+}
+
+/** Nombre de semaines de prépa selon les jours restants. Cappé entre 4 et 24. */
+function weeksUntilRace(raceIso: string): number {
+  const days = Math.ceil((new Date(raceIso).getTime() - Date.now()) / 86_400_000);
+  if (days <= 28) return 4;
+  if (days >= 168) return 24;
+  return Math.round(days / 7);
+}
+
+function loadStoredLevel(): UserLevel {
+  if (typeof window === "undefined") return "confirme";
+  try {
+    const raw = window.localStorage.getItem(LEVEL_KEY) as UserLevel | null;
+    if (raw === "debutant" || raw === "confirme" || raw === "ultra") return raw;
+  } catch {/* ignore */}
+  return "confirme";
+}
+
 function CoachPlanInner() {
   const sp = useSearchParams();
-  const goal = (sp.get("goal") as Goal) || "first-ultra";
+  // raceId : permet d'arriver depuis /race/[id] avec une cible précise.
+  // Si présent, on dérive le goal de la distance et on injecte le contexte
+  // race dans freeText pour que Claude calibre la prépa au cordeau.
+  const raceId = sp.get("raceId");
+  const targetRace = raceId ? RACES.find((r) => r.id === raceId) : null;
+  const goalParam = sp.get("goal") as Goal | null;
+  const goal: Goal = targetRace ? goalFromRace(targetRace) : (goalParam || "first-ultra");
   const [plan, setPlan] = useState<ApiPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [weekIdx, setWeekIdx] = useState(0);
+  const [userLevel, setUserLevel] = useState<UserLevel>("confirme");
+  const [hydrated, setHydrated] = useState(false);
+  // FC perso — pour afficher les plages BPM sur chaque séance (panel Karim)
+  const [hr, setHr] = useState<HrData | null>(null);
+
+  useEffect(() => {
+    setUserLevel(loadStoredLevel());
+    setHydrated(true);
+    setHr(loadHr());
+    const onHr = (e: Event) => {
+      setHr((e as CustomEvent).detail as HrData | null);
+    };
+    window.addEventListener("esprit:hr", onHr);
+    return () => window.removeEventListener("esprit:hr", onHr);
+  }, []);
+
+  function pickLevel(lvl: UserLevel) {
+    setUserLevel(lvl);
+    try {
+      window.localStorage.setItem(LEVEL_KEY, lvl);
+    } catch {/* ignore */}
+  }
 
   const level = useMemo(() => computeLevelFromMe(), []);
   const meta = GOAL_META[goal];
+  const levelMeta = LEVEL_LABELS[userLevel];
 
   useEffect(() => {
+    // Attendre l'hydratation pour avoir le bon level depuis localStorage
+    if (!hydrated) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
       setError(null);
       try {
+        // Ajuste le volume + l'intensité selon le niveau utilisateur (retour
+        // Quentin/Camille : "un toggle 'niveau' qui adapte le contenu").
+        const adjustedLevel = {
+          ...level,
+          weeklyKm: Math.round(level.weeklyKm * levelMeta.volMul),
+        };
+        // Bloc contexte course quand on arrive avec ?raceId=.
+        // On donne à Claude la cible précise : nom, date, distance, D+,
+        // heure de départ, formats, et nombre de semaines disponibles.
+        const raceBlock = targetRace
+          ? ` Course cible : ${targetRace.name} le ${new Date(targetRace.date).toLocaleDateString("fr", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}${targetRace.startTime ? ` (départ ${targetRace.startTime})` : ""} à ${targetRace.location} (${targetRace.country}). ${targetRace.distance} km, ${targetRace.elevation} m D+, difficulté ${targetRace.difficulty}/5, ${targetRace.itraPoints} pts ITRA. ${weeksUntilRace(targetRace.date)} semaines de prépa disponibles avant le jour J. Calibre le plan pour qu'il termine sur une semaine de taper qui colle à la date de course. Tagline officielle : "${targetRace.tagline}".`
+          : "";
+
         const res = await fetch("/api/coach/plan", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
             goal,
-            currentLevel: level,
+            ...(targetRace ? { targetDate: targetRace.date } : {}),
+            currentLevel: adjustedLevel,
             constraints: {
-              weeklyAvailability: 4,
+              weeklyAvailability: userLevel === "ultra" ? 6 : userLevel === "debutant" ? 3 : 4,
               terrain: "mountain",
+              ...(targetRace
+                ? { totalWeeks: weeksUntilRace(targetRace.date) }
+                : {}),
             },
-            freeText: `Traileur ${ME.profile?.trailerClass || "alpiniste"} · niveau ${ME.level} · UTMB index ${ME.connections.utmb?.runnerIndex || 0} · ITRA ${ME.connections.itra.performanceIndex}`,
+            freeText: `Niveau utilisateur déclaré : ${levelMeta.label}. ${levelMeta.specBlock} Traileur ${ME.profile?.trailerClass || "alpiniste"} · niveau ${ME.level} · UTMB index ${ME.connections.utmb?.runnerIndex || 0} · ITRA ${ME.connections.itra.performanceIndex}.${raceBlock}`,
           }),
         });
         if (!res.ok) throw new Error(`API ${res.status}`);
@@ -167,7 +276,16 @@ function CoachPlanInner() {
     return () => {
       cancelled = true;
     };
-  }, [goal, level]);
+  }, [
+    goal,
+    level,
+    userLevel,
+    hydrated,
+    levelMeta.volMul,
+    levelMeta.label,
+    levelMeta.specBlock,
+    targetRace,
+  ]);
 
   const current = plan?.plan?.[weekIdx];
   const phase = current ? PHASE_META[current.phase] : null;
@@ -193,6 +311,40 @@ function CoachPlanInner() {
         </div>
         <div className="w-9" />
       </header>
+
+      {/* Bandeau course cible — quand on arrive depuis /race/[id] */}
+      {targetRace && (
+        <section className="rounded-2xl border-2 border-peach/40 bg-gradient-to-br from-peach/20 via-bg-card to-bg p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-peach/20 text-2xl">
+              🎯
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] font-mono font-black uppercase tracking-widest text-peach">
+                Prépa calibrée · {weeksUntilRace(targetRace.date)} semaines
+              </div>
+              <div className="font-display text-base font-black leading-tight">
+                Objectif : {targetRace.name}
+              </div>
+              <div className="text-[11px] text-ink-muted mt-0.5">
+                {targetRace.distance} km · {targetRace.elevation.toLocaleString("fr")} m D+ ·{" "}
+                {new Date(targetRace.date).toLocaleDateString("fr", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "UTC",
+                })}
+              </div>
+              <Link
+                href={`/race/${targetRace.id}`}
+                className="mt-1.5 inline-block text-[10px] font-mono font-bold text-peach hover:underline"
+              >
+                Voir la course →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Loading state */}
       {loading && (
@@ -329,6 +481,53 @@ function CoachPlanInner() {
             </div>
           </section>
 
+          {/* Sélecteur niveau utilisateur — retour panel Quentin/Camille */}
+          <section className="space-y-2">
+            <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
+              Ton niveau · adapte le plan
+            </div>
+            <div className="rounded-2xl border border-cyan/25 bg-bg-card/60 p-3 space-y-2">
+              <div className="grid grid-cols-3 gap-1.5">
+                {(["debutant", "confirme", "ultra"] as const).map((lvl) => {
+                  const m = LEVEL_LABELS[lvl];
+                  const active = userLevel === lvl;
+                  return (
+                    <button
+                      key={lvl}
+                      type="button"
+                      onClick={() => pickLevel(lvl)}
+                      className={`rounded-xl px-2 py-2 text-center transition ${
+                        active
+                          ? "bg-cyan/15 border-2 border-cyan text-cyan font-bold"
+                          : "border border-ink/15 bg-bg-card/40 text-ink-muted hover:border-cyan/30"
+                      }`}
+                    >
+                      <div className="font-display text-sm font-black">
+                        {m.label}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-ink-muted leading-snug">
+                <strong className="text-cyan">{levelMeta.label}</strong> :{" "}
+                {levelMeta.tagline}.
+              </p>
+              <p className="text-[10px] font-mono text-ink-dim">
+                Change ton niveau → on regénère un plan adapté
+                {userLevel !== "confirme" && (
+                  <span>
+                    {" "}(volume ×{levelMeta.volMul} vs confirmé)
+                  </span>
+                )}
+                .
+              </p>
+            </div>
+          </section>
+
+          {/* Zones FC perso — panel test Karim */}
+          <HeartRateZones />
+
           {/* Week switcher */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">
@@ -368,6 +567,11 @@ function CoachPlanInner() {
           <section className="space-y-2">
             {current.sessions.map((s, i) => {
               const tm = TYPE_META[s.type];
+              // Plage BPM réelle si FC renseignée (panel Karim).
+              const bpm =
+                s.type === "rest" || s.type === "strength"
+                  ? null
+                  : bpmRangeForIntensity(hr, s.intensity);
               return (
                 <div
                   key={i}
@@ -410,6 +614,11 @@ function CoachPlanInner() {
                       )}
                       {!!s.elevation && (
                         <div className="text-ink-dim">{s.elevation}m D+</div>
+                      )}
+                      {bpm && (
+                        <div className="text-cyan font-bold">
+                          ❤ {bpm.min}-{bpm.max}
+                        </div>
                       )}
                     </div>
                   </div>
