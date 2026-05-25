@@ -4,29 +4,41 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  PROVIDERS,
-  getProvider,
-  getConnection,
-  timeSinceSync,
-} from "@/lib/data/connections";
+import { getProvider, timeSinceSync } from "@/lib/data/connections";
+import { getRealConnection } from "@/lib/connections-server";
 import type { WatchBrand } from "@/lib/types";
 import StravaConnectedActions from "@/components/connections/StravaConnectedActions";
 
-export function generateStaticParams() {
-  return PROVIDERS.map((p) => ({ provider: p.id }));
+// Lecture du statut réel (Supabase) → rendu dynamique obligatoire.
+export const dynamic = "force-dynamic";
+
+// Messages d'erreur OAuth lisibles (le callback redirige avec ?strava_error=)
+const STRAVA_ERROR_LABELS: Record<string, string> = {
+  access_denied: "Tu as refusé l'autorisation sur Strava. Réessaie quand tu veux.",
+  invalid_state: "La session de connexion a expiré. Relance la connexion.",
+};
+function readableStravaError(raw: string): string {
+  return (
+    STRAVA_ERROR_LABELS[raw] ||
+    "La connexion à Strava a échoué. Réessaie — si ça persiste, contacte-nous."
+  );
 }
 
-export default function ProviderDetailPage({
+export default async function ProviderDetailPage({
   params,
+  searchParams,
 }: {
   params: { provider: string };
+  searchParams?: { strava_error?: string; strava_connected?: string };
 }) {
   const provider = getProvider(params.provider as WatchBrand);
   if (!provider) notFound();
 
-  const conn = getConnection(provider.id);
-  const isConnected = conn?.status === "connected";
+  const conn = await getRealConnection(provider.id);
+  const isConnected = conn.connected;
+
+  const stravaError = searchParams?.strava_error;
+  const justConnected = searchParams?.strava_connected === "1";
 
   const methodLabel = {
     "oauth-bidirectional": "OAuth 2.0 bidirectionnel",
@@ -55,6 +67,21 @@ export default function ProviderDetailPage({
         <div className="w-9" />
       </header>
 
+      {/* Feedback OAuth — succès / erreur après retour de Strava */}
+      {justConnected && isConnected && (
+        <div className="rounded-xl border-2 border-lime/40 bg-lime/10 p-3 text-center text-[13px] font-bold text-ink">
+          ✓ {provider.name} connecté — tes sorties vont remonter automatiquement.
+        </div>
+      )}
+      {stravaError && (
+        <div className="rounded-xl border-2 border-mythic/40 bg-mythic/10 p-3 text-[13px] text-ink">
+          <div className="font-black text-mythic">Connexion {provider.name} échouée</div>
+          <p className="mt-0.5 text-ink-muted leading-relaxed">
+            {readableStravaError(stravaError)}
+          </p>
+        </div>
+      )}
+
       {/* Hero */}
       <section
         className="relative overflow-hidden rounded-2xl p-5 text-white shadow-lg"
@@ -76,16 +103,11 @@ export default function ProviderDetailPage({
           <div className="mt-4 rounded-xl bg-black/25 p-3 backdrop-blur">
             <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider">
               <span className="h-2 w-2 rounded-full bg-lime animate-pulse" />
-              <span>Connecté en tant que</span>
-              <strong>{conn?.athleteName}</strong>
+              <span>Connecté{conn.athleteName ? " en tant que" : ""}</span>
+              {conn.athleteName && <strong>{conn.athleteName}</strong>}
             </div>
-            <div className="mt-1 flex items-center gap-4 text-[11px] opacity-90">
-              <span>
-                <strong>{conn?.syncedActivities?.toLocaleString("fr")}</strong> activités
-              </span>
-              <span>
-                Dernière sync <strong>{timeSinceSync(conn?.lastSync)}</strong>
-              </span>
+            <div className="mt-1 text-[11px] opacity-90">
+              Dernière sync <strong>{timeSinceSync(conn.lastSync)}</strong>
             </div>
           </div>
         )}

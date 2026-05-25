@@ -67,34 +67,12 @@ export const PROVIDERS: ProviderDefinition[] = [
   },
 ];
 
-// ====== STATE UTILISATEUR MOCK ======
-// En prod : lecture/écriture via Supabase (table user_connections).
-export const MY_CONNECTIONS: UserConnection[] = [
-  {
-    providerId: "strava",
-    status: "connected",
-    connectedAt: "2025-09-14T10:15:00.000Z",
-    lastSync: "2026-04-22T06:32:00.000Z",
-    athleteName: "Traileur",
-    syncedActivities: 142,
-  },
-];
-
 // ====== HELPERS ======
+// NB : le statut de connexion réel se lit via getRealConnection()
+// (lib/connections-server.ts) depuis Supabase user_integrations.
+// Plus aucun mock ici — un nouveau compte n'a aucune connexion.
 export function getProvider(id: WatchBrand): ProviderDefinition | undefined {
   return PROVIDERS.find((p) => p.id === id);
-}
-
-export function getConnection(id: WatchBrand): UserConnection | undefined {
-  return MY_CONNECTIONS.find((c) => c.providerId === id);
-}
-
-export function isConnected(id: WatchBrand): boolean {
-  return getConnection(id)?.status === "connected";
-}
-
-export function connectedProviders(): ProviderDefinition[] {
-  return PROVIDERS.filter((p) => isConnected(p.id));
 }
 
 /** Temps lisible depuis la dernière sync. Ex: "il y a 3 min" */

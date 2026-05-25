@@ -2,24 +2,31 @@
 // Hub des intégrations Strava (only au lancement).
 // Décision MVP (28/04/26) : pas d'intégrations natives Garmin/Coros/Suunto —
 // les FIT remontent via Strava qui est déjà l'écosystème de référence.
-// Objectif : donner confiance, montrer transparence RGPD, CTA connexion clair.
+// Statut de connexion lu en RÉEL depuis Supabase (jamais de mock).
 
 import Link from "next/link";
-import {
-  PROVIDERS,
-  MY_CONNECTIONS,
-  getConnection,
-  timeSinceSync,
-} from "@/lib/data/connections";
-import type { ProviderDefinition, UserConnection } from "@/lib/data/connections";
+import { PROVIDERS, timeSinceSync } from "@/lib/data/connections";
+import type { ProviderDefinition } from "@/lib/data/connections";
+import { getRealConnection, type RealConnection } from "@/lib/connections-server";
+
+// Lecture du statut réel (Supabase) → rendu dynamique obligatoire.
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Connexions · Esprit Trail",
 };
 
-export default function ConnectionsPage() {
+export default async function ConnectionsPage() {
   const sorted = [...PROVIDERS].sort((a, b) => a.priority - b.priority);
-  const connectedCount = MY_CONNECTIONS.filter((c) => c.status === "connected").length;
+
+  // Statut réel de chaque provider depuis Supabase user_integrations
+  const connections = await Promise.all(
+    sorted.map(async (p) => ({
+      provider: p,
+      connection: await getRealConnection(p.id),
+    })),
+  );
+  const connectedCount = connections.filter((c) => c.connection.connected).length;
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-6">
@@ -51,13 +58,15 @@ export default function ConnectionsPage() {
           </div>
           <div className="flex-1">
             <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-lime">
-              Sync active
+              {connectedCount > 0 ? "Sync active" : "Aucune sync"}
             </div>
             <div className="font-display text-xl font-black text-ink leading-tight">
-              {connectedCount} / {PROVIDERS.length} connectés
+              {connectedCount} / {PROVIDERS.length} connecté{connectedCount > 1 ? "s" : ""}
             </div>
             <div className="text-[11px] text-ink-muted">
-              Import auto des sorties + métriques physio
+              {connectedCount > 0
+                ? "Import auto des sorties + métriques"
+                : "Connecte Strava pour importer tes sorties"}
             </div>
           </div>
         </div>
@@ -68,7 +77,7 @@ export default function ConnectionsPage() {
         <div className="flex items-start gap-2">
           <span className="text-base">🔐</span>
           <div>
-            <strong className="text-ink">Tes données t'appartiennent.</strong> Esprit Trail
+            <strong className="text-ink">Tes données t&apos;appartiennent.</strong> Esprit Trail
             utilise les API officielles de chaque provider. On ne stocke que le strict
             nécessaire pour tes runs et tes stats. Tu peux te déconnecter à tout
             moment — on supprime alors tout (RGPD article 17).
@@ -81,10 +90,9 @@ export default function ConnectionsPage() {
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-ink-muted">
           Connexions disponibles
         </div>
-        {sorted.map((p) => {
-          const conn = getConnection(p.id);
-          return <ProviderCard key={p.id} provider={p} connection={conn} />;
-        })}
+        {connections.map(({ provider, connection }) => (
+          <ProviderCard key={provider.id} provider={provider} connection={connection} />
+        ))}
       </section>
 
       {/* FAQ rapide */}
@@ -101,7 +109,7 @@ export default function ConnectionsPage() {
           <span>📤</span>
           <div>
             <strong className="text-ink">Publier vers Strava depuis Esprit Trail ?</strong>{" "}
-            Oui — Strava supporte l'écriture bidirectionnelle, donc tes runs Esprit Trail
+            Oui — Strava supporte l&apos;écriture bidirectionnelle, donc tes runs Esprit Trail
             (off races, FKT...) repartent vers Strava en un clic.
           </div>
         </div>
@@ -124,10 +132,9 @@ function ProviderCard({
   connection,
 }: {
   provider: ProviderDefinition;
-  connection?: UserConnection;
+  connection: RealConnection;
 }) {
-  const isConnected = connection?.status === "connected";
-  const isError = connection?.status === "error";
+  const isConnected = connection.connected;
 
   const methodLabel = {
     "oauth-bidirectional": "OAuth bidirectionnel",
@@ -159,11 +166,6 @@ function ProviderCard({
                 Connecté
               </span>
             )}
-            {isError && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-mythic/40 bg-mythic/10 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-mythic">
-                Erreur
-              </span>
-            )}
           </div>
           <p className="mt-0.5 text-[11px] text-ink-muted">{p.tagline}</p>
 
@@ -176,18 +178,11 @@ function ProviderCard({
             </span>
           </div>
 
-          {/* Stats ou CTA selon état */}
-          {isConnected && connection ? (
-            <div className="mt-3 flex items-center gap-4 text-[11px]">
-              <span className="text-ink-muted">
-                <strong className="text-ink">
-                  {connection.syncedActivities?.toLocaleString("fr") ?? "—"}
-                </strong>{" "}
-                activités
-              </span>
-              <span className="text-ink-muted">
-                Sync <strong className="text-ink">{timeSinceSync(connection.lastSync)}</strong>
-              </span>
+          {/* Stats ou CTA selon état réel */}
+          {isConnected ? (
+            <div className="mt-3 text-[11px] text-ink-muted">
+              Dernière sync{" "}
+              <strong className="text-ink">{timeSinceSync(connection.lastSync)}</strong>
             </div>
           ) : (
             <div className="mt-3">
