@@ -8,6 +8,7 @@ import { getProvider, timeSinceSync } from "@/lib/data/connections";
 import { getRealConnection } from "@/lib/connections-server";
 import type { WatchBrand } from "@/lib/types";
 import StravaConnectedActions from "@/components/connections/StravaConnectedActions";
+import ConnectWithStravaButton from "@/components/connections/ConnectWithStravaButton";
 
 // Lecture du statut réel (Supabase) → rendu dynamique obligatoire.
 export const dynamic = "force-dynamic";
@@ -172,13 +173,11 @@ export default async function ProviderDetailPage({
       {!isConnected ? (
         <section className="space-y-3">
           {provider.id === "strava" ? (
-            <a
-              href={`/api/oauth/${provider.id}?from=/settings/connections/${provider.id}`}
-              className="block w-full rounded-xl px-5 py-4 text-center font-display text-base font-black uppercase tracking-wider text-white shadow-md btn-chunky"
-              style={{ backgroundColor: provider.brandColor }}
-            >
-              + Connecter {provider.name}
-            </a>
+            <div className="flex flex-col items-center gap-2">
+              <ConnectWithStravaButton
+                from={`/settings/connections/${provider.id}`}
+              />
+            </div>
           ) : (
             <button
               type="button"
@@ -219,6 +218,18 @@ export default async function ProviderDetailPage({
             </div>
           )}
         </section>
+      )}
+
+      {/* Attribution officielle Strava — conforme aux brand guidelines */}
+      {provider.id === "strava" && (
+        <div className="flex justify-center pt-2">
+          <img
+            src="/strava-powered-by-orange.svg"
+            alt="Powered by Strava"
+            height={24}
+            style={{ height: "24px", width: "auto" }}
+          />
+        </div>
       )}
 
       {/* Docs */}

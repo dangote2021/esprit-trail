@@ -300,24 +300,22 @@ function StepSplash({ onStart }: { onStart: (name: string, handle: string) => vo
           </span>
           <div className="h-px flex-1 bg-ink/10" />
         </div>
-        <button
-          onClick={() => {
-            // Lance directement le flow OAuth Strava. Au retour, l'app importera les
-            // données et le user pourra finir l'onboarding pré-rempli.
-            if (typeof window !== "undefined") {
-              const from = encodeURIComponent("/onboarding?strava=connected");
-              window.location.href = `/api/oauth/strava?from=${from}`;
-            }
-          }}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#fc4c02]/30 bg-[#fc4c02]/5 py-3 text-[#fc4c02] transition hover:border-[#fc4c02] hover:bg-[#fc4c02]/10"
-        >
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#fc4c02] font-display text-xs font-black text-white">
-            S
-          </div>
-          <span className="font-display text-sm font-black uppercase tracking-wider">
-            J&apos;ai déjà un Strava — connecte-le
-          </span>
-        </button>
+        {/* Bouton officiel Connect with Strava — conforme aux brand guidelines */}
+        <div className="flex justify-center">
+          <a
+            href={`/api/oauth/strava?from=${encodeURIComponent("/onboarding?strava=connected")}`}
+            aria-label="Connect with Strava"
+            className="inline-block transition active:scale-[0.98] hover:opacity-95"
+          >
+            <img
+              src="/btn-strava-connect-with.svg"
+              alt="Connect with Strava"
+              height={48}
+              width={237}
+              style={{ height: "48px", width: "auto", maxWidth: "100%" }}
+            />
+          </a>
+        </div>
         <div className="text-[10px] font-mono text-ink-dim">
           Temps estimé : 2 min · Tout est modifiable plus tard
         </div>
@@ -1164,28 +1162,32 @@ function StepStrava({
 
       {connected ? (
         <div className="flex items-center gap-3 rounded-xl border-2 border-lime bg-lime/10 p-4 shadow-glow-lime">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#fc4c02] font-display text-sm font-black text-white">
-            S
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-lime/30 font-display text-xl font-black text-lime">
+            ✓
           </div>
           <div className="flex-1">
             <div className="font-display text-sm font-black text-lime">Strava connecté</div>
             <div className="text-[11px] text-ink-muted">Import en cours en arrière-plan…</div>
           </div>
-          <div className="text-lg font-mono font-bold text-lime">✓</div>
         </div>
       ) : (
-        <button
-          onClick={handleConnect}
-          disabled={pending}
-          className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#fc4c02] p-4 text-white shadow-glow-lime transition hover:scale-[1.01] disabled:opacity-60"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white/20 font-display text-base font-black">
-            S
-          </div>
-          <div className="font-display font-black uppercase tracking-wider">
-            {pending ? "Connexion…" : "Se connecter avec Strava"}
-          </div>
-        </button>
+        <div className="flex justify-center">
+          {/* Bouton officiel Connect with Strava — conforme aux brand guidelines */}
+          <a
+            href={`/api/oauth/strava?from=${encodeURIComponent("/onboarding?strava_connected=1")}`}
+            aria-label="Connect with Strava"
+            aria-disabled={pending}
+            className={`inline-block transition active:scale-[0.98] hover:opacity-95 ${pending ? "opacity-60 pointer-events-none" : ""}`}
+          >
+            <img
+              src="/btn-strava-connect-with.svg"
+              alt="Connect with Strava"
+              height={48}
+              width={237}
+              style={{ height: "48px", width: "auto", maxWidth: "100%" }}
+            />
+          </a>
+        </div>
       )}
 
       <button
