@@ -5,6 +5,7 @@
 // Badge "Créé par toi" pour bien les différencier des seeds.
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { loadMyGuildes, MY_GUILDES_EVENT, type MyGuilde } from "@/lib/my-guildes";
 
 export default function MyCreatedGuildes() {
@@ -32,9 +33,10 @@ export default function MyCreatedGuildes() {
       </div>
       <div className="space-y-2">
         {items.map((g) => (
-          <div
+          <Link
             key={g.id}
-            className="block rounded-2xl border-2 border-lime/30 bg-gradient-to-r from-lime/8 to-bg-card p-4"
+            href={`/guildes/${g.id}`}
+            className="block rounded-2xl border-2 border-lime/30 bg-gradient-to-r from-lime/8 to-bg-card p-4 transition hover:border-lime/50"
           >
             <div className="flex items-start gap-3">
               <div className="text-3xl">{g.emoji}</div>
@@ -58,7 +60,7 @@ export default function MyCreatedGuildes() {
                 )}
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

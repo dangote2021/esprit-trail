@@ -7,12 +7,19 @@ import {
   GuildeMemberActions,
 } from "@/components/guildes/GuildeActions";
 import GuildeMemberCount from "@/components/guildes/GuildeMemberCount";
+import UserCreatedGuildeDetail from "@/components/guildes/UserCreatedGuildeDetail";
 
 export default function GuildeDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  // Les guildes créées par l'user ont un id qui commence par "user-".
+  // On délègue le rendu à un composant client qui lit depuis localStorage.
+  if (params.id.startsWith("user-")) {
+    return <UserCreatedGuildeDetail id={params.id} />;
+  }
+
   const guilde = getGuilde(params.id);
   if (!guilde) notFound();
 

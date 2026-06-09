@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ME } from "@/lib/data/me";
 import { getStoredIdentity, setStoredIdentity } from "@/lib/identity";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import NotifPermissionCard from "@/components/settings/NotifPermissionCard";
 import {
   loadTrainingState,
   setTrainingState,
@@ -415,6 +416,8 @@ export default function SettingsPage() {
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-gold">
           Notifications
         </div>
+        {/* Rappels push PWA — opt-in (P1.1) */}
+        <NotifPermissionCard />
         <div className="rounded-2xl border border-ink/10 bg-bg-card/60 p-2 divide-y divide-ink/5">
           {(
             [

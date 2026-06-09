@@ -1248,12 +1248,21 @@ function StepReady({
         </div>
       </div>
 
-      <div className="mt-8 w-full max-w-xs">
+      <div className="mt-8 w-full max-w-xs space-y-3">
+        {/* CTA principal — vers le Coach IA pour générer le plan tout de suite.
+            Boucle de rétention : l'user finit l'onboarding AVEC un plan dans
+            son cockpit. Le lendemain, il revient pour voir sa séance du jour. */}
         <Link
-          href="/"
+          href="/coach?from=onboarding"
           className="block w-full rounded-xl bg-lime py-4 font-display text-lg font-black uppercase tracking-wider text-bg shadow-glow-lime transition hover:scale-[1.02]"
         >
-          ▶ Lance le jeu
+          🧠 Génère mon plan
+        </Link>
+        <Link
+          href="/"
+          className="block w-full text-center text-xs font-mono text-ink-muted hover:text-ink"
+        >
+          Passer pour l&apos;instant
         </Link>
         <div className="mt-3 text-[10px] font-mono text-ink-dim">
           Tu pourras tout modifier depuis ton profil.
