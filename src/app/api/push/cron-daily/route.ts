@@ -5,7 +5,8 @@ import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+// Pas de maxDuration explicite : 10s par defaut sur Hobby plan Vercel,
+// suffisant pour envoyer quelques dizaines de notifs en parallele.
 
 // GET /api/push/cron-daily
 // Endpoint declenche par Vercel Cron tous les jours a 17h UTC (18h-19h Paris).
@@ -85,41 +86,34 @@ export async function GET(req: NextRequest) {
     tag: "esprit-daily",
   });
 
-  let sent = 0;
-  let failed = 0;
-  const dead: string[] = [];
-
-  for (const sub of subs || []) {
-    try {
-      await webpush.sendNotification(
-        {
-          endpoint: sub.endpoint,
-          keys: { p256dh: sub.p256dh, auth: sub.auth },
-        },
-        payload,
-      );
-      sent += 1;
-    } catch (e: unknown) {
-      failed += 1;
-      const status = (e as { statusCode?: number })?.statusCode;
-      // 404 / 410 = subscription expired ou inconnue → on supprime
-      if (status === 404 || status === 410) {
-        dead.push(sub.id);
+  // Envoi en parallele pour tenir dans 10s
+  const results = await Promise.all(
+    (subs || []).map(async (sub) => {
+      try {
+        await webpush.sendNotification(
+          {
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth },
+          },
+          payload,
+        );
+        return { id: sub.id, ok: true as const };
+      } catch (e: unknown) {
+        const status = (e as { statusCode?: number })?.statusCode;
+        return { id: sub.id, ok: false as const, status };
       }
-    }
-  }
+    }),
+  );
 
-  // Nettoyage des subscriptions mortes
+  const sent = results.filter((r) => r.ok).length;
+  const failed = results.length - sent;
+  // 404 / 410 = subscription expired ou inconnue → on supprime
+  const dead = results
+    .filter((r) => !r.ok && (r.status === 404 || r.status === 410))
+    .map((r) => r.id);
+
   if (dead.length > 0) {
     await supabase.from("push_subscriptions").delete().in("id", dead);
-  }
-
-  // Stamp last_sent_at sur les vivants (best effort)
-  if (sent > 0) {
-    await supabase
-      .from("push_subscriptions")
-      .update({ last_sent_at: new Date().toISOString() })
-      .not("id", "in", `(${dead.join(",") || "''"})`);
   }
 
   return NextResponse.json({
