@@ -25,6 +25,18 @@ export type ManualRun = {
  * Met à jour une sortie manuelle existante. Remplace l'entrée dans
  * localStorage en gardant l'ordre. No-op si l'id n'existe pas.
  */
+/** Dispatch event quand les sorties changent — toutes les UIs live
+ *  (DailyQuestHero, StreakBadge, ProfileStatsSections, RecentRuns…) écoutent
+ *  `esprit:runs` pour se rafraîchir sans reload. */
+function notifyRunsChanged() {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(new Event("esprit:runs"));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function updateManualRun(id: string, patch: Partial<Omit<ManualRun, "id">>) {
   if (typeof window === "undefined") return;
   const all = loadManualRuns();
@@ -33,6 +45,7 @@ export function updateManualRun(id: string, patch: Partial<Omit<ManualRun, "id">
   all[idx] = { ...all[idx], ...patch };
   try {
     window.localStorage.setItem(KEY, JSON.stringify(all));
+    notifyRunsChanged();
   } catch {
     /* ignore */
   }
@@ -125,6 +138,7 @@ export function saveManualRun(run: ManualRun) {
   all.unshift(run);
   try {
     window.localStorage.setItem(KEY, JSON.stringify(all.slice(0, 100)));
+    notifyRunsChanged();
   } catch {
     /* ignore */
   }
@@ -135,6 +149,7 @@ export function deleteManualRun(id: string) {
   const all = loadManualRuns().filter((r) => r.id !== id);
   try {
     window.localStorage.setItem(KEY, JSON.stringify(all));
+    notifyRunsChanged();
   } catch {
     /* ignore */
   }

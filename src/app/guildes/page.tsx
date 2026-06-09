@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { GUILDES } from "@/lib/data/guildes";
+import CreateGuildeButton from "@/components/guildes/CreateGuildeButton";
+import MyCreatedGuildes from "@/components/guildes/MyCreatedGuildes";
 
 const CATEGORY_META: Record<string, { label: string; emoji: string; color: string }> = {
   local: { label: "Local", emoji: "📍", color: "text-lime" },
@@ -31,12 +33,7 @@ export default function TeamsPage() {
             Ton crew trail
           </h1>
         </div>
-        <span
-          className="cursor-not-allowed rounded-lg border border-ink/10 bg-bg-card/40 px-3 py-1.5 text-[11px] font-mono font-bold uppercase text-ink-muted"
-          title="Bientôt disponible"
-        >
-          + Créer · bientôt
-        </span>
+        <CreateGuildeButton />
       </header>
 
       {/* Hero */}
@@ -178,6 +175,9 @@ export default function TeamsPage() {
           </Link>
         </section>
       )}
+
+      {/* Crews créés par l'user (apparait seulement s'il en a créé un) */}
+      <MyCreatedGuildes />
 
       {/* Découvrir */}
       <section className="space-y-3">

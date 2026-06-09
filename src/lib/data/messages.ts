@@ -76,7 +76,7 @@ export const CONVERSATIONS: Conversation[] = [
       authorId: "u-clem",
       createdAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
     },
-    unreadCount: 2,
+    unreadCount: 0,
     updatedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
   },
   // === Groupe Crew Mercantour ===
@@ -97,7 +97,7 @@ export const CONVERSATIONS: Conversation[] = [
       authorId: "u-marine",
       createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     },
-    unreadCount: 5,
+    unreadCount: 0,
     updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
   // === DM avec Vincent (casquette) ===

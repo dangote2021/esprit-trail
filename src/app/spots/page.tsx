@@ -29,6 +29,22 @@ const SpotsMap = dynamic(() => import("@/components/spots/SpotsMap"), {
 
 type GeoStatus = "idle" | "asking" | "ok" | "denied" | "unavailable";
 
+// Villes pré-réglées pour fallback quand la géoloc est refusée ou non dispo.
+// Permet à l'user de centrer la carte + trier les spots autour de SA ville
+// même sans accorder de permission.
+const PRESET_CITIES: { name: string; lat: number; lng: number }[] = [
+  { name: "Paris", lat: 48.8566, lng: 2.3522 },
+  { name: "Lyon", lat: 45.7640, lng: 4.8357 },
+  { name: "Marseille", lat: 43.2965, lng: 5.3698 },
+  { name: "Annecy", lat: 45.8992, lng: 6.1294 },
+  { name: "Bordeaux", lat: 44.8378, lng: -0.5792 },
+  { name: "Toulouse", lat: 43.6047, lng: 1.4442 },
+  { name: "Lille", lat: 50.6292, lng: 3.0573 },
+  { name: "Nantes", lat: 47.2184, lng: -1.5536 },
+  { name: "Strasbourg", lat: 48.5734, lng: 7.7521 },
+  { name: "Grenoble", lat: 45.1885, lng: 5.7245 },
+];
+
 // Estime le temps de trajet en voiture pour atteindre un spot
 // (vitesse moyenne 70 km/h tenant compte d'un mix autoroute/départementale).
 const AVG_DRIVING_SPEED_KMH = 70;
@@ -127,7 +143,7 @@ export default function SpotsPage() {
       <DiscoveryBannerClient />
 
       {/* Hero compact */}
-      <section className="rounded-2xl border-2 border-cyan/30 bg-gradient-to-br from-cyan/10 via-bg-card to-bg p-4">
+      <section className="rounded-2xl border-2 border-cyan/30 bg-gradient-to-br from-cyan/10 via-bg-card to-bg p-4 space-y-3">
         <div className="flex items-start gap-3">
           <div className="text-3xl">📍</div>
           <div className="flex-1">
@@ -138,10 +154,10 @@ export default function SpotsPage() {
               {status === "asking"
                 ? "Récupération de ta position…"
                 : coords
-                ? "Spots triés par distance. Touche un spot pour voir le tracé sur la carte. GPX dispo pour ta montre."
-                : status === "denied"
-                ? "Géolocalisation refusée — affichage des spots populaires de France."
-                : "Active la géoloc dans ton navigateur pour voir les spots les plus proches."}
+                  ? "Spots triés par distance. Touche un spot pour voir le tracé sur la carte. GPX dispo pour ta montre."
+                  : status === "denied"
+                    ? "Géoloc refusée — choisis ta ville pour centrer la carte."
+                    : "Pas de géoloc — choisis ta ville pour centrer la carte."}
             </p>
             {selectedSlug && (
               <button
@@ -153,6 +169,31 @@ export default function SpotsPage() {
             )}
           </div>
         </div>
+
+        {/* Fallback ville quand pas de coords — l'user choisit sa ville pour
+            que la carte se centre + spots soient triés par distance */}
+        {!coords && status !== "asking" && (
+          <div>
+            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan/80 mb-1.5">
+              Centre sur ta ville
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {PRESET_CITIES.map((c) => (
+                <button
+                  key={c.name}
+                  type="button"
+                  onClick={() => {
+                    setCoords({ lat: c.lat, lng: c.lng });
+                    setStatus("ok");
+                  }}
+                  className="rounded-md border border-cyan/30 bg-cyan/5 px-2.5 py-1 text-[11px] font-mono font-bold text-cyan hover:bg-cyan/15 transition"
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Carte interactive Leaflet — affiche le tracé du spot sélectionné si selectedSlug */}

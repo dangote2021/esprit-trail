@@ -12,6 +12,7 @@ import HomeTrainingZone from "@/components/home/HomeTrainingZone";
 import PotosFeed from "@/components/home/PotosFeed";
 import FollowSuggestions from "@/components/home/FollowSuggestions";
 import RecentRuns from "@/components/home/RecentRuns";
+import StreakBadge from "@/components/home/StreakBadge";
 import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
 import { MY_BADGES } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
@@ -66,6 +67,8 @@ export default async function HomePage({
       <header className="flex items-center justify-between pt-4">
         <TQLogo showBaseline />
         <div className="flex items-center gap-2">
+          {/* Streak badge — apparait à partir de 2 semaines consécutives avec sortie */}
+          <StreakBadge />
           <Link
             href="/notifications"
             className="relative rounded-full bg-bg-card p-2.5 text-ink hover:text-lime transition tap-bounce card-chunky wobble"

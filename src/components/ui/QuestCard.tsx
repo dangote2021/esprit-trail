@@ -1,4 +1,14 @@
+"use client";
+
+// ====== QuestCard ======
+// Card de quête utilisée sur la home (grilles daily/weekly). Progression
+// recalculée en LIVE depuis les vraies sorties (esprit_manual_runs) via
+// quest-progress.ts. Plus de XP fictif : la récompense est le badge si
+// la quête en débloque un, sinon juste un "Done" propre.
+
+import { useEffect, useState } from "react";
 import type { Quest } from "@/lib/types";
+import { computeQuestProgress } from "@/lib/quest-progress";
 
 const periodStyles = {
   daily: { color: "border-cyan/40 bg-cyan/5", accent: "text-cyan", label: "DAILY" },
@@ -18,9 +28,26 @@ function timeLeft(iso: string): string {
 }
 
 export default function QuestCard({ quest }: { quest: Quest }) {
+  const [mounted, setMounted] = useState(false);
+  const [progress, setProgress] = useState<number>(0);
+
+  useEffect(() => {
+    setMounted(true);
+    const refresh = () => setProgress(computeQuestProgress(quest));
+    refresh();
+    window.addEventListener("esprit:runs", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("esprit:runs", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, [quest]);
+
   const style = periodStyles[quest.period];
-  const pct = Math.min(100, Math.round((quest.progress / quest.target) * 100));
-  const done = quest.progress >= quest.target;
+  const pct = mounted
+    ? Math.min(100, Math.round((progress / Math.max(1, quest.target)) * 100))
+    : 0;
+  const done = mounted && progress >= quest.target;
 
   return (
     <div
@@ -49,7 +76,8 @@ export default function QuestCard({ quest }: { quest: Quest }) {
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[11px] font-mono">
               <span className="text-ink-dim">
-                {quest.progress.toLocaleString("fr")} / {quest.target.toLocaleString("fr")} {quest.unit}
+                {progress.toLocaleString("fr", { maximumFractionDigits: 1 })} /{" "}
+                {quest.target.toLocaleString("fr")} {quest.unit}
               </span>
               <span className={style.accent}>{pct}%</span>
             </div>
@@ -59,28 +87,26 @@ export default function QuestCard({ quest }: { quest: Quest }) {
                   done
                     ? "bg-lime"
                     : quest.period === "daily"
-                    ? "bg-cyan"
-                    : quest.period === "weekly"
-                    ? "bg-violet"
-                    : quest.period === "seasonal"
-                    ? "bg-peach"
-                    : "bg-gold"
+                      ? "bg-cyan"
+                      : quest.period === "weekly"
+                        ? "bg-violet"
+                        : quest.period === "seasonal"
+                          ? "bg-peach"
+                          : "bg-gold"
                 }`}
                 style={{ width: `${pct}%` }}
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-1 text-xs">
-            <span className="rounded-md bg-lime/15 px-2 py-1 font-mono font-bold text-lime">
-              +{quest.xpReward.toLocaleString("fr")} XP
-            </span>
-            {quest.badgeReward && (
+          {/* Récompense honnête : badge si débloquable, sinon rien (plus de XP fictif) */}
+          {quest.badgeReward && (
+            <div className="flex items-center gap-2 pt-1 text-xs">
               <span className="rounded-md bg-gold/15 px-2 py-1 font-mono font-bold text-gold">
-                🏅 Badge
+                🏅 Badge à débloquer
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
