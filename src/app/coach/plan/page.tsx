@@ -12,6 +12,7 @@ import { RACES } from "@/lib/data/races";
 import type { Race } from "@/lib/types";
 import HeartRateZones from "@/components/coach/HeartRateZones";
 import { loadHr, bpmRangeForIntensity, type HrData } from "@/lib/hr-zones";
+import { savePlan } from "@/lib/coach-plan";
 
 type Goal =
   | "specific-trail"
@@ -267,6 +268,35 @@ function CoachPlanInner() {
         if (cancelled) return;
         if (!data.ok || !data.plan) throw new Error("Réponse plan invalide");
         setPlan(data);
+        // Persiste le plan en localStorage pour la rétention :
+        // la home va l'utiliser pour afficher la semaine en cours.
+        try {
+          savePlan({
+            goal: data.goal,
+            goalLabel: GOAL_META[data.goal]?.label || data.goal,
+            totalWeeks: data.totalWeeks,
+            generatedAt: data.generatedAt || new Date().toISOString(),
+            raceName: targetRace?.name,
+            raceDate: targetRace?.date,
+            plan: data.plan.map((w) => ({
+              weekNumber: w.week,
+              block: w.label || w.phase,
+              focus: w.focus,
+              weeklyKm: w.weeklyKm,
+              weeklyElevation: w.weeklyElevation,
+              sessions: w.sessions.map((s) => ({
+                type: s.type,
+                title: s.title,
+                duration: s.duration,
+                distance: s.distance,
+              })),
+              coachTip: w.coachTip,
+              nutritionTip: w.nutritionTip,
+            })),
+          });
+        } catch {
+          /* ignore */
+        }
       } catch (e) {
         if (!cancelled) setError((e as Error).message || "Erreur de génération");
       } finally {

@@ -13,6 +13,7 @@ import PotosFeed from "@/components/home/PotosFeed";
 import FollowSuggestions from "@/components/home/FollowSuggestions";
 import RecentRuns from "@/components/home/RecentRuns";
 import StreakBadge from "@/components/home/StreakBadge";
+import WeekPlanCard from "@/components/home/WeekPlanCard";
 import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
 import { MY_BADGES } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
@@ -84,6 +85,10 @@ export default async function HomePage({
       {/* Zone entraînement — quête du jour + CTA sortie, OU encart calme
           si l'utilisateur est en pause (panel test Bruno) */}
       <HomeTrainingZone />
+
+      {/* Plan d'entraînement actif — séances de la semaine en cours.
+          Si pas de plan : CTA "Génère ton plan". Boucle de retour quotidien. */}
+      <WeekPlanCard />
 
       {/* Activité des potos — feed compact (item 5 P1 panel test) */}
       <PotosFeed />
