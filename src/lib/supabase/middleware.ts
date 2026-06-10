@@ -77,6 +77,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/u/") || // Profil public communautaire
     pathname.startsWith("/api/oauth") ||
     pathname.startsWith("/api/gpx") ||
+    pathname.startsWith("/api/webhooks/") ||
     pathname.startsWith("/.well-known") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
