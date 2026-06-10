@@ -80,10 +80,10 @@ export async function POST(req: NextRequest) {
   }
   const clientId = process.env.STRAVA_CLIENT_ID || "";
   const clientSecret = process.env.STRAVA_CLIENT_SECRET || "";
-  const verifyToken = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN || "";
+  const verifyToken = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN_2 || "";
   if (!clientId || !clientSecret || !verifyToken) {
     return NextResponse.json(
-      { ok: false, error: "STRAVA_CLIENT_ID/SECRET or STRAVA_WEBHOOK_VERIFY_TOKEN missing" },
+      { ok: false, error: "STRAVA_CLIENT_ID/SECRET or STRAVA_WEBHOOK_VERIFY_TOKEN_2 missing" },
       { status: 500 },
     );
   }

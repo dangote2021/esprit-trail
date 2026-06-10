@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   const verifyToken = url.searchParams.get("hub.verify_token");
   const challenge = url.searchParams.get("hub.challenge");
 
-  const expected = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN || "";
+  const expected = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN_2 || "";
 
   if (mode !== "subscribe" || !challenge) {
     return NextResponse.json(
