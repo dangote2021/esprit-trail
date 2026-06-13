@@ -132,8 +132,8 @@ const fr: Dict = {
   "landing.features.off_races.desc": "FKT, courses pirates, GR projects",
   "landing.features.progressive": "Plan progressif",
   "landing.features.progressive.desc": "augmentation douce du volume pour éviter blessures",
-  "landing.features.strava": "Sync Strava 1 clic",
-  "landing.features.strava.desc": "ton historique importé",
+  "landing.features.strava": "Tracker GPS natif",
+  "landing.features.strava.desc": "pas besoin de montre, Strava bientôt en sync",
   "landing.features.gut": "Gut training",
   "landing.features.gut.desc": "plan 8 semaines pour tolérer 90g glucides/h",
   "landing.install.eyebrow": "Installe Esprit Trail",
@@ -241,7 +241,7 @@ const fr: Dict = {
 
   // Discovery banner
   "discovery.eyebrow": "Mode découverte · sans compte",
-  "discovery.text": "Tu visites Esprit Trail sans compte — aperçu uniquement. Pour débloquer toutes les fonctionnalités (Coach IA, dossards en jeu, ranking ITRA/UTMB, sync Strava, GPX persos), crée ton compte en 30 sec.",
+  "discovery.text": "Tu visites Esprit Trail sans compte — aperçu uniquement. Pour débloquer toutes les fonctionnalités (Coach IA, dossards en jeu, ranking ITRA/UTMB, tracker GPS natif, GPX persos), crée ton compte en 30 sec.",
   "discovery.signup": "Créer mon compte gratuit",
 
   // Errors / 404
@@ -405,7 +405,7 @@ const en: Dict = {
   // Run start CTA
   "run.cta.eyebrow": "Ready to crush a trail session?",
   "run.cta.title": "Start an outing",
-  "run.cta.subtitle": "Sync Strava, stack km and crunch your data.",
+  "run.cta.subtitle": "GPS tracker, manual entry or Strava — your call.",
   "run.strava_modal.eyebrow": "Recommended · 30 sec",
   "run.strava_modal.title": "Connect Strava?",
   "run.strava_modal.body": "With Strava connected, your runs import automatically every time you sync your watch. The AI Coach, Form radar and ranking calibrate on your real data. No double entry, nothing forgotten.",

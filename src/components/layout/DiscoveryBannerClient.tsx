@@ -34,7 +34,7 @@ export default function DiscoveryBannerClient() {
           <p className="mt-1 text-xs text-ink-muted leading-relaxed">
             Tu visites Esprit Trail sans compte — aperçu uniquement. Pour débloquer
             toutes les fonctionnalités (Coach IA, dossards en jeu, ranking
-            ITRA/UTMB, sync Strava, GPX persos), crée ton compte en 30 sec.
+            ITRA/UTMB, tracker GPS natif, GPX persos), crée ton compte en 30 sec.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <Link

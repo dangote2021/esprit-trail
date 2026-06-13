@@ -259,7 +259,7 @@ export default function DemoPage() {
             <div className="font-bold text-lime">Comment ça marche</div>
             <div className="flex gap-2">
               <span className="text-lime font-bold">1.</span>
-              <span>Tu cours, chaque km synchronisé Strava = 1 ticket</span>
+              <span>Tu cours, chaque km enregistré (tracker ou Strava) = 1 ticket</span>
             </div>
             <div className="flex gap-2">
               <span className="text-lime font-bold">2.</span>
@@ -273,7 +273,8 @@ export default function DemoPage() {
 
           <p className="text-[11px] text-ink-muted leading-relaxed pt-1">
             🔓 Avec un compte : tickets cumulés sur tous les tirages de
-            dossards partenaires et FKT collectifs. Synchro Strava 1 clic.
+            dossards partenaires et FKT collectifs. Tracker GPS natif (Strava
+            bientôt).
           </p>
         </div>
       </section>
@@ -286,7 +287,8 @@ export default function DemoPage() {
         </h2>
         <p className="text-sm text-ink-muted leading-relaxed">
           Crée ton compte gratuit (30 sec) et accède à toute l&apos;app : Coach
-          IA, plan nutri perso pour ta course, sync Strava, tirages dossards.
+          IA, plan nutri perso pour ta course, tracker GPS natif, tirages
+          dossards.
         </p>
         <div className="flex flex-col gap-2 pt-1">
           <Link

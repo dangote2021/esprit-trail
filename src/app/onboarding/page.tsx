@@ -1088,8 +1088,10 @@ function StepGoals({
   );
 }
 
-// ====== STEP 7 — STRAVA ======
-// On se concentre sur Strava : c'est l'essentiel, couvre 80% des traileurs.
+// ====== STEP 7 — COMMENT TU ENREGISTRES ======
+// Refonte post-panel test : les 3 options (tracker GPS, saisie manuelle,
+// Strava) sont au meme niveau. L'user choisit ce qui lui va, aucune n'est
+// "recommandee" — Strava est marquee "en review" honnetement.
 
 function StepStrava({
   connected,
@@ -1100,64 +1102,22 @@ function StepStrava({
   onConnect: () => void;
   onNext: () => void;
 }) {
-  const [pending, setPending] = useState(false);
-
-  function handleConnect() {
-    setPending(true);
-    // Redirige vers le flow OAuth Strava. La callback finira par renvoyer sur
-    // /onboarding?strava_connected=1 côté prod. En attendant on simule le retour
-    // via la state locale pour ne pas casser le parcours.
-    if (typeof window !== "undefined") {
-      const from = encodeURIComponent("/onboarding?strava_connected=1");
-      window.location.href = `/api/oauth/strava?from=${from}`;
-    }
-    // Fallback si route pas dispo
-    setTimeout(() => {
-      setPending(false);
-      onConnect();
-    }, 1200);
-  }
+  // Note : `onConnect` est gardee pour compatibilite avec le state parent
+  // (au cas ou un retour OAuth ait deja set `stravaConnected=true`)
+  void onConnect;
 
   return (
     <div className="py-4 space-y-5">
       <div className="text-center">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-lime">
-          Synchronisation
+          Tes sorties
         </div>
-        <h1 className="mt-1 font-display text-3xl font-black">
-          Connecte Strava
+        <h1 className="mt-1 font-display text-3xl font-black leading-tight">
+          Comment tu enregistres&nbsp;?
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-ink-muted">
-          Zéro re-saisie. Esprit Trail importe tes sorties et calcule ton radar
-          automatiquement.
+          Choisis ta méthode. Tu pourras toujours en changer plus tard.
         </p>
-      </div>
-
-      <div className="rounded-xl border border-lime/25 bg-lime/5 p-3 space-y-1.5 text-[12px] text-ink leading-relaxed">
-        <div className="flex items-start gap-2">
-          <span className="text-peach">✓</span>
-          <span>
-            <strong>Import auto</strong> : toutes tes sorties passées en 2 clics
-          </span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-peach">✓</span>
-          <span>
-            <strong>XP, badges, quêtes</strong> se mettent à jour tout seuls
-          </span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-peach">✓</span>
-          <span>
-            <strong>Coach IA</strong> ajuste ton plan selon ta réalité
-          </span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-peach">✓</span>
-          <span>
-            <strong>Publication Strava</strong> bidirectionnelle (optionnelle)
-          </span>
-        </div>
       </div>
 
       {connected ? (
@@ -1166,26 +1126,85 @@ function StepStrava({
             ✓
           </div>
           <div className="flex-1">
-            <div className="font-display text-sm font-black text-lime">Strava connecté</div>
-            <div className="text-[11px] text-ink-muted">Import en cours en arrière-plan…</div>
+            <div className="font-display text-sm font-black text-lime">
+              Strava connecté
+            </div>
+            <div className="text-[11px] text-ink-muted">
+              Tes sorties seront importées automatiquement.
+            </div>
           </div>
         </div>
       ) : (
-        <div className="flex justify-center">
-          {/* Bouton officiel Connect with Strava — conforme aux brand guidelines */}
+        <div className="space-y-3">
+          {/* Carte 1 : Tracker GPS natif */}
+          <button
+            type="button"
+            onClick={onNext}
+            className="block w-full text-left rounded-2xl border-2 border-lime/40 bg-lime/5 p-4 hover:bg-lime/10 transition"
+          >
+            <div className="flex items-start gap-3">
+              <div className="text-3xl">🛰️</div>
+              <div className="flex-1">
+                <div className="font-display text-base font-black text-ink">
+                  Tracker GPS natif
+                </div>
+                <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
+                  Tu lances, tu cours, l&apos;app trace et calcule tout. Aucune
+                  montre requise.
+                </p>
+              </div>
+              <div className="text-ink-muted">→</div>
+            </div>
+          </button>
+
+          {/* Carte 2 : Saisie manuelle */}
+          <button
+            type="button"
+            onClick={onNext}
+            className="block w-full text-left rounded-2xl border-2 border-ink/15 bg-bg-card/50 p-4 hover:border-ink/30 transition"
+          >
+            <div className="flex items-start gap-3">
+              <div className="text-3xl">✎</div>
+              <div className="flex-1">
+                <div className="font-display text-base font-black text-ink">
+                  Saisie manuelle
+                </div>
+                <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
+                  Tu rentres distance, D+, durée. 30 sec. Idéal si tu sors
+                  parfois sans montre.
+                </p>
+              </div>
+              <div className="text-ink-muted">→</div>
+            </div>
+          </button>
+
+          {/* Carte 3 : Strava (en review, cap 1 athlete pour l'instant) */}
           <a
             href={`/api/oauth/strava?from=${encodeURIComponent("/onboarding?strava_connected=1")}`}
             aria-label="Connect with Strava"
-            aria-disabled={pending}
-            className={`inline-block transition active:scale-[0.98] hover:opacity-95 ${pending ? "opacity-60 pointer-events-none" : ""}`}
+            className="block w-full text-left rounded-2xl border-2 border-[#fc4c02]/25 bg-[#fc4c02]/5 p-4 hover:border-[#fc4c02]/50 transition"
           >
-            <img
-              src="/btn-strava-connect-with.svg"
-              alt="Connect with Strava"
-              height={48}
-              width={237}
-              style={{ height: "48px", width: "auto", maxWidth: "100%" }}
-            />
+            <div className="flex items-start gap-3">
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white font-display text-base font-black"
+                style={{ background: "#fc4c02" }}
+              >
+                S
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-display text-base font-black text-ink">
+                  Sync Strava
+                  <span className="ml-1.5 inline-block rounded-md bg-ink/10 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider text-ink-muted align-middle">
+                    en review
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
+                  Import auto de ton historique. Capacité limitée pendant la
+                  review Strava — tu auras peut-être une erreur 403.
+                </p>
+              </div>
+              <div className="text-ink-muted">→</div>
+            </div>
           </a>
         </div>
       )}
@@ -1196,12 +1215,9 @@ function StepStrava({
       >
         {connected ? "Terminer →" : "Continuer →"}
       </button>
-      <button
-        onClick={onNext}
-        className="w-full text-center text-[12px] text-ink-muted underline hover:text-ink"
-      >
-        Je connecterai plus tard depuis Profil
-      </button>
+      <p className="text-center text-[11px] text-ink-muted leading-relaxed">
+        Tu pourras combiner les 3 méthodes plus tard depuis ton profil.
+      </p>
     </div>
   );
 }

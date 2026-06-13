@@ -403,7 +403,43 @@ export default function PublicLanding({
         </div>
       </section>
 
-      {/* Capture #3 — Dossards en jeu */}
+      {/* Capture #3 — Tracker GPS natif (no-Strava-needed) */}
+      <section className="space-y-3">
+        <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
+          📱 Tracker GPS natif
+        </div>
+        <div className="rounded-3xl border-2 border-cyan/30 bg-gradient-to-br from-cyan/10 via-bg-card to-bg p-4 shadow-lg">
+          <div className="flex items-start gap-3">
+            <div className="text-4xl">🛰️</div>
+            <div className="flex-1">
+              <div className="font-display text-lg font-black text-ink leading-tight">
+                Lance ta sortie en 1 tap
+              </div>
+              <div className="text-[11px] text-ink-muted mt-0.5">
+                Pas besoin de montre · pas besoin de Strava
+              </div>
+              <p className="mt-2 text-xs text-ink-muted leading-relaxed">
+                L&apos;app a son propre tracker GPS — distance, D+, allure, tracé,
+                tout est calculé. Ou tu saisis ta sortie à la main en 30 sec.
+                Streak, quêtes et coach IA fonctionnent pareil.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2 text-[10px] font-mono">
+                <span className="rounded-md bg-cyan/20 px-2 py-0.5 font-bold text-cyan">
+                  Tracker GPS
+                </span>
+                <span className="rounded-md bg-bg-raised px-2 py-0.5 font-bold text-ink-muted">
+                  Saisie manuelle
+                </span>
+                <span className="rounded-md bg-bg-raised px-2 py-0.5 font-bold text-ink-muted">
+                  Strava bientôt
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Capture #4 — Dossards en jeu */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
           🎫 Dossards en jeu
@@ -485,9 +521,10 @@ export default function PublicLanding({
             </li>
           )}
           <li className="flex gap-2">
-            <span>📊</span>
+            <span>📱</span>
             <span>
-              <strong>Sync Strava 1 clic</strong> · ton historique importé
+              <strong>Tracker GPS natif</strong> · pas besoin de montre, l&apos;app
+              enregistre tes sorties (Strava bientôt en sync)
             </span>
           </li>
           <li className="flex gap-2">

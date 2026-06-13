@@ -341,30 +341,39 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Strava sync — rassurer les users actifs Strava */}
-      <section className="rounded-3xl border-2 border-[#fc4c02]/40 bg-gradient-to-br from-[#fc4c02]/10 via-bg-card to-bg p-5 card-shine">
+      {/* Comment tu enregistres tes sorties — tracker GPS + saisie manuelle au cœur, Strava bientôt */}
+      <section className="rounded-3xl border-2 border-lime/40 bg-gradient-to-br from-lime/10 via-bg-card to-bg p-5 card-shine">
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#fc4c02] text-white font-display text-lg font-black card-chunky">
-            S
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-lime text-bg font-display text-lg font-black card-chunky">
+            📱
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] font-mono font-black uppercase tracking-widest text-[#fc4c02]">
-              Tu utilises déjà Strava ?
+            <div className="text-[10px] font-mono font-black uppercase tracking-widest text-lime">
+              Comment tu enregistres
             </div>
             <h3 className="mt-1 font-display text-lg font-black text-ink leading-tight">
-              Sync 1 clic, on importe ton historique.
+              Tracker GPS natif. Pas besoin de montre.
             </h3>
             <p className="mt-1 text-xs text-ink-muted leading-relaxed">
-              Tes runs passées, tes stats, ton volume hebdo : tout est récupéré
-              automatiquement. Le Coach IA et le radar Forme se calibrent sur ta
-              vraie réalité, sans re-saisie.
+              L&apos;app a son propre tracker GPS — tu lances, tu cours, ça
+              trace. Ou tu saisis ta sortie à la main en 30 sec. Streak, quêtes,
+              coach IA, stats : tout marche pareil. La sync Strava arrive
+              bientôt (review en cours).
             </p>
-            <Link
-              href="/login"
-              className="mt-2 inline-block rounded-md bg-[#fc4c02] px-3 py-1.5 text-[11px] font-mono font-black uppercase tracking-wider text-white hover:scale-105 transition"
-            >
-              Connecter Strava →
-            </Link>
+            <div className="mt-2 flex gap-2 flex-wrap">
+              <Link
+                href="/run/track"
+                className="inline-block rounded-md bg-lime px-3 py-1.5 text-[11px] font-mono font-black uppercase tracking-wider text-bg hover:scale-105 transition"
+              >
+                🛰️ Tracker GPS →
+              </Link>
+              <Link
+                href="/run/manual"
+                className="inline-block rounded-md border border-ink/15 bg-bg-card/60 px-3 py-1.5 text-[11px] font-mono font-black uppercase tracking-wider text-ink hover:scale-105 transition"
+              >
+                ✎ Saisie manuelle →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
