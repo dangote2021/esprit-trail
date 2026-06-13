@@ -76,7 +76,7 @@ export default function SpotsPage() {
       () => {
         setStatus("denied");
       },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 5 * 60 * 1000 },
+      { enableHighAccuracy: false, timeout: 6000, maximumAge: 5 * 60 * 1000 },
     );
   }, []);
 
@@ -152,7 +152,7 @@ export default function SpotsPage() {
             </div>
             <p className="mt-1 text-xs text-ink-muted leading-relaxed">
               {status === "asking"
-                ? "Récupération de ta position…"
+                ? "Récupération de ta position… ou choisis ta ville ci-dessous, pas besoin d\'attendre."
                 : coords
                   ? "Spots triés par distance. Touche un spot pour voir le tracé sur la carte. GPX dispo pour ta montre."
                   : status === "denied"
@@ -172,7 +172,7 @@ export default function SpotsPage() {
 
         {/* Fallback ville quand pas de coords — l'user choisit sa ville pour
             que la carte se centre + spots soient triés par distance */}
-        {!coords && status !== "asking" && (
+        {!coords && (
           <div>
             <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan/80 mb-1.5">
               Centre sur ta ville

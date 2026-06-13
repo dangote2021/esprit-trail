@@ -41,8 +41,8 @@ const SCOPES: {
   {
     id: "world",
     label: "Monde",
-    metric: "XP saison",
-    unit: "",
+    metric: "D+ saison",
+    unit: "m",
     data: LEADERBOARD_WORLD_SEASON_XP,
     color: "violet",
   },
@@ -320,13 +320,8 @@ export default function LeaderboardPage() {
               {entry.user.avatar}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <div className="truncate font-bold">
-                  {entry.isYou ? "Toi" : entry.user.username}
-                </div>
-                <span className="shrink-0 rounded bg-bg-raised px-1.5 py-0.5 text-[9px] font-mono font-black text-lime">
-                  LV{entry.user.level}
-                </span>
+              <div className="truncate font-bold">
+                {entry.isYou ? "Toi" : entry.user.username}
               </div>
               <div className="truncate text-[11px] text-ink-muted">
                 {entry.user.title}
@@ -396,8 +391,8 @@ function PodiumStep({
       <div className="text-3xl">{entry.user.avatar}</div>
       <div className="text-center">
         <div className="truncate text-xs font-bold">{entry.user.username}</div>
-        <div className="text-[10px] font-mono text-ink-muted">
-          LV{entry.user.level}
+        <div className="truncate text-[10px] font-mono text-ink-muted">
+          {entry.user.title}
         </div>
       </div>
       <div

@@ -116,7 +116,11 @@ export default function BestResults() {
         <div className="text-[11px] font-black uppercase tracking-widest text-ink-muted">
           Tes courses mythiques · TOP 3
         </div>
-        <div className="mt-2 text-xs text-ink-dim italic">Chargement...</div>
+        <div className="mt-3 space-y-2" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-12 rounded-xl bg-ink/5 animate-pulse" />
+          ))}
+        </div>
       </section>
     );
   }

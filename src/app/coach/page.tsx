@@ -221,12 +221,14 @@ export default function CoachHubPage() {
       </section>
 
       {selected && (
-        <Link
-          href={`/coach/plan?goal=${selected}`}
-          className="block w-full rounded-xl bg-cyan py-4 text-center font-black uppercase tracking-wider text-bg shadow-glow-cyan transition hover:scale-[1.01]"
-        >
-          Générer mon plan →
-        </Link>
+        <div className="sticky bottom-24 z-40 -mx-4 px-4">
+          <Link
+            href={`/coach/plan?goal=${selected}`}
+            className="block w-full rounded-xl bg-cyan py-4 text-center font-black uppercase tracking-wider text-bg shadow-glow-cyan ring-2 ring-cyan/30 transition hover:scale-[1.01]"
+          >
+            Générer mon plan →
+          </Link>
+        </div>
       )}
 
       {/* Why it works */}

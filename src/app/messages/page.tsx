@@ -68,9 +68,20 @@ export default function MessagesListPage() {
       </div>
 
       {loading && (
-        <div className="text-center py-8 text-xs font-mono text-ink-dim">
-          Chargement…
-        </div>
+        <ul className="space-y-1.5" aria-hidden>
+          {[0, 1, 2, 3].map((i) => (
+            <li
+              key={i}
+              className="flex items-center gap-3 rounded-2xl border border-ink/10 bg-bg-card/60 p-3"
+            >
+              <div className="h-10 w-10 shrink-0 rounded-xl bg-ink/10 animate-pulse" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-1/3 rounded bg-ink/10 animate-pulse" />
+                <div className="h-2.5 w-2/3 rounded bg-ink/5 animate-pulse" />
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
 
       {/* Liste de conversations */}
