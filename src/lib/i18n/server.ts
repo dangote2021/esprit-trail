@@ -1,33 +1,16 @@
 // ====== i18n server helpers ======
 // Lecture de la langue depuis le cookie côté server components.
 
-import { cookies, headers } from "next/headers";
-import { translate, type Lang, DEFAULT_LANG, LANGS } from "./dict";
+import { translate, type Lang, DEFAULT_LANG } from "./dict";
 
 const COOKIE_NAME = "esprit_lang";
 
 export function getServerLang(): Lang {
-  // 1. Cookie explicite
-  try {
-    const cookieStore = cookies();
-    const c = cookieStore.get(COOKIE_NAME)?.value;
-    if (c === "fr" || c === "en") return c;
-  } catch {
-    // headers/cookies pas dispos dans le contexte → fallback
-  }
-
-  // 2. Accept-Language navigateur
-  try {
-    const h = headers();
-    const al = h.get("accept-language") ?? "";
-    // Prend la première langue préférée
-    const first = al.split(",")[0]?.split("-")[0]?.toLowerCase();
-    const found = LANGS.find((l) => l.code === first);
-    if (found) return found.code;
-  } catch {
-    // ignore
-  }
-
+  // La traduction EN n'est pas encore câblée sur l'ensemble de l'app (seuls
+  // quelques composants consomment le dictionnaire). On force donc le français
+  // pour éviter d'avoir <html lang="en"> sur un contenu FR (mismatch a11y/SEO)
+  // et un mode EN partiel qui paraît cassé. Réactiver la détection
+  // cookie + Accept-Language quand le dictionnaire EN sera complet.
   return DEFAULT_LANG;
 }
 

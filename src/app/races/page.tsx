@@ -119,7 +119,15 @@ export default function RacesPage() {
     if (cat !== "all" && r.category !== cat) return false;
     if (franceOnly && !r.country.toLowerCase().includes("france")) return false;
     return true;
-  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }).sort((a, b) => {
+    const now = Date.now();
+    const da = new Date(a.date).getTime();
+    const db = new Date(b.date).getTime();
+    const aPast = da < now;
+    const bPast = db < now;
+    if (aPast !== bPast) return aPast ? 1 : -1; // courses à venir d'abord
+    return aPast ? db - da : da - db; // passées : récentes d'abord / à venir : proches d'abord
+  });
 
   // OFF Races officielles + user-submitted
   const allOffRaces = [...OFF_RACES, ...userOffRaces];
@@ -451,12 +459,20 @@ export default function RacesPage() {
                   )}
                 </div>
                 <div className="absolute right-3 top-3 rounded-md bg-black/60 backdrop-blur px-2 py-1 text-right">
-                  <div className="text-[9px] font-mono uppercase text-ink-muted leading-none">
-                    dans
-                  </div>
-                  <div className="font-display text-base font-black text-peach leading-none">
-                    {daysUntil}j
-                  </div>
+                  {daysUntil < 0 ? (
+                    <div className="font-display text-sm font-black uppercase text-ink-muted leading-none">
+                      Terminé
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-[9px] font-mono uppercase text-ink-muted leading-none">
+                        {daysUntil === 0 ? "c'est" : "dans"}
+                      </div>
+                      <div className="font-display text-base font-black text-peach leading-none">
+                        {daysUntil === 0 ? "auj." : `${daysUntil}j`}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
