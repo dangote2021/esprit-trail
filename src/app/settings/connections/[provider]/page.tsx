@@ -169,6 +169,46 @@ export default async function ProviderDetailPage({
         </div>
       </section>
 
+      {/* Banniere transparence — Strava est en review Developer Program.
+          Cap a 1 athlete connecte pour l'instant. On le dit honnetement
+          et on rappelle que l'app marche sans. */}
+      {!isConnected && provider.id === "strava" && (
+        <section className="rounded-2xl border-2 border-cyan/30 bg-cyan/5 p-4 space-y-2">
+          <div className="flex items-start gap-2">
+            <span className="text-xl leading-none">⏳</span>
+            <div className="flex-1">
+              <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan">
+                Sync auto en review
+              </div>
+              <h3 className="font-display text-base font-black text-ink leading-tight mt-0.5">
+                Strava arrive — capacite limitee pendant la review
+              </h3>
+              <p className="mt-1 text-xs text-ink-muted leading-relaxed">
+                On a soumis l&apos;app au Developer Program Strava. Tant que la
+                review n&apos;est pas validee, on est cape a 1 athlete connecte.
+                Tu peux quand meme tester la sync (tu auras une erreur 403 si
+                tu n&apos;es pas le 1er), ou utiliser l&apos;app sans Strava — tout
+                marche pareil.
+              </p>
+              <div className="mt-2 flex gap-2 text-[11px]">
+                <Link
+                  href="/run/track"
+                  className="rounded-lg bg-lime px-3 py-1.5 font-mono font-bold uppercase tracking-wider text-bg"
+                >
+                  🛰️ Tracker GPS
+                </Link>
+                <Link
+                  href="/run/manual"
+                  className="rounded-lg border border-ink/15 bg-bg-card/60 px-3 py-1.5 font-mono font-bold uppercase tracking-wider text-ink"
+                >
+                  ✎ Saisie manuelle
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* CTA connexion / déconnexion */}
       {!isConnected ? (
         <section className="space-y-3">

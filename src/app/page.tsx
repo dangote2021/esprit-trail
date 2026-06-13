@@ -14,6 +14,7 @@ import FollowSuggestions from "@/components/home/FollowSuggestions";
 import RecentRuns from "@/components/home/RecentRuns";
 import StreakBadge from "@/components/home/StreakBadge";
 import WeekPlanCard from "@/components/home/WeekPlanCard";
+import FirstRunCTA from "@/components/home/FirstRunCTA";
 import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
 import { MY_BADGES } from "@/lib/data/me";
 import { questsForPeriod } from "@/lib/data/quests";
@@ -81,6 +82,11 @@ export default async function HomePage({
           </Link>
         </div>
       </header>
+
+      {/* Premiere sortie — CTA proeminent si esprit_manual_runs est vide.
+          Cible le drop-off J+1 : tracker GPS ou saisie manuelle, sans
+          attendre Strava. Disparait des qu'il y a >= 1 sortie. */}
+      <FirstRunCTA />
 
       {/* Zone entraînement — quête du jour + CTA sortie, OU encart calme
           si l'utilisateur est en pause (panel test Bruno) */}

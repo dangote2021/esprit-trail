@@ -46,32 +46,55 @@ export default function StravaConnectionStatus() {
   const isConnected = state === "connected";
 
   return (
-    <Link
-      href="/settings/connections/strava"
-      className={`flex items-center gap-3 rounded-lg border p-3 transition hover:scale-[1.01] ${
-        isConnected
-          ? "border-lime/40 bg-lime/5"
-          : "border-[#fc4c02]/30 bg-[#fc4c02]/5 hover:border-[#fc4c02]"
-      }`}
-    >
-      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#fc4c02] font-display text-sm font-black text-white">
-        S
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="font-display text-sm font-black text-ink">Strava</div>
-        <div className="text-[11px] text-ink-muted">
-          {isConnected
-            ? "✓ Connecté — sorties importées auto"
-            : "Connecte ton compte pour importer tes sorties"}
-        </div>
-      </div>
-      <div
-        className={`text-[10px] font-mono font-bold uppercase ${
-          isConnected ? "text-lime" : "text-[#fc4c02]"
+    <div className="space-y-1.5">
+      <Link
+        href="/settings/connections/strava"
+        className={`flex items-center gap-3 rounded-lg border p-3 transition hover:scale-[1.01] ${
+          isConnected
+            ? "border-lime/40 bg-lime/5"
+            : "border-ink/15 bg-bg-card/40 hover:border-ink/30"
         }`}
       >
-        {isConnected ? "✓" : "Connecter →"}
-      </div>
-    </Link>
+        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#fc4c02] font-display text-sm font-black text-white">
+          S
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-display text-sm font-black text-ink">
+            Strava
+            {!isConnected && (
+              <span className="ml-1.5 inline-block rounded-md bg-ink/10 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider text-ink-muted align-middle">
+                en review
+              </span>
+            )}
+          </div>
+          <div className="text-[11px] text-ink-muted">
+            {isConnected
+              ? "✓ Connecté — sorties importées auto"
+              : "Sync auto à venir. App utilisable sans."}
+          </div>
+        </div>
+        <div
+          className={`text-[10px] font-mono font-bold uppercase ${
+            isConnected ? "text-lime" : "text-ink-muted"
+          }`}
+        >
+          {isConnected ? "✓" : "Détails →"}
+        </div>
+      </Link>
+
+      {/* Fallback honnete : on rappelle que la saisie manuelle / tracker GPS marchent */}
+      {!isConnected && (
+        <div className="text-[10px] text-ink-muted leading-relaxed px-1">
+          <Link href="/run/track" className="underline hover:text-ink">
+            Tracker GPS
+          </Link>
+          {" · "}
+          <Link href="/run/manual" className="underline hover:text-ink">
+            Saisie manuelle
+          </Link>
+          {" — tes sorties alimentent quetes, streak et coach IA."}
+        </div>
+      )}
+    </div>
   );
 }
