@@ -9,7 +9,7 @@ import Link from "next/link";
 import { BrandLogoFull } from "@/components/ui/TQLogo";
 
 export const metadata: Metadata = {
-  title: "Installer Esprit Trail",
+  title: "Installer",
   description:
     "Installer Esprit Trail sur iPhone (PWA Safari) ou Android (Google Play). Plein écran, comme une vraie app, en 30 secondes.",
 };

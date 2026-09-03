@@ -5,7 +5,8 @@
 // sur les mock data quand l'user n'est pas authentifié (mode démo).
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   conversationDisplayAvatar,
   conversationDisplayName,
@@ -14,17 +15,53 @@ import {
 } from "@/lib/data/messages";
 import type { Conversation } from "@/lib/types";
 import NewConversationButton from "@/components/messages/NewConversationButton";
-import { listConversations } from "@/lib/supabase/messaging";
+import { listConversations, createConversation } from "@/lib/supabase/messaging";
 
+// useSearchParams() exige un Suspense boundary (App Router) — sinon build error.
 export default function MessagesListPage() {
+  return (
+    <Suspense fallback={null}>
+      <MessagesListPageInner />
+    </Suspense>
+  );
+}
+
+function MessagesListPageInner() {
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const newTargetId = searchParams.get("new");
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       const list = await listConversations();
       if (cancelled) return;
+
+      // ?new=<userId> — démarrer (ou reprendre) un DM depuis un profil public.
+      // Ajouté 03/09/26 : avant, ce paramètre était généré (bouton "Envoyer
+      // un message" sur /u/[username]) mais jamais lu nulle part — le lien
+      // ne faisait rien de plus qu'ouvrir la liste des conversations.
+      if (newTargetId) {
+        const existing = list.find(
+          (c) => c.type === "dm" && c.members.some((m) => m.id === newTargetId),
+        );
+        if (existing) {
+          router.replace(`/messages/${existing.id}`);
+          return;
+        }
+        const createdId = await createConversation({
+          type: "dm",
+          memberIds: [newTargetId],
+        });
+        if (!cancelled && createdId) {
+          router.replace(`/messages/${createdId}`);
+          return;
+        }
+        // Pas connecté ou échec RPC : on retombe sur la liste normale.
+      }
+
       // Trier par updatedAt desc
       const sorted = [...list].sort(
         (a, b) =>
@@ -37,7 +74,7 @@ export default function MessagesListPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [newTargetId, router]);
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-4">

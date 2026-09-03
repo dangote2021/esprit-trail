@@ -35,9 +35,29 @@ export async function updateSession(request: NextRequest) {
   });
 
   // IMPORTANT: ne RIEN mettre entre createServerClient et getUser().
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Hardening 03/09/26 (post-incident outage) : si Supabase est injoignable
+  // (pause du projet, incident réseau...), getUser() peut rejeter ou traîner
+  // jusqu'au timeout de la fonction. On ne veut JAMAIS que ça fasse tomber
+  // tout le site (y compris les pages publiques qui n'ont pas besoin d'auth).
+  // En cas d'échec : on traite la requête comme "non connecté" et on laisse
+  // la logique isPublicRoute ci-dessous décider (redirect /login pour les
+  // routes protégées, passthrough pour le reste).
+  let user: { id: string } | null = null;
+  try {
+    // Course contre un timeout court : si Supabase ne répond pas en 4s
+    // (DNS mort, projet en pause...), on abandonne plutôt que de laisser
+    // la requête traîner jusqu'au kill de la fonction (25s → 504 garanti).
+    const timeout = new Promise<null>((resolve) => {
+      setTimeout(() => resolve(null), 4000);
+    });
+    const result = await Promise.race([
+      supabase.auth.getUser().then((r) => r.data.user),
+      timeout,
+    ]);
+    user = result;
+  } catch (err) {
+    console.error("[middleware] supabase.auth.getUser() failed — degraded mode (no session)", err);
+  }
 
   const pathname = request.nextUrl.pathname;
 
@@ -78,6 +98,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/api/oauth") ||
     pathname.startsWith("/api/gpx") ||
     pathname.startsWith("/api/webhooks/") ||
+    pathname.startsWith("/api/cron/") || // Vercel Cron (keepalive Supabase, etc.)
     pathname.startsWith("/.well-known") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||

@@ -119,7 +119,32 @@ function getPerfs(userKey: string | undefined): PublicPerfs | null {
   return PUBLIC_PERFS[userKey] || null;
 }
 
-export default function UserPublicProfile({ username }: { username: string }) {
+// ====== Profil réel (Supabase), chargé côté serveur dans page.tsx ======
+// Ajouté 03/09/26 : avant, cette page ne connaissait QUE les personas de
+// démo + le localStorage. Un vrai utilisateur inscrit n'apparaissait jamais.
+export type RealProfileData = {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar: string;
+  xp: number;
+  streak: number;
+  itraIndex: number | null;
+  utmbIndex: number | null;
+  volumeYear: number;
+  elevYear: number;
+  finishesYear: number;
+  submittedRaces: { id: string; name: string; distance: number; elevation: number; location: string }[];
+  submittedOffRaces: { id: string; name: string; distance: number; elevation: number; location: string }[];
+};
+
+export default function UserPublicProfile({
+  username,
+  realProfile,
+}: {
+  username: string;
+  realProfile: RealProfileData | null;
+}) {
   const [hydrated, setHydrated] = useState(false);
   const [allRaces, setAllRaces] = useState<Race[]>([]);
   const [allOff, setAllOff] = useState<OffRace[]>([]);
@@ -130,14 +155,16 @@ export default function UserPublicProfile({ username }: { username: string }) {
     setAllOff(loadUserOffRaces());
   }, []);
 
-  // 1) Cherche d'abord dans MESSAGE_USERS (panel personas)
+  // 1) Priorité au vrai profil Supabase s'il existe
+  // 2) Sinon persona de démo (MESSAGE_USERS — parcours messagerie/démo)
   const panelEntry = Object.entries(MESSAGE_USERS).find(
     ([, u]) => u.username === username,
   );
   const fromPanel = panelEntry?.[1];
   const userKey = panelEntry?.[0];
 
-  // 2) Sinon fallback : extrait depuis submittedBy d'une race
+  // 3) Sinon fallback local : extrait depuis submittedBy d'une race soumise
+  //    hors connexion (localStorage uniquement)
   const fromRaces = useMemo(() => {
     const found =
       allRaces.find((r) => r.submittedBy?.username === username)?.submittedBy ||
@@ -145,26 +172,53 @@ export default function UserPublicProfile({ username }: { username: string }) {
     return found;
   }, [allRaces, allOff, username]);
 
-  const profile = fromPanel
+  const profile = realProfile
     ? {
-        username: fromPanel.username,
-        displayName: fromPanel.displayName,
-        avatar: fromPanel.avatar,
-        level: fromPanel.level,
-        online: fromPanel.online,
+        username: realProfile.username,
+        displayName: realProfile.displayName,
+        avatar: realProfile.avatar,
+        level: undefined,
+        online: undefined,
       }
-    : fromRaces
-      ? { ...fromRaces, level: undefined, online: undefined }
-      : {
-          username,
-          displayName: username,
-          avatar: "🏃",
-          level: undefined,
-          online: undefined,
-        };
+    : fromPanel
+      ? {
+          username: fromPanel.username,
+          displayName: fromPanel.displayName,
+          avatar: fromPanel.avatar,
+          level: fromPanel.level,
+          online: fromPanel.online,
+        }
+      : fromRaces
+        ? { ...fromRaces, level: undefined, online: undefined }
+        : {
+            username,
+            displayName: username,
+            avatar: "🏃",
+            level: undefined,
+            online: undefined,
+          };
 
-  const perfs = getPerfs(userKey);
-  const totem = perfs?.totem ? TOTEMS[perfs.totem] : null;
+  // Perfs : vrai profil en priorité (ITRA/UTMB/volume réels), sinon persona démo
+  const demoPerfs = getPerfs(userKey);
+  const perfs = realProfile
+    ? {
+        cailloux: realProfile.itraIndex ?? 0,
+        utmbIndex: realProfile.utmbIndex ?? 0,
+        volumeYear: realProfile.volumeYear,
+        elevYear: realProfile.elevYear,
+        finishesYear: realProfile.finishesYear,
+        topRaces: [],
+      }
+    : demoPerfs;
+  // On n'affiche le bloc ranking que s'il y a une vraie donnée à montrer
+  // (pas de cailloux/UTMB à 0 pour un profil réel qui n'a encore rien fait).
+  const showRankingBlock = realProfile
+    ? Boolean(realProfile.itraIndex || realProfile.utmbIndex)
+    : Boolean(demoPerfs);
+  const showYearBlock = realProfile
+    ? realProfile.finishesYear > 0 || realProfile.volumeYear > 0
+    : Boolean(demoPerfs);
+  const totem = demoPerfs?.totem ? TOTEMS[demoPerfs.totem] : null;
 
   // Conversation existante avec cet user ?
   const existingConv = userKey
@@ -177,12 +231,28 @@ export default function UserPublicProfile({ username }: { username: string }) {
 
   const messageHref = existingConv
     ? `/messages/${existingConv.id}`
-    : userKey
-      ? `/messages?new=${userKey}`
-      : `/messages`;
+    : realProfile
+      ? `/messages?new=${realProfile.id}`
+      : userKey
+        ? `/messages?new=${userKey}`
+        : `/messages`;
 
-  const myRaces = allRaces.filter((r) => r.submittedBy?.username === username);
-  const myOff = allOff.filter((r) => r.submittedBy?.username === username);
+  // Courses réelles (Supabase, publiées par ce user) + fallback local
+  // (soumises hors connexion, cf. AddRaceForm) — dédupliquées par id.
+  const localRaces = allRaces.filter((r) => r.submittedBy?.username === username);
+  const localOff = allOff.filter((r) => r.submittedBy?.username === username);
+  const myRaces = realProfile
+    ? [
+        ...realProfile.submittedRaces,
+        ...localRaces.filter((r) => !realProfile.submittedRaces.some((rr) => rr.id === r.id)),
+      ]
+    : localRaces;
+  const myOff = realProfile
+    ? [
+        ...realProfile.submittedOffRaces,
+        ...localOff.filter((r) => !realProfile.submittedOffRaces.some((rr) => rr.id === r.id)),
+      ]
+    : localOff;
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-20 space-y-5">
@@ -267,7 +337,7 @@ export default function UserPublicProfile({ username }: { username: string }) {
       </section>
 
       {/* === RANKING & CAILLOUX === */}
-      {perfs && (
+      {showRankingBlock && perfs && (
         <section className="space-y-2">
           <div className="text-[10px] font-mono font-black uppercase tracking-widest text-ink-muted px-1">
             Ranking & points
@@ -322,7 +392,7 @@ export default function UserPublicProfile({ username }: { username: string }) {
       )}
 
       {/* === PERFORMANCES 12 derniers mois === */}
-      {perfs && (
+      {showYearBlock && perfs && (
         <section className="space-y-2">
           <div className="text-[10px] font-mono font-black uppercase tracking-widest text-ink-muted px-1">
             12 derniers mois
@@ -451,7 +521,11 @@ export default function UserPublicProfile({ username }: { username: string }) {
       )}
 
       {/* Empty state si vraiment rien */}
-      {hydrated && !perfs && myRaces.length === 0 && myOff.length === 0 && (
+      {hydrated &&
+        !showRankingBlock &&
+        !showYearBlock &&
+        myRaces.length === 0 &&
+        myOff.length === 0 && (
         <section className="rounded-2xl border-2 border-dashed border-ink/15 bg-bg-card/40 p-6 text-center space-y-2">
           <div className="text-3xl">🤷</div>
           <div className="font-display text-sm font-black text-ink">

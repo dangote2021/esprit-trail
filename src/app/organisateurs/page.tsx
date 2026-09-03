@@ -8,7 +8,7 @@ import Link from "next/link";
 import { BIB_CHALLENGES } from "@/lib/data/bib-challenges";
 
 export const metadata: Metadata = {
-  title: "Organisateurs de course — Mets ton dossard en jeu sur Esprit Trail",
+  title: "Organisateurs de course — Mets ton dossard en jeu",
   description:
     "Mets un ou plusieurs dossards en jeu sur Esprit Trail. Exposition garantie auprès d'une audience qualifiée de traileurs francophones. Tu valides quel dossard, quel challenge, quelle deadline.",
 };
