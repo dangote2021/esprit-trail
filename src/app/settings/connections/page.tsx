@@ -13,7 +13,7 @@ import { getRealConnection, type RealConnection } from "@/lib/connections-server
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Connexions · Esprit Trail",
+  title: "Connexions",
 };
 
 export default async function ConnectionsPage() {
