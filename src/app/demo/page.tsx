@@ -9,7 +9,7 @@ import { BrandLogoFull } from "@/components/ui/TQLogo";
 import { pickDemoPack } from "@/lib/data/demo-spots";
 
 export const metadata = {
-  title: "Démo · Esprit Trail",
+  title: "Démo",
   description:
     "Découvre Esprit Trail en 2 minutes : spots GPX, plan nutrition par course, dossards en jeu. Démo sans inscription.",
 };
