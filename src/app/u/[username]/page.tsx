@@ -41,26 +41,68 @@ async function loadRealProfile(username: string): Promise<RealProfileData | null
     const since = new Date();
     since.setDate(since.getDate() - 365);
 
-    const [{ data: runs }, { data: races }, { data: offRaces }] = await Promise.all([
-      supabase
-        .from("runs")
-        .select("distance, elevation")
-        .eq("user_id", profile.id)
-        .gte("date", since.toISOString()),
-      supabase
-        .from("user_races")
-        .select("id, name, distance, elevation, location")
-        .eq("submitter_id", profile.id)
-        .eq("status", "published"),
-      supabase
-        .from("user_off_races")
-        .select("id, name, distance, elevation, location")
-        .eq("submitter_id", profile.id)
-        .eq("status", "published"),
-    ]);
+    const [{ data: runs }, { data: races }, { data: offRaces }, { data: completedUq }] =
+      await Promise.all([
+        supabase
+          .from("runs")
+          .select("distance, elevation")
+          .eq("user_id", profile.id)
+          .gte("date", since.toISOString()),
+        supabase
+          .from("user_races")
+          .select("id, name, distance, elevation, location")
+          .eq("submitter_id", profile.id)
+          .eq("status", "published"),
+        supabase
+          .from("user_off_races")
+          .select("id, name, distance, elevation, location")
+          .eq("submitter_id", profile.id)
+          .eq("status", "published"),
+        // Hardening 04/09/26 : rapport de test communauté — quest_definitions
+        // et user_quests étaient seedés en base (catalogue + vraie progression
+        // calculée depuis les runs) mais jamais lus nulle part dans l'app. On
+        // affiche ici les quêtes réellement complétées (pas expirées) sur le
+        // profil public — lecture publique (RLS déjà en place sur ces deux
+        // tables). Requête à plat + jointure en mémoire ci-dessous, comme le
+        // reste de cette page (pas d'embed FK PostgREST utilisé ailleurs dans
+        // le repo — on reste sur le pattern éprouvé).
+        supabase
+          .from("user_quests")
+          .select("quest_id, completed_at")
+          .eq("user_id", profile.id)
+          .not("completed_at", "is", null)
+          .gte("expires_at", new Date().toISOString())
+          .order("completed_at", { ascending: false })
+          .limit(6),
+      ]);
 
     const volumeYear = (runs ?? []).reduce((s, r) => s + Number(r.distance || 0), 0);
     const elevYear = (runs ?? []).reduce((s, r) => s + Number(r.elevation || 0), 0);
+
+    let completedQuests: RealProfileData["completedQuests"] = [];
+    if (completedUq && completedUq.length > 0) {
+      const { data: defs } = await supabase
+        .from("quest_definitions")
+        .select("id, title, icon, xp_reward, period")
+        .in(
+          "id",
+          completedUq.map((q) => q.quest_id),
+        );
+      const defById = new Map((defs ?? []).map((d) => [d.id, d]));
+      completedQuests = completedUq
+        .map((q) => {
+          const def = defById.get(q.quest_id);
+          if (!def) return null;
+          return {
+            id: q.quest_id,
+            title: def.title,
+            icon: def.icon,
+            xpReward: def.xp_reward,
+            period: def.period,
+          };
+        })
+        .filter((q): q is NonNullable<typeof q> => q !== null);
+    }
 
     return {
       id: profile.id,
@@ -76,6 +118,7 @@ async function loadRealProfile(username: string): Promise<RealProfileData | null
       finishesYear: (runs ?? []).length,
       submittedRaces: races ?? [],
       submittedOffRaces: offRaces ?? [],
+      completedQuests,
     };
   } catch (err) {
     // Supabase injoignable : on ne fait pas planter la page, on retombe
