@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { getGuilde } from "@/lib/data/guildes";
 import {
   GuildeJoinButton,
@@ -8,6 +7,7 @@ import {
 } from "@/components/guildes/GuildeActions";
 import GuildeMemberCount from "@/components/guildes/GuildeMemberCount";
 import UserCreatedGuildeDetail from "@/components/guildes/UserCreatedGuildeDetail";
+import RealGuildeDetail from "@/components/guildes/RealGuildeDetail";
 
 export default function GuildeDetailPage({
   params,
@@ -21,7 +21,12 @@ export default function GuildeDetailPage({
   }
 
   const guilde = getGuilde(params.id);
-  if (!guilde) notFound();
+  // Hardening 04/09/26 : si l'id ne correspond à aucune team mock, ça peut
+  // être une vraie team Supabase (uuid) — avant, on 404 systématiquement,
+  // rendant les vraies teams inaccessibles même en URL directe.
+  if (!guilde) {
+    return <RealGuildeDetail id={params.id} />;
+  }
 
   const daysLeft = guilde.currentChallenge
     ? Math.max(
