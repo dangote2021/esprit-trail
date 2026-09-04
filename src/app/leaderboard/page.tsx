@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   LEADERBOARD_FRIENDS_WEEKLY_KM,
@@ -9,6 +9,10 @@ import {
   LEADERBOARD_ITRA,
   LEADERBOARD_UTMB,
 } from "@/lib/data/leaderboard";
+import {
+  getRealWorldElevationLeaderboard,
+  getRealOfficialLeaderboard,
+} from "@/lib/supabase/leaderboard";
 import type { LeaderboardEntry } from "@/lib/types";
 
 type Tier = "community" | "itra" | "utmb";
@@ -70,8 +74,47 @@ const OFFICIAL: Record<"itra" | "utmb", { label: string; metric: string; unit: s
 export default function LeaderboardPage() {
   const [tier, setTier] = useState<Tier>("community");
   const [scope, setScope] = useState<Scope>("friends");
-  const active = SCOPES.find((s) => s.id === scope)!;
-  const officialActive = tier === "itra" ? OFFICIAL.itra : tier === "utmb" ? OFFICIAL.utmb : null;
+
+  // Hardening 04/09/26 : le sous-onglet "Monde" (D+ cumulé) et les
+  // classements officiels ITRA/UTMB passent en données réelles Supabase.
+  // On initialise avec les données mock (affichage instantané) puis on les
+  // remplace dès que la vraie requête répond — repli propre si elle échoue.
+  const [realWorld, setRealWorld] = useState<LeaderboardEntry[] | null>(null);
+  const [realItra, setRealItra] = useState<LeaderboardEntry[] | null>(null);
+  const [realUtmb, setRealUtmb] = useState<LeaderboardEntry[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getRealWorldElevationLeaderboard()
+      .then((data) => {
+        if (!cancelled && data.length > 0) setRealWorld(data);
+      })
+      .catch(() => {});
+    getRealOfficialLeaderboard("itra_performance_index", LEADERBOARD_ITRA.slice(0, 10))
+      .then((data) => {
+        if (!cancelled && data.length > 0) setRealItra(data);
+      })
+      .catch(() => {});
+    getRealOfficialLeaderboard("utmb_index", LEADERBOARD_UTMB.slice(0, 10))
+      .then((data) => {
+        if (!cancelled && data.length > 0) setRealUtmb(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const resolvedScopes = SCOPES.map((s) =>
+    s.id === "world" && realWorld ? { ...s, data: realWorld } : s,
+  );
+  const resolvedOfficial: typeof OFFICIAL = {
+    itra: realItra ? { ...OFFICIAL.itra, data: realItra } : OFFICIAL.itra,
+    utmb: realUtmb ? { ...OFFICIAL.utmb, data: realUtmb } : OFFICIAL.utmb,
+  };
+
+  const active = resolvedScopes.find((s) => s.id === scope)!;
+  const officialActive = tier === "itra" ? resolvedOfficial.itra : tier === "utmb" ? resolvedOfficial.utmb : null;
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-5">

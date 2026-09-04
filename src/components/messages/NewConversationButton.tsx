@@ -6,10 +6,10 @@
 // Phase 2. Pour la démo : crée la conversation en mémoire puis route
 // vers /messages/<id>.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { MESSAGE_USERS, ME_ID } from "@/lib/data/messages";
-import { createConversation } from "@/lib/supabase/messaging";
+import type { MessageUser } from "@/lib/types";
+import { createConversation, listAllUsers } from "@/lib/supabase/messaging";
 
 export default function NewConversationButton() {
   const [open, setOpen] = useState(false);
@@ -18,7 +18,20 @@ export default function NewConversationButton() {
   const [groupName, setGroupName] = useState("");
   const router = useRouter();
 
-  const candidates = Object.values(MESSAGE_USERS).filter((u) => u.id !== ME_ID);
+  // Hardening 04/09/26 : vrais membres de la communauté (repli mock géré par
+  // listAllUsers si non connecté) au lieu des seuls personas de démo.
+  const [candidates, setCandidates] = useState<MessageUser[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    listAllUsers().then((users) => {
+      if (!cancelled) setCandidates(users);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   function toggleSelect(id: string) {
     if (mode === "dm") {
