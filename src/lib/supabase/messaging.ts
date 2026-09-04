@@ -53,6 +53,35 @@ export async function getViewerId(): Promise<string> {
   return uid ?? MOCK_ME_ID;
 }
 
+/** Hardening 04/09/26 : liste des destinataires possibles pour démarrer une
+ *  conversation (NewConversationButton). Avant, la liste ne proposait que
+ *  des personas fictifs codés en dur (MESSAGE_USERS), donc impossible
+ *  d'écrire à un vrai membre de la communauté depuis cette modale — même si
+ *  la messagerie elle-même fonctionne très bien avec de vrais comptes
+ *  (cf. correctifs viewerId / RLS). Repli sur les personas mock si non
+ *  authentifié ou si la requête échoue, pour ne pas casser la démo. */
+export async function listAllUsers(): Promise<MessageUser[]> {
+  const uid = await getUserId();
+  if (!uid) {
+    return Object.values(MOCK_USERS).filter((u) => u.id !== MOCK_ME_ID);
+  }
+  const sb = getSupabaseBrowserClient();
+  const { data, error } = await sb
+    .from("profiles")
+    .select("id, username, display_name, avatar")
+    .neq("id", uid);
+  if (error || !data) {
+    console.error("[messaging] listAllUsers", error);
+    return Object.values(MOCK_USERS).filter((u) => u.id !== MOCK_ME_ID);
+  }
+  return data.map((p) => ({
+    id: p.id as string,
+    username: p.username as string,
+    displayName: (p.display_name as string | null) || (p.username as string),
+    avatar: (p.avatar as string | null) || "🏃",
+  }));
+}
+
 // ============================================================================
 // CONVERSATIONS
 // ============================================================================
