@@ -133,6 +133,17 @@ export default function BottomNav() {
   )
     return null;
 
+  // Hardening 04/09/26 : sur une conversation individuelle (/messages/[id]),
+  // ConversationThread affiche déjà sa propre barre de saisie fixée en bas
+  // (fixed inset-x-0 bottom-0 z-30). Ce nav global est fixed ... z-40 et se
+  // superpose exactement à la même zone : sur un écran assez court, il
+  // recouvre entièrement le composer, qui reste bien dans le DOM (bon
+  // placeholder, bon viewerId) mais devient invisible et inutilisable.
+  // On masque donc ce nav uniquement sur le détail d'une conversation, pas
+  // sur la liste /messages elle-même (qui doit rester dans le nav).
+  const isConversationDetail = /^\/messages\/[^/]+\/?$/.test(pathname);
+  if (isConversationDetail) return null;
+
   // Pages publiques en mode "Découverte" — le BottomNav loggé pointe vers
   // /profile, /leaderboard qui sont auth-only et redirigent vers /login.
   // Pour les non-loggés on affiche un nav minimaliste 3 entrées + CTA signup.
