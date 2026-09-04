@@ -21,6 +21,7 @@ import {
   sendMessage as sbSendMessage,
   subscribeToMessages,
   markRead,
+  getViewerId,
 } from "@/lib/supabase/messaging";
 import ConversationOptionsMenu, {
   isUserBlocked,
@@ -81,6 +82,11 @@ export default function ConversationThread({
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [extraMessages, setExtraMessages] = useState<Message[]>([]);
+  // Hardening 03/09/26 : id réel de l'utilisateur connecté (ou id mock "me"
+  // en démo) — voir getViewerId(). Sans ça, tout le thread comparait à ME_ID
+  // ("me"), qui ne correspond jamais à un vrai compte Supabase : mauvais
+  // interlocuteur affiché en header, mauvais alignement des bulles, etc.
+  const [viewerId, setViewerId] = useState<string>(ME_ID);
   const [draft, setDraft] = useState("");
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [blockedState, setBlockedState] = useState(false);
@@ -93,13 +99,15 @@ export default function ConversationThread({
     setExtraMessages(loadDraftMessages(conversationId));
     let cancelled = false;
     (async () => {
-      const [conv, msgs] = await Promise.all([
+      const [conv, msgs, vid] = await Promise.all([
         fetchConversation(conversationId),
         listMessages(conversationId),
+        getViewerId(),
       ]);
       if (cancelled) return;
       setConversation(conv);
       setInitialMessages(msgs);
+      setViewerId(vid);
     })();
     // Marque la conversation comme lue dès qu'on l'ouvre (no-op si pas authentifié)
     markRead(conversationId).catch(() => {});
@@ -117,10 +125,10 @@ export default function ConversationThread({
   }, [conversationId]);
 
   const conversationName = conversation
-    ? conversationDisplayName(conversation)
+    ? conversationDisplayName(conversation, viewerId)
     : "…";
   const conversationAvatar = conversation
-    ? conversationDisplayAvatar(conversation)
+    ? conversationDisplayAvatar(conversation, viewerId)
     : "💬";
   const type = conversation?.type ?? "dm";
   const memberCount = conversation?.members.length ?? 0;
@@ -129,8 +137,8 @@ export default function ConversationThread({
   // En DM, l'autre user (le 1er membre qui n'est pas moi)
   const otherUser = useMemo(() => {
     if (!conversation || conversation.type !== "dm") return null;
-    return conversation.members.find((m) => m.id !== ME_ID) ?? null;
-  }, [conversation]);
+    return conversation.members.find((m) => m.id !== viewerId) ?? null;
+  }, [conversation, viewerId]);
 
   // Vérifier si l'autre user est bloqué (re-check après modification)
   useEffect(() => {
@@ -159,7 +167,7 @@ export default function ConversationThread({
     const optimistic: Message = {
       id: `local-${Date.now()}`,
       conversationId,
-      authorId: ME_ID,
+      authorId: viewerId,
       text,
       createdAt: new Date().toISOString(),
       status: "sending",
@@ -299,7 +307,7 @@ export default function ConversationThread({
               <div className="flex-1 h-px bg-ink/10" />
             </div>
             {group.messages.map((m, idx) => {
-              const isMe = m.authorId === ME_ID;
+              const isMe = m.authorId === viewerId;
               const author = getUser(m.authorId);
               const prevSameAuthor =
                 idx > 0 && group.messages[idx - 1].authorId === m.authorId;

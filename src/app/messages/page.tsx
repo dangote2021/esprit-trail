@@ -15,7 +15,11 @@ import {
 } from "@/lib/data/messages";
 import type { Conversation } from "@/lib/types";
 import NewConversationButton from "@/components/messages/NewConversationButton";
-import { listConversations, createConversation } from "@/lib/supabase/messaging";
+import {
+  listConversations,
+  createConversation,
+  getViewerId,
+} from "@/lib/supabase/messaging";
 
 // useSearchParams() exige un Suspense boundary (App Router) — sinon build error.
 export default function MessagesListPage() {
@@ -29,6 +33,10 @@ export default function MessagesListPage() {
 function MessagesListPageInner() {
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  // Hardening 03/09/26 : id réel du compte connecté (ou id mock "me" en
+  // démo) — sert à savoir qui est "l'autre" en DM et qui est l'auteur d'un
+  // dernier message. Voir getViewerId() pour le pourquoi.
+  const [viewerId, setViewerId] = useState(ME_ID);
   const router = useRouter();
   const searchParams = useSearchParams();
   const newTargetId = searchParams.get("new");
@@ -36,8 +44,9 @@ function MessagesListPageInner() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      const list = await listConversations();
+      const [list, vid] = await Promise.all([listConversations(), getViewerId()]);
       if (cancelled) return;
+      setViewerId(vid);
 
       // ?new=<userId> — démarrer (ou reprendre) un DM depuis un profil public.
       // Ajouté 03/09/26 : avant, ce paramètre était généré (bouton "Envoyer
@@ -136,10 +145,10 @@ function MessagesListPageInner() {
 
       <ul className="space-y-1.5">
         {convs.map((conv) => {
-          const name = conversationDisplayName(conv);
-          const avatar = conversationDisplayAvatar(conv);
+          const name = conversationDisplayName(conv, viewerId);
+          const avatar = conversationDisplayAvatar(conv, viewerId);
           const lastMsg = conv.lastMessage;
-          const isMine = lastMsg?.authorId === ME_ID;
+          const isMine = lastMsg?.authorId === viewerId;
           const hasUnread = conv.unreadCount > 0;
           return (
             <li key={conv.id}>
@@ -163,7 +172,7 @@ function MessagesListPageInner() {
                     {avatar}
                   </div>
                   {conv.type === "dm" &&
-                    conv.members.find((m) => m.id !== ME_ID)?.online && (
+                    conv.members.find((m) => m.id !== viewerId)?.online && (
                       <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-lime ring-2 ring-bg-card" />
                     )}
                   {conv.type === "group" && (

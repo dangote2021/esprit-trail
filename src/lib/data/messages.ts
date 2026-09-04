@@ -357,16 +357,27 @@ export function totalUnread(): number {
   return CONVERSATIONS.reduce((sum, c) => sum + c.unreadCount, 0);
 }
 
-/** Pour les DM : affiche le nom de l'autre participant (pas "Toi"). */
-export function conversationDisplayName(conv: Conversation): string {
+/** Pour les DM : affiche le nom de l'autre participant (pas "Toi").
+ *  Hardening 03/09/26 : accepte maintenant un `viewerId` optionnel — sans
+ *  lui, on comparait toujours à ME_ID (id mock "me"), donc pour un vrai
+ *  compte Supabase (dont l'id n'est jamais "me") ces fonctions ne filtraient
+ *  RIEN et affichaient le premier membre trouvé, qui est souvent... soi-même.
+ *  Les appelants réels doivent passer l'id réel de l'utilisateur connecté. */
+export function conversationDisplayName(
+  conv: Conversation,
+  viewerId: string = ME_ID,
+): string {
   if (conv.type === "group") return conv.name || "Groupe";
-  const other = conv.members.find((m) => m.id !== ME_ID);
+  const other = conv.members.find((m) => m.id !== viewerId);
   return other?.displayName || "Inconnu";
 }
 
-export function conversationDisplayAvatar(conv: Conversation): string {
+export function conversationDisplayAvatar(
+  conv: Conversation,
+  viewerId: string = ME_ID,
+): string {
   if (conv.type === "group") return conv.avatar || "👥";
-  const other = conv.members.find((m) => m.id !== ME_ID);
+  const other = conv.members.find((m) => m.id !== viewerId);
   return other?.avatar || "👤";
 }
 

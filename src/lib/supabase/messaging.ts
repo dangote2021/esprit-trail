@@ -40,6 +40,19 @@ async function shouldUseMock(): Promise<boolean> {
   return uid === null;
 }
 
+/** Hardening 03/09/26 : "qui suis-je" pour l'UI de messagerie (comparaisons
+ *  isMe / affichage du bon interlocuteur en DM). Avant, tous les composants
+ *  messagerie comparaient directement à MOCK_ME_ID ("me"), ce qui cassait
+ *  totalement l'affichage dès qu'un vrai compte Supabase envoyait/recevait
+ *  un message (son id réel n'est jamais "me", donc aucune comparaison ne
+ *  matchait jamais — mauvais interlocuteur affiché, messages mal alignés).
+ *  Retourne l'id Supabase réel si connecté, sinon l'id mock ("me") pour ne
+ *  pas casser le parcours démo. */
+export async function getViewerId(): Promise<string> {
+  const uid = await getUserId();
+  return uid ?? MOCK_ME_ID;
+}
+
 // ============================================================================
 // CONVERSATIONS
 // ============================================================================
