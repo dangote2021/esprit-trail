@@ -136,6 +136,7 @@ export type RealProfileData = {
   finishesYear: number;
   submittedRaces: { id: string; name: string; distance: number; elevation: number; location: string }[];
   submittedOffRaces: { id: string; name: string; distance: number; elevation: number; location: string }[];
+  completedQuests: { id: string; title: string; icon: string | null; xpReward: number; period: string }[];
 };
 
 export default function UserPublicProfile({
@@ -426,6 +427,33 @@ export default function UserPublicProfile({
         </section>
       )}
 
+      {/* === QUÊTES COMPLÉTÉES (réel, Supabase) === */}
+      {realProfile && realProfile.completedQuests.length > 0 && (
+        <section className="space-y-2">
+          <div className="text-[10px] font-mono font-black uppercase tracking-widest text-cyan px-1">
+            Quêtes complétées
+          </div>
+          <ul className="grid grid-cols-2 gap-1.5">
+            {realProfile.completedQuests.map((q) => (
+              <li
+                key={q.id}
+                className="flex items-center gap-2 rounded-xl border border-cyan/20 bg-cyan/5 p-2.5"
+              >
+                <div className="text-lg shrink-0">{q.icon ?? "✅"}</div>
+                <div className="min-w-0">
+                  <div className="truncate text-[11px] font-bold text-ink">
+                    {q.title}
+                  </div>
+                  <div className="text-[9px] font-mono text-cyan uppercase tracking-wider">
+                    +{q.xpReward} XP
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {/* === COURSES MYTHIQUES === */}
       {perfs && perfs.topRaces.length > 0 && (
         <section className="space-y-2">
@@ -525,7 +553,8 @@ export default function UserPublicProfile({
         !showRankingBlock &&
         !showYearBlock &&
         myRaces.length === 0 &&
-        myOff.length === 0 && (
+        myOff.length === 0 &&
+        (!realProfile || realProfile.completedQuests.length === 0) && (
         <section className="rounded-2xl border-2 border-dashed border-ink/15 bg-bg-card/40 p-6 text-center space-y-2">
           <div className="text-3xl">🤷</div>
           <div className="font-display text-sm font-black text-ink">
