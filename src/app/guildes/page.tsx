@@ -1,7 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GUILDES } from "@/lib/data/guildes";
+import { GUILDES, type Guilde } from "@/lib/data/guildes";
 import CreateGuildeButton from "@/components/guildes/CreateGuildeButton";
 import MyCreatedGuildes from "@/components/guildes/MyCreatedGuildes";
+import { getRealGuildes } from "@/lib/supabase/guildes";
 
 const CATEGORY_META: Record<string, { label: string; emoji: string; color: string }> = {
   local: { label: "Local", emoji: "📍", color: "text-lime" },
@@ -20,6 +24,23 @@ const JOIN_RULE_META: Record<string, { label: string; color: string }> = {
 export default function TeamsPage() {
   const myTeam = GUILDES.find((g) => g.iAmMember);
   const discoverable = GUILDES.filter((g) => !g.iAmMember);
+
+  // Hardening 04/09/26 : rapport de test communauté (section 3) — les 2
+  // vraies teams Supabase (Vercors Dimanche Matin, Chamonix Vertical Crew,
+  // 6 membres réels) n'apparaissaient jamais, seules les 5 teams fictives
+  // codées en dur étaient affichées. Chargement progressif : la page rend
+  // les mocks tout de suite, puis affiche les vraies teams dès que la
+  // requête Supabase répond (repli silencieux si elle échoue).
+  const [realGuildes, setRealGuildes] = useState<Guilde[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    getRealGuildes().then((gs) => {
+      if (!cancelled) setRealGuildes(gs);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-6">
@@ -178,6 +199,63 @@ export default function TeamsPage() {
 
       {/* Crews créés par l'user (apparait seulement s'il en a créé un) */}
       <MyCreatedGuildes />
+
+      {/* Vraies teams Supabase (real data, pas les 5 teams démo) */}
+      {realGuildes.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
+            <span>⚡ Vraies teams actives</span>
+          </div>
+          <div className="space-y-2">
+            {realGuildes.map((g) => {
+              const full = g.memberCount >= g.maxMembers;
+              return (
+                <Link
+                  key={g.id}
+                  href={`/guildes/${g.id}`}
+                  className="block rounded-xl border border-cyan/25 bg-bg-card/60 p-4 hover:border-cyan/50 transition"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">{g.emoji}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="font-display text-sm font-black truncate">
+                          {g.name}
+                        </div>
+                        {g.iAmMember && (
+                          <span className="rounded bg-lime/20 px-1.5 py-0.5 text-[9px] font-mono font-black text-lime">
+                            ✓ MEMBRE
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-ink-muted italic truncate">
+                        {g.tagline}
+                      </div>
+                      <div className="mt-1 flex gap-2 text-[10px] font-mono">
+                        <span className="text-ink-muted">
+                          👥 {g.memberCount}/{g.maxMembers}
+                        </span>
+                        <span className="text-ink-dim">· {g.location}</span>
+                      </div>
+                    </div>
+                    <div className="shrink-0">
+                      {full ? (
+                        <span className="text-[9px] font-mono text-ink-dim uppercase">
+                          Complète
+                        </span>
+                      ) : (
+                        <span className="rounded-md bg-cyan/10 px-2 py-1 text-[10px] font-mono font-bold text-cyan border border-cyan/30">
+                          Voir →
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Découvrir */}
       <section className="space-y-3">
