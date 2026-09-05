@@ -1,36 +1,19 @@
 // ====== /notifications — centre de notifs ======
-// Placeholder propre en attendant le backend notifs.
+// Hardening 05/09/26 : rapport de test panel — la page n'affichait qu'un
+// message de bienvenue figé (`SAMPLES`), jamais mis à jour, quel que soit
+// le compte. Le rendu réel (messages non lus, badges débloqués) vit
+// maintenant dans <NotificationsFeed />, un composant client — ce fichier
+// reste un Server Component pour garder les metadata statiques.
 
 import Link from "next/link";
+import NotificationsFeed from "@/components/notifications/NotificationsFeed";
 
 export const metadata = {
   title: "Notifications",
   description: "Tout ce qui se passe sur ton Esprit Trail.",
 };
 
-type Notif = {
-  id: string;
-  icon: string;
-  title: string;
-  body: string;
-  when: string;
-  tone: "lime" | "gold" | "sky" | "mythic";
-};
-
-const SAMPLES: Notif[] = [
-  {
-    id: "welcome",
-    icon: "🏁",
-    title: "Bienvenue au Esprit Trail",
-    body: "Ton compte est prêt. Connecte Strava et fais une première sortie ça part !",
-    when: "à l'instant",
-    tone: "lime",
-  },
-];
-
 export default function NotificationsPage() {
-  const notifs = SAMPLES;
-
   return (
     <main className="min-h-screen bg-bg px-4 pb-24 pt-6">
       <div className="mx-auto max-w-md">
@@ -53,44 +36,7 @@ export default function NotificationsPage() {
         </div>
 
         {/* List */}
-        {notifs.length === 0 ? (
-          <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-bg-card p-8 text-center">
-            <div className="text-4xl">📭</div>
-            <p className="mt-2 font-display text-lg font-black text-ink">
-              Rien à signaler
-            </p>
-            <p className="mt-1 text-sm text-ink-muted">
-              Quand tu auras des nouvelles quêtes, badges débloqués ou messages
-              de ta team, ça s'affichera ici.
-            </p>
-          </div>
-        ) : (
-          <ul className="space-y-2.5">
-            {notifs.map((n) => (
-              <li
-                key={n.id}
-                className="flex gap-3 rounded-2xl border border-ink/10 bg-bg-card p-4"
-              >
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl ${toneBg(n.tone)}`}>
-                  {n.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-display text-sm font-black text-ink">
-                      {n.title}
-                    </p>
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-ink-dim">
-                      {n.when}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
-                    {n.body}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <NotificationsFeed />
 
         {/* Settings */}
         <div className="mt-6 rounded-2xl border border-ink/10 bg-bg-card p-4">
@@ -111,17 +57,4 @@ export default function NotificationsPage() {
       </div>
     </main>
   );
-}
-
-function toneBg(tone: Notif["tone"]) {
-  switch (tone) {
-    case "lime":
-      return "bg-lime/15 text-lime";
-    case "gold":
-      return "bg-gold/15 text-gold";
-    case "sky":
-      return "bg-sky/15 text-sky";
-    case "mythic":
-      return "bg-mythic/15 text-mythic";
-  }
 }
