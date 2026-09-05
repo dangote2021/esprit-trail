@@ -32,11 +32,19 @@ export default function TeamsPage() {
   // les mocks tout de suite, puis affiche les vraies teams dès que la
   // requête Supabase répond (repli silencieux si elle échoue).
   const [realGuildes, setRealGuildes] = useState<Guilde[]>([]);
+  // Hardening 05/09/26 : rapport de test panel — la section "Vraies teams
+  // actives" restait invisible 1 à 3s pendant le fetch Supabase, donnant une
+  // impression de page vide/cassée. Squelette de chargement pendant l'attente.
+  const [loadingReal, setLoadingReal] = useState(true);
   useEffect(() => {
     let cancelled = false;
-    getRealGuildes().then((gs) => {
-      if (!cancelled) setRealGuildes(gs);
-    });
+    getRealGuildes()
+      .then((gs) => {
+        if (!cancelled) setRealGuildes(gs);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingReal(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -201,7 +209,31 @@ export default function TeamsPage() {
       <MyCreatedGuildes />
 
       {/* Vraies teams Supabase (real data, pas les 5 teams démo) */}
-      {realGuildes.length > 0 && (
+      {loadingReal && (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
+            <span>⚡ Vraies teams actives</span>
+          </div>
+          <div className="space-y-2">
+            {[0, 1].map((i) => (
+              <div
+                key={i}
+                className="animate-pulse rounded-xl border border-ink/10 bg-bg-card/60 p-4"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="h-9 w-9 shrink-0 rounded-lg bg-bg-raised" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-2/5 rounded bg-bg-raised" />
+                    <div className="h-2.5 w-3/5 rounded bg-bg-raised" />
+                    <div className="h-2.5 w-1/4 rounded bg-bg-raised" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      {!loadingReal && realGuildes.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
             <span>⚡ Vraies teams actives</span>
