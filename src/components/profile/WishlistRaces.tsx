@@ -21,6 +21,21 @@ function loadIds(): string[] {
   }
 }
 
+// Hardening 05/09/26 : rapport de test panel — une course ciblée passée
+// (ex. Hardrock Hundred) restait affichée indéfiniment avec juste un badge
+// "passée", sans façon de la retirer. On garde l'info mais on ajoute un
+// vrai bouton retirer plutôt que de laisser la carte s'accumuler sans action.
+function removeFromWishlist(id: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const ids = loadIds().filter((existing) => existing !== id);
+    window.localStorage.setItem(KEY, JSON.stringify(ids));
+    window.dispatchEvent(new Event("esprit-wishlist-update"));
+  } catch {
+    // best-effort — localStorage peut être indisponible (navigation privée)
+  }
+}
+
 export default function WishlistRaces() {
   const [hydrated, setHydrated] = useState(false);
   const [ids, setIds] = useState<string[]>([]);
@@ -84,6 +99,7 @@ export default function WishlistRaces() {
           const days = Math.ceil(
             (new Date(race.date).getTime() - Date.now()) / 86400000,
           );
+          const isPast = days <= 0;
           return (
             <Link
               key={race.id}
@@ -101,14 +117,28 @@ export default function WishlistRaces() {
                   {race.location} · {race.distance}km · {race.elevation}D+
                 </div>
               </div>
-              <div className="text-right shrink-0">
-                <div className="text-[9px] font-mono uppercase text-ink-dim">
-                  dans
+              {isPast ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeFromWishlist(race.id);
+                  }}
+                  className="shrink-0 rounded-lg border border-ink/15 bg-bg-card px-2.5 py-1.5 text-[9px] font-mono font-bold uppercase tracking-wider text-ink-muted hover:border-mythic/50 hover:text-mythic transition"
+                >
+                  Retirer
+                </button>
+              ) : (
+                <div className="text-right shrink-0">
+                  <div className="text-[9px] font-mono uppercase text-ink-dim">
+                    dans
+                  </div>
+                  <div className="font-display text-base font-black text-peach leading-none">
+                    {days}j
+                  </div>
                 </div>
-                <div className="font-display text-base font-black text-peach leading-none">
-                  {days > 0 ? `${days}j` : "passée"}
-                </div>
-              </div>
+              )}
             </Link>
           );
         })}
