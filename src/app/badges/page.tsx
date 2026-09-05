@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BadgeCard from "@/components/ui/BadgeCard";
 import { BADGES } from "@/lib/data/badges";
-import { MY_BADGES } from "@/lib/data/me";
+import { getRealUnlockedBadges } from "@/lib/supabase/badges";
 import type { BadgeRarity } from "@/lib/types";
 
 const RARITY_ORDER: BadgeRarity[] = ["common", "rare", "epic", "legendary", "mythic"];
@@ -24,15 +24,37 @@ const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
 export default function BadgesPage() {
   const [filter, setFilter] = useState<FilterTab>("all");
 
+  // Hardening 05/09/26 : rapport de test panel (section badges) — cette page
+  // affichait la liste MY_BADGES codée en dur (persona démo interne), donc
+  // les mêmes 13 badges "débloqués" pour tout le monde, même un compte à 0
+  // sortie. On calcule désormais les badges réellement débloqués depuis les
+  // vraies données Supabase de l'utilisateur connecté (voir
+  // lib/supabase/badges.ts). Chargement progressif comme sur /guildes et
+  // /messages : cabinet vide pendant le chargement plutôt qu'un faux plein.
+  const [myBadges, setMyBadges] = useState<Set<string>>(new Set());
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    getRealUnlockedBadges().then((set) => {
+      if (!cancelled) {
+        setMyBadges(set);
+        setLoaded(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filtered = BADGES.filter((b) => {
-    const unlocked = MY_BADGES.includes(b.id);
+    const unlocked = myBadges.has(b.id);
     if (filter === "unlocked") return unlocked;
     if (filter === "locked") return !unlocked;
     if (filter === "all") return true;
     return b.rarity === filter;
   });
 
-  const unlockedCount = MY_BADGES.length;
+  const unlockedCount = myBadges.size;
   const total = BADGES.length;
   const pct = Math.round((unlockedCount / total) * 100);
 
@@ -40,7 +62,7 @@ export default function BadgesPage() {
   const rarityStats = RARITY_ORDER.map((r) => ({
     rarity: r,
     total: BADGES.filter((b) => b.rarity === r).length,
-    unlocked: BADGES.filter((b) => b.rarity === r && MY_BADGES.includes(b.id)).length,
+    unlocked: BADGES.filter((b) => b.rarity === r && myBadges.has(b.id)).length,
   }));
 
   // Group par catégorie
@@ -83,7 +105,9 @@ export default function BadgesPage() {
               {unlockedCount}{" "}
               <span className="text-lg text-ink-muted">/ {total}</span>
             </div>
-            <div className="mt-1 text-xs text-ink-muted">{pct}% débloqués</div>
+            <div className="mt-1 text-xs text-ink-muted">
+              {loaded ? `${pct}% débloqués` : "Chargement de ta collection…"}
+            </div>
           </div>
           <div className="text-5xl animate-float">🏆</div>
         </div>
@@ -182,7 +206,7 @@ export default function BadgesPage() {
                 <span>{CATEGORY_LABELS[cat]?.label}</span>
               </h2>
               <div className="text-[11px] font-mono text-ink-muted">
-                {badges.filter((b) => MY_BADGES.includes(b.id)).length}/
+                {badges.filter((b) => myBadges.has(b.id)).length}/
                 {badges.length}
               </div>
             </div>
@@ -191,7 +215,7 @@ export default function BadgesPage() {
                 <div key={b.id} className="space-y-1">
                   <BadgeCard
                     badge={b}
-                    locked={!MY_BADGES.includes(b.id)}
+                    locked={!myBadges.has(b.id)}
                     size="sm"
                   />
                   <div className="px-1 text-center text-[10px] font-mono text-ink-dim">

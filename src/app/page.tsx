@@ -16,7 +16,7 @@ import StreakBadge from "@/components/home/StreakBadge";
 import WeekPlanCard from "@/components/home/WeekPlanCard";
 import FirstRunCTA from "@/components/home/FirstRunCTA";
 import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
-import { MY_BADGES } from "@/lib/data/me";
+import { getRealUnlockedBadgesServer } from "@/lib/supabase/badges-server";
 import { questsForPeriod } from "@/lib/data/quests";
 import { BADGES, getBadge } from "@/lib/data/badges";
 import { RACES } from "@/lib/data/races";
@@ -52,15 +52,22 @@ export default async function HomePage({
   const nextRace = RACES.filter((r) => new Date(r.date) > new Date())
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
 
-  // 3 derniers badges débloqués
-  const lastBadges = MY_BADGES
+  // Hardening 05/09/26 : rapport de test panel — ces deux sections
+  // affichaient MY_BADGES (persona démo interne) pour tout le monde. On
+  // calcule désormais les vrais badges débloqués depuis Supabase (runs +
+  // streak réels de l'utilisateur connecté, cf. lib/supabase/badges-server).
+  const unlockedBadgeIds = await getRealUnlockedBadgesServer(user.id);
+
+  // 3 derniers badges débloqués (ordre non garanti par un horodatage de
+  // déblocage puisque non stocké — on prend simplement 3 badges réels)
+  const lastBadges = [...unlockedBadgeIds]
     .slice(-3)
     .map((id) => getBadge(id))
     .filter((b): b is NonNullable<typeof b> => !!b);
 
   // Prochain badge réalisable
   const lockedCommon = BADGES.filter(
-    (b) => !MY_BADGES.includes(b.id) && (b.rarity === "common" || b.rarity === "rare"),
+    (b) => !unlockedBadgeIds.has(b.id) && (b.rarity === "common" || b.rarity === "rare"),
   ).slice(0, 2);
 
   return (

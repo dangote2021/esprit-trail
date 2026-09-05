@@ -1,5 +1,4 @@
 import Link from "next/link";
-import BadgeCard from "@/components/ui/BadgeCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCardClient from "@/components/profile/ProfileHeroCardClient";
 import StravaConnectionStatus from "@/components/profile/StravaConnectionStatus";
@@ -10,8 +9,8 @@ import ProfileStatsSections from "@/components/profile/ProfileStatsSections";
 import TrailIndices from "@/components/profile/TrailIndices";
 import StatRadarEditable from "@/components/profile/StatRadarEditable";
 import TotemPicker from "@/components/profile/TotemPicker";
-import { ME, MY_BADGES, MY_LOOT } from "@/lib/data/me";
-import { getBadge } from "@/lib/data/badges";
+import RealTopBadges from "@/components/profile/RealTopBadges";
+import { ME, MY_LOOT } from "@/lib/data/me";
 import { RARITY_STYLES } from "@/lib/types";
 import WishlistRaces from "@/components/profile/WishlistRaces";
 import BestResults from "@/components/profile/BestResults";
@@ -27,16 +26,6 @@ const NEUTRAL_STATS = {
 };
 
 export default function ProfilePage() {
-  const badges = MY_BADGES
-    .map((id) => getBadge(id))
-    .filter((b): b is NonNullable<typeof b> => !!b);
-  const topBadges = [...badges]
-    .sort((a, b) => {
-      const order = ["mythic", "legendary", "epic", "rare", "common"];
-      return order.indexOf(a.rarity) - order.indexOf(b.rarity);
-    })
-    .slice(0, 6);
-
   return (
     <main className="mx-auto max-w-lg px-4 safe-top pb-6 space-y-6">
       {/* Header */}
@@ -120,21 +109,11 @@ export default function ProfilePage() {
       {/* Wishlist courses (auto-syncée depuis /race/[id]) */}
       <WishlistRaces />
 
-      {/* Top badges — visible uniquement pour les profils avec activité réelle */}
+      {/* Top badges — visible uniquement pour les profils avec activité réelle,
+          et seulement si l'utilisateur a réellement débloqué un badge
+          (RealTopBadges calcule depuis Supabase, cf. lib/supabase/badges.ts) */}
       <ConfiguredProfileOnly>
-        <section className="space-y-3">
-          <SectionHeader
-            eyebrow="Trophées"
-            title="Meilleurs trophées"
-            href="/badges"
-            linkLabel={`Voir tous (${badges.length})`}
-          />
-          <div className="grid grid-cols-3 gap-3">
-            {topBadges.map((b) => (
-              <BadgeCard key={b.id} badge={b} size="sm" />
-            ))}
-          </div>
-        </section>
+        <RealTopBadges />
       </ConfiguredProfileOnly>
 
       {/* Inventaire loot — visible uniquement pour les profils avec activité réelle */}
