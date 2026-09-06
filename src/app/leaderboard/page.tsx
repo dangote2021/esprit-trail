@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  LEADERBOARD_FRIENDS_WEEKLY_KM,
-  LEADERBOARD_REGION_WEEKLY_DPLUS,
   LEADERBOARD_WORLD_SEASON_XP,
   LEADERBOARD_ITRA,
   LEADERBOARD_UTMB,
@@ -12,11 +10,19 @@ import {
 import {
   getRealWorldElevationLeaderboard,
   getRealOfficialLeaderboard,
+  getRealFriendsLeaderboard,
+  type FriendsLeaderboard,
 } from "@/lib/supabase/leaderboard";
 import type { LeaderboardEntry } from "@/lib/types";
 
+// Hardening 05/09/26 : rapport de test panel — "Amis" et "Région" affichaient
+// des noms 100% inventés (aucun rapport avec les vraies données, ni même
+// avec la communauté fictive seedée pour le test). "Région" n'a pas
+// d'équivalent réel (pas de champ région sur les profils) : l'onglet est
+// retiré plutôt que de continuer à mentir. "Amis" est désormais branché sur
+// les vraies guildes de l'utilisateur (cf. lib/supabase/leaderboard.ts).
 type Tier = "community" | "itra" | "utmb";
-type Scope = "friends" | "region" | "world";
+type Scope = "friends" | "world";
 
 const SCOPES: {
   id: Scope;
@@ -29,18 +35,10 @@ const SCOPES: {
   {
     id: "friends",
     label: "Amis",
-    metric: "Km cette semaine",
+    metric: "Km cumulés (guilde)",
     unit: "km",
-    data: LEADERBOARD_FRIENDS_WEEKLY_KM,
+    data: [],
     color: "lime",
-  },
-  {
-    id: "region",
-    label: "Région",
-    metric: "D+ cette semaine",
-    unit: "m",
-    data: LEADERBOARD_REGION_WEEKLY_DPLUS,
-    color: "peach",
   },
   {
     id: "world",
@@ -82,6 +80,9 @@ export default function LeaderboardPage() {
   const [realWorld, setRealWorld] = useState<LeaderboardEntry[] | null>(null);
   const [realItra, setRealItra] = useState<LeaderboardEntry[] | null>(null);
   const [realUtmb, setRealUtmb] = useState<LeaderboardEntry[] | null>(null);
+  // Hardening 05/09/26 : "Amis" = vraies guildes de l'utilisateur (km cumulés).
+  // null = chargement en cours, { inGuilde: false } = pas de guilde à afficher.
+  const [friendsState, setFriendsState] = useState<FriendsLeaderboard | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,14 +101,23 @@ export default function LeaderboardPage() {
         if (!cancelled && data.length > 0) setRealUtmb(data);
       })
       .catch(() => {});
+    getRealFriendsLeaderboard()
+      .then((data) => {
+        if (!cancelled) setFriendsState(data);
+      })
+      .catch(() => {
+        if (!cancelled) setFriendsState({ entries: [], inGuilde: false });
+      });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const resolvedScopes = SCOPES.map((s) =>
-    s.id === "world" && realWorld ? { ...s, data: realWorld } : s,
-  );
+  const resolvedScopes = SCOPES.map((s) => {
+    if (s.id === "world" && realWorld) return { ...s, data: realWorld };
+    if (s.id === "friends" && friendsState) return { ...s, data: friendsState.entries };
+    return s;
+  });
   const resolvedOfficial: typeof OFFICIAL = {
     itra: realItra ? { ...OFFICIAL.itra, data: realItra } : OFFICIAL.itra,
     utmb: realUtmb ? { ...OFFICIAL.utmb, data: realUtmb } : OFFICIAL.utmb,
@@ -297,7 +307,7 @@ export default function LeaderboardPage() {
       {tier === "community" && (
       <>
       {/* Scope tabs */}
-      <div className="grid grid-cols-3 gap-2 rounded-xl border border-ink/10 bg-bg-card/40 p-1">
+      <div className="grid grid-cols-2 gap-2 rounded-xl border border-ink/10 bg-bg-card/40 p-1">
         {SCOPES.map((s) => (
           <button
             key={s.id}
@@ -327,11 +337,53 @@ export default function LeaderboardPage() {
           </div>
           <div className="font-display text-base font-black">{active.metric}</div>
         </div>
-        <div className="text-[11px] font-mono text-ink-dim">
-          MàJ il y a 12 min
-        </div>
+        {!(scope === "friends" && friendsState === null) && (
+          <div className="text-[11px] font-mono text-ink-dim">
+            MàJ il y a 12 min
+          </div>
+        )}
       </div>
 
+      {/* Hardening 05/09/26 : "Amis" dépend d'un fetch réel (guilde de
+          l'utilisateur) — état de chargement et état "pas de guilde"
+          distincts, plutôt que de réutiliser silencieusement une liste vide. */}
+      {scope === "friends" && friendsState === null && (
+        <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-6 text-center">
+          <div className="text-[11px] font-mono text-ink-dim animate-pulse">
+            Chargement de ta guilde…
+          </div>
+        </div>
+      )}
+
+      {scope === "friends" && friendsState !== null && !friendsState.inGuilde && (
+        <div className="rounded-2xl border-2 border-lime/30 bg-lime/5 p-5 text-center space-y-3">
+          <div className="text-3xl">🤝</div>
+          <div className="font-display text-sm font-black">
+            Rejoins une guilde pour voir ce classement
+          </div>
+          <p className="text-xs text-ink-muted leading-relaxed">
+            "Amis" classe les membres de ta guilde par km cumulés. Tu n'appartiens
+            encore à aucune guilde.
+          </p>
+          <Link
+            href="/guildes"
+            className="inline-block rounded-xl bg-lime px-4 py-2 text-xs font-black uppercase tracking-wider text-bg shadow-glow-lime"
+          >
+            Trouver une guilde
+          </Link>
+        </div>
+      )}
+
+      {scope === "friends" && friendsState !== null && friendsState.inGuilde && friendsState.entries.length === 0 && (
+        <div className="rounded-xl border border-ink/10 bg-bg-card/40 p-6 text-center">
+          <div className="text-[11px] font-mono text-ink-dim">
+            Ta guilde n'a pas encore de sorties enregistrées.
+          </div>
+        </div>
+      )}
+
+      {(scope !== "friends" || (friendsState !== null && friendsState.inGuilde && friendsState.entries.length > 0)) && (
+      <>
       {/* Podium top 3 */}
       {active.data.length >= 3 && <Podium entries={active.data.slice(0, 3)} unit={active.unit} />}
 
@@ -396,6 +448,8 @@ export default function LeaderboardPage() {
           </li>
         ))}
       </ol>
+      </>
+      )}
       </>
       )}
     </main>
