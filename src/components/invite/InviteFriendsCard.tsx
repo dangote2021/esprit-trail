@@ -22,9 +22,9 @@
 import { useEffect, useState } from "react";
 import ShareSheet from "@/components/share/ShareSheet";
 import { showToast } from "@/components/ui/Toast";
+import { SITE_URL as CONFIGURED_SITE_URL } from "@/lib/site";
 
 const INVITES_KEY = "esprit_invites_sent";
-const SITE_URL = "https://esprit-trail.vercel.app";
 
 function getInvitesSent(): number {
   if (typeof window === "undefined") return 0;
@@ -55,10 +55,16 @@ export default function InviteFriendsCard({
   const [open, setOpen] = useState(false);
   const [invitesSent, setInvitesSent] = useState(0);
   const [mounted, setMounted] = useState(false);
+  // Hardening pré-release : SITE_URL était figé sur esprit-trail.vercel.app,
+  // donc un lien de parrainage généré après une migration de domaine (ex.
+  // ravito.app) aurait continué à pointer vers l'ancienne URL. On préfère
+  // l'origine réelle du navigateur, avec la config d'env comme repli SSR.
+  const [siteUrl, setSiteUrl] = useState(CONFIGURED_SITE_URL);
 
   useEffect(() => {
     setMounted(true);
     setInvitesSent(getInvitesSent());
+    if (typeof window !== "undefined") setSiteUrl(window.location.origin);
   }, []);
 
   // Référé code unique stocké (pour le futur backend)
@@ -73,7 +79,7 @@ export default function InviteFriendsCard({
     setRefCode(code);
   }, []);
 
-  const inviteUrl = refCode ? `${SITE_URL}/?ref=${refCode}` : SITE_URL;
+  const inviteUrl = refCode ? `${siteUrl}/?ref=${refCode}` : siteUrl;
   const shareText =
     "Rejoins-moi sur Esprit Trail — l'app coach trail / nutri / spots / dossards gratuits. Entre potos, pleins phares !";
 

@@ -6,6 +6,7 @@
 // pour ne pas déclencher la navigation du <Link> parent.
 
 import { useEffect, useState } from "react";
+import { SITE_URL } from "@/lib/site";
 
 interface Props {
   raceId: string;
@@ -30,7 +31,7 @@ export default function RaceShareButton({
     e.preventDefault();
     e.stopPropagation();
 
-    const url = `${origin || "https://esprit-trail.vercel.app"}/race/${raceId}`;
+    const url = `${origin || SITE_URL}/race/${raceId}`;
     const message = tagline
       ? `🏃 ${raceName}\n\n${tagline}\n\nDétails course + plan nutrition jour J : ${url}`
       : `🏃 Tu connais ${raceName} ?\n\nDétails course + plan nutrition jour J : ${url}`;
