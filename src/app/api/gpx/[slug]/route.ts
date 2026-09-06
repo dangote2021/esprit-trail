@@ -6,6 +6,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { TRAINING_SPOTS } from "@/lib/data/training-spots";
+import { SITE_URL } from "@/lib/site";
 
 export const runtime = "edge";
 
@@ -67,7 +68,7 @@ export async function GET(_req: NextRequest, { params }: PageProps) {
   <metadata>
     <name>${spot.name}</name>
     <desc>${spot.description}</desc>
-    <link href="https://esprit-trail.vercel.app/spots/${spot.slug}">
+    <link href="${SITE_URL}/spots/${spot.slug}">
       <text>Voir sur Esprit Trail</text>
     </link>
   </metadata>
