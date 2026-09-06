@@ -274,7 +274,13 @@ export default function RunManualPage() {
         </button>
 
         <p className="text-center text-[11px] font-mono text-ink-dim">
-          Stocké en local. Quand on aura le sync auto on remontera tout.
+          {/* Hardening 06/09/26 : ce texte disait encore "on remontera tout"
+              alors que le sync vers Supabase (quêtes, badges, XP,
+              classement) est déjà en place depuis le hardening du 05/09 —
+              copie corrigée pour refléter la réalité plutôt que de laisser
+              croire à une sauvegarde purement locale. */}
+          Sauvegardée sur cet appareil, et synchronisée avec ton compte pour
+          tes quêtes, badges et classements.
         </p>
       </form>
     </main>
