@@ -6,6 +6,7 @@
 // Génère et persiste un referralCode local pour tracker les invits.
 
 import { useEffect, useState } from "react";
+import { SITE_URL } from "@/lib/site";
 
 interface Props {
   challengeId: string;
@@ -40,7 +41,7 @@ export default function WhatsAppShare({
   className = "",
 }: Props) {
   const [refCode, setRefCode] = useState("");
-  const [origin, setOrigin] = useState("https://esprit-trail.vercel.app");
+  const [origin, setOrigin] = useState(SITE_URL);
 
   useEffect(() => {
     setRefCode(getOrCreateReferralCode(challengeId));
