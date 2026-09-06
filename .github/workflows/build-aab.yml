@@ -13,7 +13,7 @@ on:
         required: true
         default: '8'
       productionRelease:
-        description: 'Enable pre-public-release fixes (orientation=any, edge-to-edge opt-out). Set to true for v1.0.9+ public launch.'
+        description: 'Enable pre-public-release fixes (orientation=any). Set to true for v1.0.9+ public launch.'
         required: false
         type: boolean
         default: false
@@ -120,51 +120,27 @@ jobs:
           # Verify package ID is correctly written
           grep -r 'applicationId' app/build.gradle | head -3
 
-      - name: Apply pre-public-release Android resource fixes
-        if: ${{ inputs.productionRelease == true }}
-        working-directory: twa
-        run: |
-          # Fix Play Console warning #1 — edge-to-edge enforcement (Android 15+)
-          # TWA wraps a PWA whose CSS already uses safe-area-insets; opt out of
-          # Android's automatic enforcement to keep current rendering.
-          STYLES_DIR="app/src/main/res/values-v31"
-          STYLES_FILE="$STYLES_DIR/styles.xml"
-          mkdir -p "$STYLES_DIR"
-
-          if [ ! -f "$STYLES_FILE" ]; then
-            cat > "$STYLES_FILE" <<'XMLEOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <style name="Theme.LauncherActivity" parent="Theme.LauncherActivityBase">
-                  <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
-              </style>
-          </resources>
-          XMLEOF
-            echo "[PROD] Created $STYLES_FILE with edge-to-edge opt-out"
-          else
-            # Insert the opt-out into existing theme if not already present
-            if ! grep -q "windowOptOutEdgeToEdgeEnforcement" "$STYLES_FILE"; then
-              python3 <<PYEOF
-          import re
-          with open("$STYLES_FILE", 'r') as f:
-              content = f.read()
-          # Insert after first <style ...> tag
-          new = re.sub(
-              r'(<style[^>]*>)',
-              r'\1\n        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>',
-              content, count=1
-          )
-          with open("$STYLES_FILE", 'w') as f:
-              f.write(new)
-          print("[PROD] Patched existing styles.xml with edge-to-edge opt-out")
-          PYEOF
-            else
-              echo "[PROD] styles.xml already contains the opt-out, skipping"
-            fi
-          fi
-
-          echo "--- Final styles.xml ---"
-          cat "$STYLES_FILE"
+      # NOTE (06/09/26): there used to be an "Apply pre-public-release Android
+      # resource fixes" step here that patched app/src/main/res/values-v31/styles.xml
+      # to opt out of Android 15's edge-to-edge enforcement, addressing a Play
+      # Console warning. It was removed because it was broken at the root: it
+      # declared <style name="Theme.LauncherActivity" parent="Theme.LauncherActivityBase">,
+      # but Bubblewrap 1.25's generated project defines NO such app theme at all —
+      # LauncherActivity has no android:theme override and inherits the
+      # <application> tag's @android:style/Theme.Translucent.NoTitleBar directly.
+      # AAPT failed with "resource style/Theme.LauncherActivityBase ... not found",
+      # which broke every productionRelease build (verified via workflow run #2).
+      # Re-adding this fix correctly would require: (1) adding
+      # android:theme="@style/Theme.LauncherActivity" to the LauncherActivity tag
+      # in the regenerated AndroidManifest.xml, (2) defining that style with
+      # parent="@android:style/Theme.Translucent.NoTitleBar" in both
+      # values/styles.xml and values-v31/styles.xml (the latter adding
+      # android:windowOptOutEdgeToEdgeEnforcement), AND (3) bumping the installed
+      # SDK platform + compileSdkVersion to 35+, since that attribute doesn't
+      # exist in the android-34 platform installed above. That's a real Android
+      # project change that deserves its own tested PR, not a blind CI patch —
+      # so for now productionRelease only applies the orientation=any fix, which
+      # is a plain twa-manifest.json field and known to work (see step above).
 
       - name: Build .aab
         working-directory: twa
