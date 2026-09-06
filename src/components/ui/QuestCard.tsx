@@ -5,10 +5,20 @@
 // recalculée en LIVE depuis les vraies sorties (esprit_manual_runs) via
 // quest-progress.ts. Plus de XP fictif : la récompense est le badge si
 // la quête en débloque un, sinon juste un "Done" propre.
+//
+// Hardening 06/09/26 : rapport de test panel — cette card lisait la
+// progression UNIQUEMENT depuis le localStorage (computeQuestProgress),
+// alors que le backend (user_quests, run-sync.ts) lit désormais les vraies
+// sorties Supabase. Un utilisateur changeant d'appareil voyait donc un
+// affichage incohérent avec l'XP réellement attribuée. Le localStorage
+// reste affiché en repli immédiat (mode démo / le temps de la requête),
+// puis la vraie progression Supabase prend le dessus dès qu'elle est
+// disponible pour un utilisateur authentifié (lib/supabase/quests.ts).
 
 import { useEffect, useState } from "react";
 import type { Quest } from "@/lib/types";
 import { computeQuestProgress } from "@/lib/quest-progress";
+import { getRealQuestProgress } from "@/lib/supabase/quests";
 
 const periodStyles = {
   daily: { color: "border-cyan/40 bg-cyan/5", accent: "text-cyan", label: "DAILY" },
@@ -33,11 +43,22 @@ export default function QuestCard({ quest }: { quest: Quest }) {
 
   useEffect(() => {
     setMounted(true);
-    const refresh = () => setProgress(computeQuestProgress(quest));
+    let cancelled = false;
+    const refresh = () => {
+      // Repli immédiat (localStorage) : mode démo, ou le temps que la
+      // requête Supabase ci-dessous résolve.
+      setProgress(computeQuestProgress(quest));
+      getRealQuestProgress([quest]).then((real) => {
+        if (cancelled) return;
+        const realProgress = real?.get(quest.id);
+        if (realProgress !== undefined) setProgress(realProgress);
+      });
+    };
     refresh();
     window.addEventListener("esprit:runs", refresh);
     window.addEventListener("storage", refresh);
     return () => {
+      cancelled = true;
       window.removeEventListener("esprit:runs", refresh);
       window.removeEventListener("storage", refresh);
     };

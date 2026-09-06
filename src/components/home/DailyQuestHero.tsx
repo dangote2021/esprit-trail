@@ -8,22 +8,39 @@
 // Stratégie de sélection : on prend la quête daily la plus AVANCÉE (% le
 // plus haut). Si l'user a fait 4 km, "Récup active 4/5" s'affiche — il
 // finira son km pour cocher → boucle dopamine.
+//
+// Hardening 06/09/26 : rapport de test panel — le classement se basait
+// uniquement sur le localStorage (computeQuestProgress), incohérent
+// cross-device avec le backend (user_quests, run-sync.ts) désormais
+// alimenté par les vraies sorties Supabase. Le localStorage reste le repli
+// immédiat (mode démo), la vraie progression Supabase prend le dessus dès
+// qu'elle est disponible pour un utilisateur authentifié.
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { questsForPeriod } from "@/lib/data/quests";
 import { computeQuestProgress } from "@/lib/quest-progress";
+import { getRealQuestProgress } from "@/lib/supabase/quests";
 
 export default function DailyQuestHero() {
   const [mounted, setMounted] = useState(false);
   const [tick, setTick] = useState(0);
+  const [realProgress, setRealProgress] = useState<Map<string, number> | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    const refresh = () => setTick((t) => t + 1);
+    let cancelled = false;
+    const refresh = () => {
+      setTick((t) => t + 1);
+      getRealQuestProgress(questsForPeriod("daily")).then((real) => {
+        if (!cancelled) setRealProgress(real);
+      });
+    };
+    refresh();
     window.addEventListener("esprit:runs", refresh);
     window.addEventListener("storage", refresh);
     return () => {
+      cancelled = true;
       window.removeEventListener("esprit:runs", refresh);
       window.removeEventListener("storage", refresh);
     };
@@ -47,7 +64,7 @@ export default function DailyQuestHero() {
   // Recalcule la progression de chaque quête depuis les vraies sorties,
   // puis prend la plus avancée pour maximiser le sentiment de progrès.
   const ranked = daily
-    .map((q) => ({ q, progress: computeQuestProgress(q) }))
+    .map((q) => ({ q, progress: realProgress?.get(q.id) ?? computeQuestProgress(q) }))
     .sort((a, b) => {
       const pa = a.progress / Math.max(1, a.q.target);
       const pb = b.progress / Math.max(1, b.q.target);
