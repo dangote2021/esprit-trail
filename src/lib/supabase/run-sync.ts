@@ -31,7 +31,7 @@ import { getSupabaseBrowserClient } from "./client";
 import { computeUnlockedBadges } from "@/lib/badges-engine";
 import { BADGES } from "@/lib/data/badges";
 import { QUESTS } from "@/lib/data/quests";
-import { computeQuestProgress } from "@/lib/quest-progress";
+import { computeProgressFromRuns, type QuestRunLike } from "@/lib/quest-progress";
 import type { ManualRun } from "@/lib/manual-runs";
 
 async function getAuthenticatedUserId(): Promise<string | null> {
@@ -118,17 +118,36 @@ async function syncBadges(userId: string, runId: string | null): Promise<number>
 }
 
 /** Étape 3 : recalcule et persiste la progression des quêtes actives.
- *  Retourne l'XP des quêtes qui viennent de passer complétées. */
+ *  Retourne l'XP des quêtes qui viennent de passer complétées.
+ *
+ *  Hardening 06/09/26 : ce calcul se basait sur computeQuestProgress(), qui
+ *  ne lit QUE le localStorage du navigateur (esprit_manual_runs). Résultat :
+ *  la progression persistée dans Supabase (et l'XP qu'elle déclenche)
+ *  dépendait de l'appareil/navigateur utilisé pour enregistrer la sortie,
+ *  et divergeait silencieusement des vraies sorties dès qu'on changeait de
+ *  device ou qu'on vidait le storage local. On lit maintenant les vraies
+ *  sorties Supabase de l'utilisateur (déjà la source de vérité pour les
+ *  badges, cf. syncBadges ci-dessus) via computeProgressFromRuns(). */
 async function syncQuests(userId: string): Promise<number> {
   const sb = getSupabaseBrowserClient();
-  const { data: existingRows, error } = await sb
-    .from("user_quests")
-    .select("quest_id, expires_at, completed_at")
-    .eq("user_id", userId);
+  const [{ data: existingRows, error }, { data: runRows, error: runsError }, { data: profileRow }] =
+    await Promise.all([
+      sb
+        .from("user_quests")
+        .select("quest_id, expires_at, completed_at")
+        .eq("user_id", userId),
+      sb.from("runs").select("date, distance, elevation").eq("user_id", userId),
+      sb.from("profiles").select("utmb_index").eq("id", userId).maybeSingle(),
+    ]);
   if (error) {
     console.error("[run-sync] syncQuests read", error);
     return 0;
   }
+  if (runsError) {
+    console.error("[run-sync] syncQuests runs", runsError);
+  }
+  const realRuns: QuestRunLike[] = (runRows ?? []) as QuestRunLike[];
+  const utmbIndex = (profileRow as { utmb_index: number | null } | null)?.utmb_index ?? null;
   const existingByKey = new Map(
     (existingRows ?? []).map((r) => [
       `${r.quest_id}::${r.expires_at}`,
@@ -138,7 +157,7 @@ async function syncQuests(userId: string): Promise<number> {
 
   let xpGained = 0;
   const rows = QUESTS.map((quest) => {
-    const progress = computeQuestProgress(quest);
+    const progress = computeProgressFromRuns(quest, realRuns, { utmbIndex });
     const existing = existingByKey.get(`${quest.id}::${quest.expiresAt}`);
     const wasCompleted = !!existing?.completed_at;
     const isCompleted = progress >= quest.target;
