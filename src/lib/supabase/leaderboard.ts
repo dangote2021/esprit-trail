@@ -7,10 +7,15 @@
 // n'apparaissait jamais nulle part. Ce module fournit des classements réels
 // basés sur `profiles` et `runs` (RLS en lecture publique sur les deux).
 //
-// Scope assumé pour cette passe : le sous-onglet "Monde" (D+ cumulé) et les
-// classements officiels ITRA/UTMB passent en données réelles. "Amis" et
-// "Région" restent mock — il n'existe pas encore de graphe social ni de
-// champ région sur les profils, donc rien de réel à brancher là pour l'instant.
+// Hardening 05/09/26 : rapport de test panel — "Amis" et "Région" restaient
+// mock (noms 100% inventés, aucun rapport avec la vraie communauté). Il
+// n'existe toujours pas de champ région sur les profils ni de graphe
+// d'amis dédié, donc "Région" reste hors scope (l'onglet est retiré côté UI
+// plutôt que de continuer à mentir). "Amis" en revanche a un équivalent
+// réel déjà en base : les guildes ("un truc entre les amis et le classement
+// mondial", cf. lib/data/guildes.ts) — on classe donc ici les coéquipiers
+// réels de guilde(s) de l'utilisateur connecté, par km cumulés (pas de
+// fenêtre "cette semaine" stockée, même limite assumée que RealGuildeDetail).
 
 import type { LeaderboardEntry } from "@/lib/types";
 import { levelFromXp, titleForLevel } from "@/lib/types";
@@ -52,6 +57,23 @@ async function fetchRuns(): Promise<RunRow[]> {
     return [];
   }
   return (data ?? []) as RunRow[];
+}
+
+type DistanceRunRow = { user_id: string; distance: number | string | null };
+
+async function fetchRunDistances(): Promise<Map<string, number>> {
+  const sb = getSupabaseBrowserClient();
+  const { data, error } = await sb.from("runs").select("user_id, distance");
+  const totals = new Map<string, number>();
+  if (error) {
+    console.error("[leaderboard] fetchRunDistances", error);
+    return totals;
+  }
+  for (const r of (data ?? []) as DistanceRunRow[]) {
+    if (!r.user_id) continue;
+    totals.set(r.user_id, (totals.get(r.user_id) ?? 0) + (Number(r.distance) || 0));
+  }
+  return totals;
 }
 
 function profileToEntry(
@@ -97,6 +119,66 @@ export async function getRealWorldElevationLeaderboard(): Promise<LeaderboardEnt
   return byProfile.map(({ profile, value }, i) =>
     profileToEntry(profile, i + 1, value, viewerId),
   );
+}
+
+export type FriendsLeaderboard = {
+  entries: LeaderboardEntry[];
+  /** false si le viewer n'appartient à aucune guilde — l'UI doit alors
+   *  proposer d'en rejoindre une plutôt que d'afficher une liste vide. */
+  inGuilde: boolean;
+};
+
+type GuildeMemberRow = {
+  guilde_id: string;
+  user_id: string;
+  profile: ProfileRow | null;
+};
+
+/** Classement communauté "Amis" — coéquipiers réels de la ou des guilde(s)
+ *  de l'utilisateur connecté (km cumulés), au lieu de la liste fictive
+ *  précédente qui ne reflétait ni ses vrais amis ni la communauté testée. */
+export async function getRealFriendsLeaderboard(): Promise<FriendsLeaderboard> {
+  const sb = getSupabaseBrowserClient();
+  const viewerId = await getViewerId();
+  if (!viewerId) return { entries: [], inGuilde: false };
+
+  const { data: myGuildes, error: myGuildesError } = await sb
+    .from("guilde_members")
+    .select("guilde_id")
+    .eq("user_id", viewerId);
+  if (myGuildesError || !myGuildes || myGuildes.length === 0) {
+    if (myGuildesError) console.error("[leaderboard] myGuildes", myGuildesError);
+    return { entries: [], inGuilde: false };
+  }
+  const guildeIds = (myGuildes as { guilde_id: string }[]).map((g) => g.guilde_id);
+
+  const [{ data: memberRows, error: membersError }, distances] = await Promise.all([
+    sb
+      .from("guilde_members")
+      .select("guilde_id, user_id, profile:profiles(id, username, display_name, avatar, xp, itra_performance_index, utmb_index)")
+      .in("guilde_id", guildeIds),
+    fetchRunDistances(),
+  ]);
+  if (membersError || !memberRows) {
+    console.error("[leaderboard] members", membersError);
+    return { entries: [], inGuilde: true };
+  }
+
+  const byUser = new Map<string, ProfileRow>();
+  for (const m of memberRows as unknown as GuildeMemberRow[]) {
+    if (m.profile && !byUser.has(m.user_id)) byUser.set(m.user_id, m.profile);
+  }
+
+  const ranked = [...byUser.values()]
+    .map((p) => ({ profile: p, value: Math.round(distances.get(p.id) ?? 0) }))
+    .sort((a, b) => b.value - a.value);
+
+  return {
+    entries: ranked.map(({ profile, value }, i) =>
+      profileToEntry(profile, i + 1, value, viewerId),
+    ),
+    inGuilde: true,
+  };
 }
 
 /** Classements officiels ITRA / UTMB : les entrées "légendes" (les 10

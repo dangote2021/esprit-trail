@@ -142,6 +142,18 @@ export function saveManualRun(run: ManualRun) {
   } catch {
     /* ignore */
   }
+  // Hardening 05/09/26 : rapport de test panel — jusqu'ici cette sortie
+  // restait 100% locale, invisible de Supabase (donc du leaderboard, des
+  // badges et des quêtes) même pour un vrai compte connecté. Synchro best
+  // effort — ne bloque jamais l'enregistrement local, échoue silencieusement
+  // en mode démo / hors-ligne. Import dynamique pour ne pas alourdir le
+  // bundle avec le client Supabase quand cette fonction est utilisée en
+  // mode démo pur.
+  import("./supabase/run-sync")
+    .then(({ syncRunToSupabase }) => syncRunToSupabase(run))
+    .catch(() => {
+      /* best-effort */
+    });
 }
 
 export function deleteManualRun(id: string) {
