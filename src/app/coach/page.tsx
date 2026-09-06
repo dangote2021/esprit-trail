@@ -133,15 +133,18 @@ export default function CoachHubPage() {
         </div>
       </section>
 
-      {/* Disclaimer cloisonnement Coach IA / Strava — conformite policy API Strava */}
+      {/* Disclaimer cloisonnement Coach IA / Strava — conformité policy API Strava */}
+      {/* Hardening 06/09/26 : ce paragraphe (un engagement de confidentialité
+          affiché à l'utilisateur) était écrit sans aucun accent depuis le
+          départ — accents corrigés. */}
       <section className="rounded-2xl border border-ink/10 bg-bg-card/40 p-3">
         <div className="flex gap-2 items-start">
           <span className="text-base leading-none mt-0.5">🔒</span>
           <p className="text-[11px] text-ink-muted leading-relaxed">
-            <strong className="text-ink">Donnees Strava jamais envoyees au modele.</strong>{" "}
-            Le Coach IA est genere uniquement a partir de tes saisies (objectif,
-            volume, dispo). Tes activites Strava restent sur ton profil et ne
-            sortent pas pour le coaching — conforme a la policy API Strava.
+            <strong className="text-ink">Données Strava jamais envoyées au modèle.</strong>{" "}
+            Le Coach IA est généré uniquement à partir de tes saisies (objectif,
+            volume, dispo). Tes activités Strava restent sur ton profil et ne
+            sortent pas pour le coaching — conforme à la policy API Strava.
           </p>
         </div>
       </section>

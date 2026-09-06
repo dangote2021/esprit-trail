@@ -30,13 +30,27 @@ import AttachSheet, {
   renderMessageWithAttachments,
 } from "@/components/messages/AttachSheet";
 
+// Hardening 06/09/26 : un message optimiste ("sending") jamais nettoyé du
+// cache localStorage après confirmation Supabase restait affiché pour
+// toujours en double du vrai message (une bulle bloquée sur "…" à côté de
+// la vraie bulle "✓"). Passé ce délai sans confirmation, on considère
+// l'entrée orpheline (session précédente interrompue, jamais résolue) et on
+// la purge silencieusement à la relecture plutôt que de l'afficher en double.
+const STALE_SENDING_MS = 2 * 60 * 1000;
+
 function loadDraftMessages(conversationId: string): Message[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(
       `esprit_msg_draft_${conversationId}`,
     );
-    return raw ? JSON.parse(raw) : [];
+    const parsed: Message[] = raw ? JSON.parse(raw) : [];
+    const fresh = parsed.filter((m) => {
+      if (m.status !== "sending") return true;
+      return Date.now() - new Date(m.createdAt).getTime() < STALE_SENDING_MS;
+    });
+    if (fresh.length !== parsed.length) saveDraftMessages(conversationId, fresh);
+    return fresh;
   } catch {
     return [];
   }
@@ -179,9 +193,19 @@ export default function ConversationThread({
     // 2. Push Supabase (no-op si pas authentifié → optimistic seul)
     const saved = await sbSendMessage(conversationId, text);
     if (saved) {
-      setExtraMessages((prev) =>
-        prev.map((m) => (m.id === optimistic.id ? saved : m)),
-      );
+      setExtraMessages((prev) => {
+        const updated = prev.map((m) => (m.id === optimistic.id ? saved : m));
+        // Une fois confirmé côté Supabase, on ne garde plus ce message dans
+        // le cache localStorage : il sera toujours re-fetché via
+        // listMessages() au prochain chargement du thread (initialMessages).
+        // Le laisser ici dupliquait le message au reload suivant — voir
+        // loadDraftMessages() ci-dessus.
+        saveDraftMessages(
+          conversationId,
+          updated.filter((m) => m.id !== saved.id),
+        );
+        return updated;
+      });
     }
   }
 

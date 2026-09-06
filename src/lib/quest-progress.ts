@@ -14,6 +14,25 @@
 import { loadManualRuns, type ManualRun } from "./manual-runs";
 import type { Quest } from "./types";
 
+// Hardening 06/09/26 : forme minimale requise pour calculer la progression
+// d'une quête — juste assez pour accepter aussi bien une sortie localStorage
+// (ManualRun) qu'une ligne réelle de la table Supabase `runs` (où
+// distance/elevation reviennent parfois en string via postgrest). Voir
+// computeProgressFromRuns() : avant ce hardening, la synchro serveur
+// (lib/supabase/run-sync.ts) recalculait la progression des quêtes via
+// computeQuestProgress(), qui ne lit QUE le localStorage du navigateur —
+// incohérent avec les vraies sorties Supabase dès qu'on change d'appareil,
+// de navigateur, ou que le storage local est vidé.
+export type QuestRunLike = {
+  date: string;
+  distance: number | string | null | undefined;
+  elevation: number | string | null | undefined;
+};
+
+function toKm(v: QuestRunLike["distance"]): number {
+  return Number(v) || 0;
+}
+
 function startOfDay(d = new Date()): Date {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
@@ -29,7 +48,7 @@ function startOfWeek(d = new Date()): Date {
   return x;
 }
 
-function runsAfter(runs: ManualRun[], cutoff: Date): ManualRun[] {
+function runsAfter<T extends QuestRunLike>(runs: T[], cutoff: Date): T[] {
   const t = cutoff.getTime();
   return runs.filter((r) => {
     const rt = new Date(r.date).getTime();
@@ -37,34 +56,42 @@ function runsAfter(runs: ManualRun[], cutoff: Date): ManualRun[] {
   });
 }
 
-function runsBetween(runs: ManualRun[], startIso: string, endIso: string): ManualRun[] {
+function runsBetween<T extends QuestRunLike>(
+  runs: T[],
+  startIso: string,
+  endIso: string,
+): T[] {
   return runs.filter((r) => {
     const d = r.date.slice(0, 10);
     return d >= startIso && d <= endIso;
   });
 }
 
-function sumKm(runs: ManualRun[]): number {
-  return Math.round(runs.reduce((s, r) => s + (r.distance || 0), 0) * 10) / 10;
+function sumKm(runs: QuestRunLike[]): number {
+  return Math.round(runs.reduce((s, r) => s + toKm(r.distance), 0) * 10) / 10;
 }
 
-function sumDplus(runs: ManualRun[]): number {
-  return Math.round(runs.reduce((s, r) => s + (r.elevation || 0), 0));
+function sumDplus(runs: QuestRunLike[]): number {
+  return Math.round(runs.reduce((s, r) => s + toKm(r.elevation), 0));
 }
 
 /**
- * Calcule la progression réelle d'une quête en fonction des sorties stockées.
- * Retourne une valeur entre 0 et quest.target (clamped).
+ * Calcule la progression réelle d'une quête à partir d'un jeu de sorties
+ * déjà chargé (localStorage ou lignes Supabase — peu importe la source tant
+ * que la forme correspond à QuestRunLike). `utmbIndex`, quand fourni,
+ * prévaut sur le localStorage pour la quête epic-utmb-index-700 (permet à
+ * l'appelant de passer le vrai index Supabase du profil).
  */
-export function computeQuestProgress(quest: Quest): number {
-  if (typeof window === "undefined") return 0;
-  const runs = loadManualRuns();
-
+export function computeProgressFromRuns(
+  quest: Quest,
+  runs: QuestRunLike[],
+  opts?: { utmbIndex?: number | null },
+): number {
   // === Règles spécifiques par id (prioritaires sur les règles génériques) ===
   if (quest.id === "weekly-long-run") {
     // Au moins une sortie >= 15 km cette semaine
     const week = runsAfter(runs, startOfWeek());
-    const longest = week.reduce((m, r) => Math.max(m, r.distance || 0), 0);
+    const longest = week.reduce((m, r) => Math.max(m, toKm(r.distance)), 0);
     return longest >= 15 ? 1 : 0;
   }
 
@@ -82,15 +109,21 @@ export function computeQuestProgress(quest: Quest): number {
   }
 
   if (quest.id === "epic-utmb-index-700") {
-    // Lit l'index UTMB saisi manuellement par l'user
-    try {
-      const raw = window.localStorage.getItem("esprit_trail_indices");
-      if (raw) {
-        const i = JSON.parse(raw);
-        return Math.min(quest.target, Number(i?.utmb) || 0);
+    if (opts?.utmbIndex != null) {
+      return Math.min(quest.target, opts.utmbIndex);
+    }
+    // Fallback : index UTMB saisi manuellement par l'user (démo / pas de
+    // profil Supabase disponible côté appelant).
+    if (typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem("esprit_trail_indices");
+        if (raw) {
+          const i = JSON.parse(raw);
+          return Math.min(quest.target, Number(i?.utmb) || 0);
+        }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
     }
     return 0;
   }
@@ -102,7 +135,7 @@ export function computeQuestProgress(quest: Quest): number {
   }
 
   // === Règles génériques par période + unité ===
-  let pool: ManualRun[];
+  let pool: QuestRunLike[];
   switch (quest.period) {
     case "daily":
       pool = runsAfter(runs, startOfDay());
@@ -133,6 +166,20 @@ export function computeQuestProgress(quest: Quest): number {
     default:
       return 0;
   }
+}
+
+/**
+ * Calcule la progression réelle d'une quête en fonction des sorties
+ * stockées en localStorage sur CET appareil. Utilisé par l'UI (affichage
+ * client, même logique que par le passé). Pour un calcul fondé sur les
+ * vraies sorties Supabase de l'utilisateur (cross-appareil), voir
+ * computeProgressFromRuns().
+ * Retourne une valeur entre 0 et quest.target (clamped).
+ */
+export function computeQuestProgress(quest: Quest): number {
+  if (typeof window === "undefined") return 0;
+  const runs: ManualRun[] = loadManualRuns();
+  return computeProgressFromRuns(quest, runs);
 }
 
 /**
