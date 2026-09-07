@@ -20,7 +20,16 @@ const endOfWeek = () => {
   return d.toISOString();
 };
 
-export const QUESTS: Quest[] = [
+// FIX (07/09/26) : QUESTS était un tableau calcule UNE SEULE FOIS au chargement
+// du module (cold start du serveur). Les dates expiresAt (endOfToday/endOfWeek)
+// etaient donc figees a l'heure de ce cold start, pas a l'heure de la requete.
+// Sur Vercel, une fonction serverless reste chaude plusieurs heures : passe
+// minuit, "aujourd'hui" cote serveur restait bloque sur la veille, donc les
+// quetes daily s'affichaient "EXPIRÉ" des l'ouverture de l'app (et provoquaient
+// une erreur d'hydratation React #425/#422, le rendu client recalculant une
+// date differente). Fix : recalculer le tableau a chaque appel via getQuests().
+export function getQuests(): Quest[] {
+  return [
   // === DAILY ===
   {
     id: "daily-5k",
@@ -174,8 +183,9 @@ export const QUESTS: Quest[] = [
     badgeReward: "everest-month",
     expiresAt: addDays(30),
   },
-];
+  ];
+}
 
 export function questsForPeriod(period: Quest["period"]): Quest[] {
-  return QUESTS.filter((q) => q.period === period);
+  return getQuests().filter((q) => q.period === period);
 }
