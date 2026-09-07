@@ -16,6 +16,13 @@ export const metadata = {
     "Tes quêtes trail : défis quotidiens, hebdo, saisonniers et épiques. Cours, valide, progresse.",
 };
 
+// FIX (07/09/26) : cette page est prerendue statiquement au build. Sans
+// revalidate, les dates d'expiration des quêtes daily/weekly (calculées côté
+// serveur) restaient figées à l'heure du dernier déploiement, affichant
+// "EXPIRÉ" dès le lendemain. On revalide toutes les heures pour rester
+// synchro avec la vraie date sans perdre les bénéfices du rendu statique.
+export const revalidate = 3600;
+
 const SECTIONS: {
   period: "daily" | "weekly" | "seasonal" | "epic";
   eyebrow: string;
