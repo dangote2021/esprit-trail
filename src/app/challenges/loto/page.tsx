@@ -79,9 +79,9 @@ export default function LotoListPage() {
             <strong>Zéro mise. Zéro frais.</strong>
           </p>
           <p className="mt-3 text-[11px] text-ink-muted leading-relaxed">
-            Esprit Trail n'organise pas un jeu d'argent : c'est un cadeau partenaire,
-            réglé par les organisateurs pour rencontrer une vraie audience de
-            traileurs.
+            Esprit Trail n'organise pas un jeu d'argent : c'est une participation
+            pour un tirage au sort pour un dossard gratuit. Plus tu enregistres de
+            sorties trail dans l'app, plus tu augmentes tes chances !
           </p>
         </div>
       </section>

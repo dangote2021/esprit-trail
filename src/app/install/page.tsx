@@ -98,9 +98,9 @@ export default function InstallPage() {
         </div>
 
         <p className="text-sm text-ink-muted leading-relaxed">
-          La version Android arrive sur le Play Store. En attendant, tu peux
-          déjà utiliser Esprit Trail directement depuis Chrome — c&apos;est aussi
-          une PWA installable :
+          La version Android est en cours de validation sur le Play Store. En
+          attendant, tu peux déjà utiliser Esprit Trail directement depuis
+          Chrome — c&apos;est aussi une PWA installable :
         </p>
 
         <ol className="space-y-3">
@@ -120,8 +120,9 @@ export default function InstallPage() {
         </ol>
 
         <div className="rounded-xl bg-amber/10 border border-amber/20 p-3 text-xs text-ink-muted leading-relaxed">
-          🚀 <strong>Bientôt :</strong> Esprit Trail sera dispo sur le Google Play
-          Store. On t&apos;avertit dès que c&apos;est en ligne.
+          🚀 <strong>En test fermé :</strong> Esprit Trail est en cours de
+          validation sur le Google Play Store. On t&apos;avertit dès que c&apos;est
+          disponible pour tout le monde.
         </div>
       </section>
 
