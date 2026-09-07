@@ -30,7 +30,7 @@
 import { getSupabaseBrowserClient } from "./client";
 import { computeUnlockedBadges } from "@/lib/badges-engine";
 import { BADGES } from "@/lib/data/badges";
-import { QUESTS } from "@/lib/data/quests";
+import { getQuests } from "@/lib/data/quests";
 import { computeProgressFromRuns, type QuestRunLike } from "@/lib/quest-progress";
 import type { ManualRun } from "@/lib/manual-runs";
 
@@ -156,7 +156,7 @@ async function syncQuests(userId: string): Promise<number> {
   );
 
   let xpGained = 0;
-  const rows = QUESTS.map((quest) => {
+  const rows = getQuests().map((quest) => {
     const progress = computeProgressFromRuns(quest, realRuns, { utmbIndex });
     const existing = existingByKey.get(`${quest.id}::${quest.expiresAt}`);
     const wasCompleted = !!existing?.completed_at;
