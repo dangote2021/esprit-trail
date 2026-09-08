@@ -21,8 +21,29 @@
 
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
-export const dynamic = "force-dynamic";
+// IMPORTANT (08/09/26) — Bug TWA persistant malgré l'exclusion du middleware :
+// ce handler ne lit QUE process.env (aucune donnée par requête : pas de
+// headers(), cookies(), searchParams...), donc il est 100% éligible à la
+// génération statique de Next.js. Deux réglages en empêchaient pourtant la
+// pré-génération, forçant une exécution de fonction à CHAQUE requête :
+//   1. `export const dynamic = "force-dynamic"` (retiré)
+//   2. `export const runtime = "edge"` (retiré aussi — sur Next.js 14.2,
+//      le runtime edge désactive la génération statique même sans
+//      force-dynamic : "Using edge runtime on a page currently disables
+//      static generation for that page")
+// Résultat mesuré : sur une région Vercel pas encore "chauffée" (ex:
+// bom1/Mumbai, la plus proche d'Oman), le cold start de la fonction
+// coûtait à lui seul ~3.3s (mesuré depuis Muscat) — suffisant pour faire
+// timeout le vérificateur Digital Asset Links de Google et faire échouer
+// la vérification TWA (→ Custom Tab avec croix), même après le fix du
+// middleware qui ne supprimait que la latence Supabase, pas le cold start
+// lui-même. Sans ces deux réglages, Next.js pré-rend ce JSON une fois au
+// build (runtime Node.js par défaut) et le sert en statique depuis le CDN
+// Vercel : zéro invocation de fonction, donc zéro cold start, dans
+// n'importe quelle région, pour n'importe quel client (device Android,
+// vérificateur Google, navigateur). Les fingerprints restent à jour tant
+// qu'un redeploy suit un changement des env vars TWA_* — comportement
+// identique à avant, simplement calculé au build plutôt qu'à la requête.
 
 // Defaults hardcodés (les fingerprints SHA-256 sont publics — ils sont servis
 // à tout internet via /.well-known/assetlinks.json). Cela évite d'avoir à
