@@ -5,13 +5,13 @@ on:
   workflow_dispatch:
     inputs:
       versionName:
-        description: 'Version name (e.g. 1.0.8)'
+        description: 'Version name (e.g. 1.0.11)'
         required: true
-        default: '1.0.8'
+        default: '1.0.11'
       versionCode:
         description: 'Version code (integer, must be > previous Play Store upload)'
         required: true
-        default: '8'
+        default: '13'
       productionRelease:
         description: 'Enable pre-public-release fixes (orientation=any). Set to true for v1.0.9+ public launch.'
         required: false
@@ -141,6 +141,84 @@ jobs:
       # project change that deserves its own tested PR, not a blind CI patch —
       # so for now productionRelease only applies the orientation=any fix, which
       # is a plain twa-manifest.json field and known to work (see step above).
+
+      - name: Harden Android project (R8 optimization, resource shrinking, androidbrowserhelper bump)
+        working-directory: twa
+        run: |
+          # IMPORTANT (09/09/26) — Play Console pre-launch report warnings on v12/1.0.10:
+          #
+          # 1. "Améliorez la mémoire et les performances avec R8" — l'optimisation R8
+          #    n'était pas activée. Confirmé en extrayant l'AAB réellement livré
+          #    (BUNDLE-METADATA/com.android.tools/r8.json de esprit-trail-1.0.10.aab) :
+          #    isShrinkingEnabled=true, isObfuscationEnabled=true, MAIS
+          #    isOptimizationsEnabled=false. Cause : le template Bubblewrap 1.25.0 ne
+          #    déclare AUCUN `proguardFiles` dans app/build.gradle (vérifié dans le
+          #    package npm), donc R8 tourne avec un jeu de règles vide côté module ---
+          #    seules les consumer-rules embarquées dans les dépendances (AAR) sont
+          #    fusionnées, et l'une d'elles impose -dontoptimize. Fix : déclarer
+          #    explicitement `proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'`
+          #    (le fichier "optimize" plutôt que l'ancien fichier neutre) + activer
+          #    `shrinkResources true` (l'autre point manquant du même avertissement).
+          #
+          # 2. "Empreinte mémoire" côté ressources — shrinkResources n'était pas actif
+          #    non plus (même avertissement, deuxième volet) : couvert par le même fix.
+          #
+          # 3. androidbrowserhelper bump 2.6.2 -> 2.7.3 : Bubblewrap 1.25.0 code en dur
+          #    la version stable 2.6.2 (packages/cli FeatureManager.js). La 2.7.3 est la
+          #    dernière stable publiée (2.7.0 = support edge-to-edge du splash screen,
+          #    2.7.1 = "resolved deprecations in launcher activity"). Pas un remplacement
+          #    complet du 3e avertissement Play Console (usage d'API dépréciées
+          #    Window.setStatusBarColor/setNavigationBarColor) : vérifié sur le code
+          #    source amont (branche main du repo GoogleChrome/android-browser-helper)
+          #    que WebViewFallbackActivity.onCreate() appelle TOUJOURS ces API Window
+          #    dépréciées, même dans la dernière version. C'est un chemin de repli rare
+          #    (utilisé seulement si aucun navigateur compatible Custom Tabs n'est
+          #    installé sur l'appareil) et une limitation connue, non corrigée, de la
+          #    librairie TWA de Google elle-même -- donc non actionnable côté app, et
+          #    seulement un avertissement "Peut être utile", pas un blocage de
+          #    publication. Le bump reste fait pour les autres correctifs/améliorations.
+          #
+          # NB (targetSdkVersion 36) : déjà résolu, aucune action ici. Le template
+          # Bubblewrap 1.25.0 code en dur compileSdkVersion/targetSdkVersion=36 (upgrade
+          # npm silencieux un jour avant la 1.0.10) -- confirmé en dumpant le manifeste
+          # de l'AAB réellement livré (`bundletool dump manifest`) :
+          # targetSdkVersion="36". L'avertissement Play Console "cible Android 15" ne
+          # concerne donc pas ce build : c'est le statut de la track production, qui
+          # tourne encore sur une version antérieure. Il suffit de publier 1.0.10 (ou
+          # plus récent) sur la track production pour que Google Play recalcule le
+          # statut de conformité.
+          python3 <<'PYEOF'
+          path = 'app/build.gradle'
+          with open(path) as f:
+              content = f.read()
+
+          before = content
+          content = content.replace(
+              "implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'",
+              "implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.3'",
+          )
+          assert content != before, "androidbrowserhelper dependency line not found — Bubblewrap template may have changed"
+
+          before = content
+          content = content.replace(
+              "    buildTypes {\n        release {\n            minifyEnabled true\n        }\n    }\n",
+              "    buildTypes {\n        release {\n            minifyEnabled true\n            shrinkResources true\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n",
+          )
+          assert content != before, "release buildType block not found — Bubblewrap template may have changed"
+
+          with open(path, 'w') as f:
+              f.write(content)
+          print("Patched app/build.gradle OK")
+          PYEOF
+
+          # proguardFiles above references app/proguard-rules.pro — Bubblewrap never
+          # generates one. Left empty on purpose: androidbrowserhelper/androidx already
+          # ship their own consumer-rules.txt (auto-merged by AGP), which is what kept
+          # the app working even with zero app-level rules up to now.
+          touch app/proguard-rules.pro
+
+          echo "--- Verification ---"
+          grep -n "androidbrowserhelper:androidbrowserhelper\|shrinkResources\|proguardFiles" app/build.gradle
 
       - name: Build .aab
         working-directory: twa
