@@ -89,6 +89,18 @@ jobs:
           with open('twa-manifest.json', 'r') as f:
               m = json.load(f)
           m['packageId'] = 'app.ravito'
+          # minSdkVersion 23 (Android 6.0+) instead of Bubblewrap's default 21:
+          # com.google.androidbrowserhelper:androidbrowserhelper:2.7.3 (bumped in the
+          # "Harden Android project" step below, for its edge-to-edge splash-screen
+          # fixes) declares minSdkVersion 23 in its own manifest, and the manifest
+          # merger hard-fails if the app project declares a lower one ("uses-sdk:
+          # minSdkVersion 21 cannot be smaller than version 23 declared in library
+          # [...androidbrowserhelper:2.7.3]") -- confirmed via workflow run #6, which
+          # failed at :app:processReleaseMainManifest with exactly this error. Android
+          # 5.0/5.1 (API 21-22) usage is statistically negligible in 2026, so raising
+          # the floor is the standard fix (Gradle's own suggestion), not a real
+          # regression in device coverage.
+          m['minSdkVersion'] = 23
           m['signingKey'] = {
               'path': os.path.abspath('android.keystore'),
               'alias': 'my-key-alias'
