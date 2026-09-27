@@ -443,8 +443,7 @@ export default function RunTrackPage() {
 
         {state === "idle" && (
           <p className="text-center text-[11px] font-mono text-ink-dim mt-3">
-            Sortie GPS basique — distance, D+, allure. Pas d&apos;envoi auto vers
-            Strava (tu peux quand même brancher Strava dans les paramètres).
+            Sortie GPS basique — distance, D+, allure.
           </p>
         )}
       </div>

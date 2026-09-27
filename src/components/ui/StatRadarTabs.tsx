@@ -61,7 +61,7 @@ export function StatRadarTabs({
           </>
         ) : (
           <>
-            <strong className="text-ink">Forme physiologique.</strong> HRV, sommeil, charge aiguë/chronique, TSB (fraîcheur) et régularité. Données remontées via Strava.
+            <strong className="text-ink">Forme physiologique.</strong> HRV, sommeil, charge aiguë/chronique, TSB (fraîcheur) et régularité. Données remontées depuis ta montre ou tes sorties enregistrées.
           </>
         )}
       </div>

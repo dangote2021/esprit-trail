@@ -341,7 +341,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Comment tu enregistres tes sorties — tracker GPS + saisie manuelle au cœur, Strava bientôt */}
+      {/* Comment tu enregistres tes sorties — tracker GPS + saisie manuelle */}
       <section className="rounded-3xl border-2 border-lime/40 bg-gradient-to-br from-lime/10 via-bg-card to-bg p-5 card-shine">
         <div className="flex items-start gap-3">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-lime text-bg font-display text-lg font-black card-chunky">

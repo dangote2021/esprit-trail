@@ -36,7 +36,7 @@ import type { TrailerClass, TrailerStats } from "@/lib/types";
 // 4 CHARACTER (casquette + tshirt + chaussures — mode SIMS)
 // 5 STATS (révèle le radar basé sur auto-éval)
 // 6 OBJECTIFS (liste unifiée)
-// 7 STRAVA (connexion Strava, c'est l'essentiel)
+// 7 ENREGISTREMENT (tracker GPS ou saisie manuelle)
 // 8 PRÊT À JOUER (récap + launch)
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
@@ -89,7 +89,6 @@ export default function OnboardingPage() {
   const [character, setCharacter] = useState<Character>(DEFAULT_CHARACTER);
   const [charTab, setCharTab] = useState<CharTab>("tete");
   const [goals, setGoals] = useState<string[]>([]);
-  const [stravaConnected, setStravaConnected] = useState(false);
 
   // Stats blending : class baseline + self-eval overrides
   const baseStats: TrailerStats = statsForProfile(trailerClass, years);
@@ -203,9 +202,7 @@ export default function OnboardingPage() {
           />
         )}
         {step === 7 && (
-          <StepStrava
-            connected={stravaConnected}
-            onConnect={() => setStravaConnected(true)}
+          <StepRecordMethod
             onNext={() => setStep(8)}
           />
         )}
@@ -292,30 +289,6 @@ function StepSplash({ onStart }: { onStart: (name: string, handle: string) => vo
           ▶ Commencer
         </button>
 
-        {/* Strava early connect — pour les power users qui ont déjà tout */}
-        <div className="relative my-2 flex items-center">
-          <div className="h-px flex-1 bg-ink/10" />
-          <span className="px-3 font-mono text-[9px] uppercase tracking-widest text-ink-dim">
-            ou
-          </span>
-          <div className="h-px flex-1 bg-ink/10" />
-        </div>
-        {/* Bouton officiel Connect with Strava — conforme aux brand guidelines */}
-        <div className="flex justify-center">
-          <a
-            href={`/api/oauth/strava?from=${encodeURIComponent("/onboarding?strava=connected")}`}
-            aria-label="Connect with Strava"
-            className="inline-block transition active:scale-[0.98] hover:opacity-95"
-          >
-            <img
-              src="/btn-strava-connect-with.svg"
-              alt="Connect with Strava"
-              height={48}
-              width={237}
-              style={{ height: "48px", width: "auto", maxWidth: "100%" }}
-            />
-          </a>
-        </div>
         <div className="text-[10px] font-mono text-ink-dim">
           Temps estimé : 2 min · Tout est modifiable plus tard
         </div>
@@ -1089,23 +1062,10 @@ function StepGoals({
 }
 
 // ====== STEP 7 — COMMENT TU ENREGISTRES ======
-// Refonte post-panel test : les 3 options (tracker GPS, saisie manuelle,
-// Strava) sont au meme niveau. L'user choisit ce qui lui va, aucune n'est
-// "recommandee" — Strava est marquee "en review" honnetement.
+// Les 2 options (tracker GPS, saisie manuelle) sont au meme niveau.
+// L'user choisit ce qui lui va, aucune n'est "recommandee".
 
-function StepStrava({
-  connected,
-  onConnect,
-  onNext,
-}: {
-  connected: boolean;
-  onConnect: () => void;
-  onNext: () => void;
-}) {
-  // Note : `onConnect` est gardee pour compatibilite avec le state parent
-  // (au cas ou un retour OAuth ait deja set `stravaConnected=true`)
-  void onConnect;
-
+function StepRecordMethod({ onNext }: { onNext: () => void }) {
   return (
     <div className="py-4 space-y-5">
       <div className="text-center">
@@ -1120,103 +1080,58 @@ function StepStrava({
         </p>
       </div>
 
-      {connected ? (
-        <div className="flex items-center gap-3 rounded-xl border-2 border-lime bg-lime/10 p-4 shadow-glow-lime">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-lime/30 font-display text-xl font-black text-lime">
-            ✓
+      <div className="space-y-3">
+        {/* Carte 1 : Tracker GPS natif */}
+        <button
+          type="button"
+          onClick={onNext}
+          className="block w-full text-left rounded-2xl border-2 border-lime/40 bg-lime/5 p-4 hover:bg-lime/10 transition"
+        >
+          <div className="flex items-start gap-3">
+            <div className="text-3xl">🛰️</div>
+            <div className="flex-1">
+              <div className="font-display text-base font-black text-ink">
+                Tracker GPS natif
+              </div>
+              <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
+                Tu lances, tu cours, l&apos;app trace et calcule tout. Aucune
+                montre requise.
+              </p>
+            </div>
+            <div className="text-ink-muted">→</div>
           </div>
-          <div className="flex-1">
-            <div className="font-display text-sm font-black text-lime">
-              Strava connecté
+        </button>
+
+        {/* Carte 2 : Saisie manuelle */}
+        <button
+          type="button"
+          onClick={onNext}
+          className="block w-full text-left rounded-2xl border-2 border-ink/15 bg-bg-card/50 p-4 hover:border-ink/30 transition"
+        >
+          <div className="flex items-start gap-3">
+            <div className="text-3xl">✎</div>
+            <div className="flex-1">
+              <div className="font-display text-base font-black text-ink">
+                Saisie manuelle
+              </div>
+              <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
+                Tu rentres distance, D+, durée. 30 sec. Idéal si tu sors
+                parfois sans montre.
+              </p>
             </div>
-            <div className="text-[11px] text-ink-muted">
-              Tes sorties seront importées automatiquement.
-            </div>
+            <div className="text-ink-muted">→</div>
           </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {/* Carte 1 : Tracker GPS natif */}
-          <button
-            type="button"
-            onClick={onNext}
-            className="block w-full text-left rounded-2xl border-2 border-lime/40 bg-lime/5 p-4 hover:bg-lime/10 transition"
-          >
-            <div className="flex items-start gap-3">
-              <div className="text-3xl">🛰️</div>
-              <div className="flex-1">
-                <div className="font-display text-base font-black text-ink">
-                  Tracker GPS natif
-                </div>
-                <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
-                  Tu lances, tu cours, l&apos;app trace et calcule tout. Aucune
-                  montre requise.
-                </p>
-              </div>
-              <div className="text-ink-muted">→</div>
-            </div>
-          </button>
-
-          {/* Carte 2 : Saisie manuelle */}
-          <button
-            type="button"
-            onClick={onNext}
-            className="block w-full text-left rounded-2xl border-2 border-ink/15 bg-bg-card/50 p-4 hover:border-ink/30 transition"
-          >
-            <div className="flex items-start gap-3">
-              <div className="text-3xl">✎</div>
-              <div className="flex-1">
-                <div className="font-display text-base font-black text-ink">
-                  Saisie manuelle
-                </div>
-                <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
-                  Tu rentres distance, D+, durée. 30 sec. Idéal si tu sors
-                  parfois sans montre.
-                </p>
-              </div>
-              <div className="text-ink-muted">→</div>
-            </div>
-          </button>
-
-          {/* Carte 3 : Strava (en review, cap 1 athlete pour l'instant) */}
-          <a
-            href={`/api/oauth/strava?from=${encodeURIComponent("/onboarding?strava_connected=1")}`}
-            aria-label="Connect with Strava"
-            className="block w-full text-left rounded-2xl border-2 border-[#fc4c02]/25 bg-[#fc4c02]/5 p-4 hover:border-[#fc4c02]/50 transition"
-          >
-            <div className="flex items-start gap-3">
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white font-display text-base font-black"
-                style={{ background: "#fc4c02" }}
-              >
-                S
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-display text-base font-black text-ink">
-                  Sync Strava
-                  <span className="ml-1.5 inline-block rounded-md bg-ink/10 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider text-ink-muted align-middle">
-                    en review
-                  </span>
-                </div>
-                <p className="mt-0.5 text-xs text-ink-muted leading-relaxed">
-                  Import auto de ton historique. Capacité limitée pendant la
-                  review Strava — tu auras peut-être une erreur 403.
-                </p>
-              </div>
-              <div className="text-ink-muted">→</div>
-            </div>
-          </a>
-        </div>
-      )}
+        </button>
+      </div>
 
       <button
         onClick={onNext}
         className="w-full rounded-xl bg-lime py-4 font-display font-black uppercase tracking-wider text-bg shadow-glow-lime transition hover:scale-[1.01]"
       >
-        {connected ? "Terminer →" : "Continuer →"}
+        Continuer →
       </button>
       <p className="text-center text-[11px] text-ink-muted leading-relaxed">
-        Tu pourras combiner les 3 méthodes plus tard depuis ton profil.
+        Tu pourras combiner les 2 méthodes plus tard depuis ton profil.
       </p>
     </div>
   );

@@ -259,7 +259,7 @@ export default function DemoPage() {
             <div className="font-bold text-lime">Comment ça marche</div>
             <div className="flex gap-2">
               <span className="text-lime font-bold">1.</span>
-              <span>Tu cours, chaque km enregistré (tracker ou Strava) = 1 ticket</span>
+              <span>Tu cours, chaque km enregistré (tracker ou saisie manuelle) = 1 ticket</span>
             </div>
             <div className="flex gap-2">
               <span className="text-lime font-bold">2.</span>
@@ -273,8 +273,7 @@ export default function DemoPage() {
 
           <p className="text-[11px] text-ink-muted leading-relaxed pt-1">
             🔓 Avec un compte : tickets cumulés sur tous les tirages de
-            dossards partenaires et FKT collectifs. Tracker GPS natif (Strava
-            bientôt).
+            dossards partenaires et FKT collectifs. Tracker GPS natif inclus.
           </p>
         </div>
       </section>

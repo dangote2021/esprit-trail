@@ -53,15 +53,6 @@ export default function PrivacyPage() {
           <li>Événements d'usage (pages visitées, actions) pour améliorer l'app</li>
         </ul>
 
-        <h3>Données tierces</h3>
-        <p>
-          Si tu connectes Strava, on récupère tes activités via leur API
-          (token OAuth stocké chiffré). Tu peux révoquer à tout moment.
-          Si tu utilises une montre Garmin, Coros ou Suunto, c'est leur sync
-          Strava native qui remonte tes données — Esprit Trail n'accède pas
-          directement à leurs API.
-        </p>
-
         <h2>3. Finalités</h2>
         <ul>
           <li>Te fournir le service (compte, activités, coach IA, team)</li>
@@ -74,7 +65,7 @@ export default function PrivacyPage() {
         <h2>4. Base légale</h2>
         <ul>
           <li><strong>Exécution du contrat :</strong> fourniture du service</li>
-          <li><strong>Consentement :</strong> cookies non-essentiels, connexions tierces</li>
+          <li><strong>Consentement :</strong> cookies non-essentiels</li>
           <li><strong>Intérêt légitime :</strong> sécurité, amélioration produit</li>
           <li><strong>Obligation légale :</strong> conservation de certains logs</li>
         </ul>
@@ -85,7 +76,6 @@ export default function PrivacyPage() {
           <li><strong>Supabase</strong> (base de données, auth) — hébergement UE</li>
           <li><strong>Vercel</strong> (hébergement app) — edge network</li>
           <li><strong>Anthropic (Claude API)</strong> — coach IA, prompts traités en UE/US sans rétention</li>
-          <li><strong>Strava</strong> — si tu connectes ton compte (sync sorties)</li>
         </ul>
         <p>
           Aucune donnée n'est vendue ni partagée à des fins publicitaires.

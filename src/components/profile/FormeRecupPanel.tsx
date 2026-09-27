@@ -7,8 +7,9 @@
 //
 // Source des données :
 //   - ME.physio (mock data pour le MVP : HRV, sleep, acuteLoad, chronicLoad,
-//     freshness). À terme, ces valeurs viendront de Strava + d'un calculateur
-//     Esprit Trail qui agrège tes sorties pour produire les vrais scores.
+//     freshness). À terme, ces valeurs viendront de la montre connectée
+//     (Garmin/Coros/Suunto) + d'un calculateur Esprit Trail qui agrège tes
+//     sorties pour produire les vrais scores.
 //   - VO₂max : estimé via tes meilleurs efforts récents (formule Cooper /
 //     vVO₂max). Hardcodé en mock pour l'instant.
 //
@@ -38,7 +39,7 @@ function freshnessLabel(tsb: number) {
 
 /**
  * Estime un VO₂max à partir des stats utilisateur. Heuristique très simple pour
- * le MVP — sera remplacée par une vraie estimation depuis les efforts Strava.
+ * le MVP — sera remplacée par une vraie estimation depuis les efforts enregistrés.
  */
 function estimateVo2max(physio: Physio): { value: number; delta30j: number } {
   // Base : 45 + bonus selon chronicLoad (fitness de fond)
@@ -179,7 +180,7 @@ function PanelInner() {
             <span
               className="inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full text-[8px] font-bold"
               style={{ background: "rgba(24,95,165,0.15)", color: "#185fa5" }}
-              title="Estimation à la louche basée sur ta charge de fond + ta régularité. Pas du gold lab — quand on aura les vraies données vVO₂max via Strava, on remplacera. En attendant ça donne une idée des tendances."
+              title="Estimation à la louche basée sur ta charge de fond + ta régularité. Pas du gold lab — quand on aura les vraies données vVO₂max de ta montre, on remplacera. En attendant ça donne une idée des tendances."
             >
               ?
             </span>

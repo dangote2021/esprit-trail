@@ -77,7 +77,7 @@ export default function MentionsPage() {
           reproduction sans autorisation est interdite.
         </p>
         <p>
-          Les marques tierces citées (Strava, Garmin, Coros, Suunto, UTMB,
+          Les marques tierces citées (Garmin, Coros, Suunto, UTMB,
           ITRA, etc.) restent la propriété de leurs détenteurs respectifs.
         </p>
 

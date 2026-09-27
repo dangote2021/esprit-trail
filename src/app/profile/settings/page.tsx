@@ -382,35 +382,6 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* CONNEXIONS — Strava uniquement */}
-      <section className="space-y-3">
-        <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan">
-          Connexion Strava
-        </div>
-        <div className="rounded-2xl border border-ink/10 bg-bg-card/60 p-4">
-          <Link
-            href="/settings/connections/strava"
-            className="flex items-center gap-3 hover:opacity-90 transition"
-          >
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-xl font-display text-lg font-black text-white"
-              style={{ backgroundColor: "#fc4c02" }}
-            >
-              S
-            </div>
-            <div className="flex-1">
-              <div className="font-display text-base font-black">Strava</div>
-              <div className="text-[11px] font-mono text-ink-muted">
-                Configurer la connexion
-              </div>
-            </div>
-            <span className="rounded-lg border border-ink/15 px-3 py-1.5 text-[10px] font-mono font-bold uppercase text-ink-muted">
-              Gérer →
-            </span>
-          </Link>
-        </div>
-      </section>
-
       {/* NOTIFICATIONS */}
       <section className="space-y-3">
         <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-gold">

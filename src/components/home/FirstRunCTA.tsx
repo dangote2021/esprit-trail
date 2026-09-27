@@ -6,7 +6,7 @@
 //
 // Cible le drop-off J+1 : un user qui s'inscrit, fait un tour, et ne sait
 // pas par ou commencer. On lui propose explicitement Tracker GPS ou Saisie
-// manuelle, sans pousser Strava (en review).
+// manuelle.
 //
 // Une fois qu'il a au moins 1 sortie, le composant disparait — la home
 // affiche RecentRuns / WeekPlanCard a la place.
@@ -81,10 +81,6 @@ export default function FirstRunCTA() {
           <div className="text-[10px] text-ink-muted mt-0.5">30 sec</div>
         </Link>
       </div>
-
-      <p className="mt-3 text-[10px] text-ink-muted leading-relaxed text-center">
-        Sync Strava en review — toute l&apos;app marche sans pour le moment.
-      </p>
     </section>
   );
 }

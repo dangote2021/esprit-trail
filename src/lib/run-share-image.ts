@@ -19,7 +19,7 @@ export type RunForShare = {
   authorName: string;
   authorUsername: string;
   authorAvatar?: string; // emoji
-  /** Google-encoded polyline (Strava / tracker GPS natif). Optionnel —
+  /** Google-encoded polyline (tracker GPS natif). Optionnel —
    *  si présent, on dessine la trace en silhouette stylée. */
   polyline?: string | null;
 };

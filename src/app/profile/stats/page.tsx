@@ -1,14 +1,15 @@
 // ====== /profile/stats — Sondage d'auto-évaluation radar ======
 //
-// Avant que la sync Strava ait suffisamment de runs pour calibrer automatiquement
+// Avant que le tracker GPS ait suffisamment de runs pour calibrer automatiquement
 // le radar terrain, on laisse l'utilisateur déclarer ses points forts/faibles
 // (endurance, vitesse, technique, mental, grimpe) via 5 sliders.
 //
 // Le radar se met à jour en live pendant qu'on bouge les curseurs.
 //
 // Persistance MVP : localStorage côté client (clé "esprit_stats_override").
-// Quand le backend Strava sera branché (#74), les stats déclarées serviront de
-// "seed" et seront progressivement écrasées par les valeurs calculées.
+// Quand un calcul auto sur les sorties enregistrées sera branché (#74), les
+// stats déclarées serviront de "seed" et seront progressivement écrasées par
+// les valeurs calculées.
 
 "use client";
 
@@ -143,7 +144,7 @@ export default function StatsEditPage() {
           Tes points forts, tes points faibles.
         </h1>
         <p className="mt-2 text-sm text-ink-muted leading-relaxed">
-          Avant que tes sorties Strava aient calibré ton radar tout seul,
+          Avant que tes sorties enregistrées aient calibré ton radar tout seul,
           dis-nous comment tu te vois. Honnête, pas modeste — c'est juste pour
           toi. Ça ajustera tes plans coach IA et tes recommandations de
           parcours.

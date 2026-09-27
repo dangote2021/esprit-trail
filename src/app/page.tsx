@@ -91,8 +91,8 @@ export default async function HomePage({
       </header>
 
       {/* Premiere sortie — CTA proeminent si esprit_manual_runs est vide.
-          Cible le drop-off J+1 : tracker GPS ou saisie manuelle, sans
-          attendre Strava. Disparait des qu'il y a >= 1 sortie. */}
+          Cible le drop-off J+1 : tracker GPS ou saisie manuelle.
+          Disparait des qu'il y a >= 1 sortie. */}
       <FirstRunCTA />
 
       {/* Zone entraînement — quête du jour + CTA sortie, OU encart calme

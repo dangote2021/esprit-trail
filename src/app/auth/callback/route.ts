@@ -2,7 +2,7 @@
 // Route unique qui gère :
 //  - Les magic links Supabase (token_hash + type) → verifyOtp (pas besoin de
 //    code_verifier, fonctionne même si l'user clique depuis un autre browser)
-//  - Les OAuth providers (Google, Strava, etc.) qui reviennent avec ?code=... →
+//  - Les OAuth providers (Google, etc.) qui reviennent avec ?code=... →
 //    exchangeCodeForSession
 // Les deux chemins terminent sur un redirect vers ?next (par défaut /).
 //

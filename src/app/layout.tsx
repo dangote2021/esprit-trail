@@ -43,7 +43,6 @@ export const metadata: Metadata = {
     "plan nutrition trail",
     "spots GPX",
     "GPX trail France",
-    "strava",
     "off race",
     "FKT",
     "running",

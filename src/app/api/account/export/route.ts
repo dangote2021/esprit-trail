@@ -48,7 +48,7 @@ export async function GET() {
       teams: guildMembers.data ?? [],
       integrations: integrations.data ?? [],
       note:
-        "Les tokens OAuth (Strava) sont volontairement exclus de l'export pour des raisons de sécurité.",
+        "Les éventuels tokens OAuth sont volontairement exclus de l'export pour des raisons de sécurité.",
     };
 
     const filename = `esprit-trail-export-${user.id.slice(0, 8)}-${new Date().toISOString().slice(0, 10)}.json`;

@@ -31,7 +31,7 @@ export const ME: User = {
       },
     },
     itra: { performanceIndex: 612, level: 612 },
-    watches: ["strava"],
+    watches: [],
   },
   stats: {
     totalDistance: 742,
@@ -41,7 +41,7 @@ export const ME: User = {
     highestElevation: 2924,
     biggestDrop: 2850,
   },
-  // Stats physio — remontées via Strava (qui agrège les FIT depuis ta montre)
+  // Stats physio — remontées depuis ta montre (FIT) ou saisies à la main
   // TSB freshness négatif = fatigué (bloc spécifique en cours), normal à J-14
   physio: {
     hrv: 62,           // 0-100, moyenne 7 nuits
@@ -81,7 +81,7 @@ export const MY_RUNS: Run[] = [
     duration: 7220, // 2h00'20
     avgPace: "6:32/km",
     terrain: "mountain",
-    source: "strava",
+    source: "manual",
     xpEarned: 831,
     badgesUnlocked: [],
     lootDropped: [],
@@ -98,7 +98,7 @@ export const MY_RUNS: Run[] = [
     duration: 2580,
     avgPace: "5:15/km",
     terrain: "flat",
-    source: "strava",
+    source: "manual",
     xpEarned: 100,
     badgesUnlocked: [],
     lootDropped: [],
@@ -115,7 +115,7 @@ export const MY_RUNS: Run[] = [
     duration: 14400,
     avgPace: "8:22/km",
     terrain: "mountain",
-    source: "strava",
+    source: "manual",
     xpEarned: 1287,
     badgesUnlocked: ["mile-high"],
     lootDropped: [
@@ -141,7 +141,7 @@ export const MY_RUNS: Run[] = [
     duration: 2720,
     avgPace: "4:29/km",
     terrain: "flat",
-    source: "strava",
+    source: "manual",
     xpEarned: 102,
     badgesUnlocked: [],
     lootDropped: [],
@@ -158,7 +158,7 @@ export const MY_RUNS: Run[] = [
     duration: 11400,
     avgPace: "8:26/km",
     terrain: "alpine",
-    source: "strava",
+    source: "manual",
     xpEarned: 1471,
     badgesUnlocked: [],
     lootDropped: [],
@@ -175,7 +175,7 @@ export const MY_RUNS: Run[] = [
     duration: 3300,
     avgPace: "5:37/km",
     terrain: "hilly",
-    source: "strava",
+    source: "manual",
     xpEarned: 258,
     badgesUnlocked: [],
     lootDropped: [],
@@ -192,7 +192,7 @@ export const MY_RUNS: Run[] = [
     duration: 5940,
     avgPace: "6:59/km",
     terrain: "mountain",
-    source: "strava",
+    source: "manual",
     xpEarned: 611,
     badgesUnlocked: ["night-runner"],
     lootDropped: [],

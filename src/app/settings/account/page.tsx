@@ -69,17 +69,6 @@ export default async function AccountPage() {
 
       {/* Shortcuts */}
       <section className="mt-6 space-y-3">
-        <Link
-          href="/settings/connections"
-          className="flex items-center justify-between rounded-2xl border-2 border-ink/15 bg-bg-card px-5 py-4 transition hover:border-ink/30"
-        >
-          <div>
-            <p className="text-sm font-bold text-ink">Montres & Strava</p>
-            <p className="text-xs text-ink-muted">Gérer les synchros</p>
-          </div>
-          <span className="text-ink-muted">→</span>
-        </Link>
-
         <form action="/auth/signout" method="post">
           <button
             type="submit"

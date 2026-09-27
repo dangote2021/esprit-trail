@@ -2,7 +2,7 @@
 
 // ====== /run/manual — Saisie manuelle d'une sortie ======
 // Formulaire pour ajouter une sortie a posteriori (oubli de tracking,
-// importée hors Strava, etc.). Sauvegardé dans localStorage via le module
+// etc.). Sauvegardé dans localStorage via le module
 // manual-runs, et apparaîtra dans l'historique du profil.
 
 import { useState } from "react";
