@@ -5,7 +5,7 @@
 // visibilité auprès d'une audience qualifiée de traileurs.
 //
 // Comment on gagne des tickets :
-//   - 1 ticket   : tu accomplis le challenge (ex: 20km enregistrés sur Strava)
+//   - 1 ticket   : tu accomplis le challenge (ex: 20km enregistrés)
 //   - +1 ticket  : par ami qui rejoint via ton lien WhatsApp (max +5)
 //
 // Comment on tire : random pondéré par le nombre de tickets, le {drawAt}.
@@ -128,7 +128,7 @@ export const BIB_CHALLENGES: BibChallenge[] = [
 
     rules: [
       "1 sortie de 20 km minimum (terrain libre, juste du dénivelé honnête)",
-      "Activité enregistrée sur Strava ou ta montre, taggée #EspritTrailLoto",
+      "Activité enregistrée (tracker ou montre), taggée #EspritTrailLoto",
       "1 ticket par challenge. +1 ticket par ami qui rejoint via ton lien WhatsApp (max +5)",
       "Tirage au sort le 1er juillet 20h00. Frais de dossier 0€. Aucun achat requis.",
     ],
@@ -174,7 +174,7 @@ export const BIB_CHALLENGES: BibChallenge[] = [
     rules: [
       "Cumul 1 000 m de D+ sur 7 jours glissants — plein de manières d'y arriver",
       "Plusieurs sorties OK, on additionne",
-      "Activités vérifiées Strava ou photo montre, taggées #EspritTrailLoto",
+      "Activités vérifiées (tracker ou photo montre), taggées #EspritTrailLoto",
       "2 dossards à gagner. Tirage 16 mai. 100% gratuit.",
     ],
 
@@ -264,7 +264,7 @@ export const BIB_CHALLENGES: BibChallenge[] = [
 
     rules: [
       "Cumule 50 km de course sur 7 jours glissants",
-      "Activités tracées (Strava ou app montre)",
+      "Activités tracées (tracker ou app montre)",
       "Course pirate, pas de chrono officiel — on est entre traileurs",
       "Tirage le 1er août. Coup de fil pour les 3 gagnants.",
     ],

@@ -253,8 +253,8 @@ export default async function LotoDetailPage({ params }: PageProps) {
           </div>
 
           <p className="text-[10px] text-ink-dim">
-            Volume calculé à partir de tes activités Strava sur les 30 derniers
-            jours. Plus tu cumules, plus tu débloques de niveaux.
+            Volume calculé à partir de tes activités enregistrées sur les 30
+            derniers jours. Plus tu cumules, plus tu débloques de niveaux.
           </p>
         </section>
 

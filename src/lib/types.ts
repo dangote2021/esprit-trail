@@ -28,7 +28,7 @@ export interface TrainingBlock {
   questIds: string[]; // Quêtes de ce bloc
 }
 
-export type WatchBrand = "strava" | "garmin" | "coros" | "suunto";
+export type WatchBrand = "garmin" | "coros" | "suunto";
 
 export type TerrainType = "flat" | "hilly" | "mountain" | "alpine" | "technical";
 
@@ -56,8 +56,8 @@ export interface TrailerStats {
 }
 
 // ====== STATS PHYSIO (issue du user testing Mira + Théo B.) ======
-// Données physiologiques remontées via Strava (qui agrège les FIT de ta montre)
-// et d'algos de charge maison. Calibrés 0-100, lisibles au radar Forme physio.
+// Données physiologiques remontées depuis ta montre (FIT) ou saisies à la
+// main, et d'algos de charge maison. Calibrés 0-100, lisibles au radar Forme physio.
 export interface PhysioStats {
   // Récup & nerveux
   hrv: number; // Variabilité cardiaque (plus c'est haut, mieux c'est)
@@ -135,8 +135,8 @@ export interface Run {
   // Carte
   polylinePreview?: string; // emoji art or SVG path
   /** Google polyline encodée — utilisée par le tracker live et l'image
-   *  de partage pour redessiner la trace. Optionnel : les sorties Strava
-   *  importées n'en ont pas forcément. */
+   *  de partage pour redessiner la trace. Optionnel : les sorties saisies
+   *  manuellement n'en ont pas forcément. */
   polyline?: string | null;
 }
 

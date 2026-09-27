@@ -2,15 +2,9 @@
 
 // ====== RunStartCTA ======
 // CTA principal de la home "Lance une sortie". Au 1er clic, on propose
-// brievement les 3 facons d'enregistrer une sortie (tracker GPS, saisie
-// manuelle, ou Strava — quand il sera dispo). Aucun choix push : les 3
-// options sont au meme niveau. Une fois la modale vue, les clics suivants
-// vont direct sur /run/new.
-//
-// Strava est en attente de review Developer Program — pour l'instant
-// limite a 1 athlete. Donc on ne pousse pas la sync Strava en priorite :
-// on met en avant le tracker GPS et la saisie manuelle qui marchent
-// pour tout le monde.
+// brievement les 2 facons d'enregistrer une sortie (tracker GPS ou saisie
+// manuelle). Aucun choix push : les options sont au meme niveau. Une fois
+// la modale vue, les clics suivants vont direct sur /run/new.
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -64,7 +58,7 @@ export default function RunStartCTA() {
               Lance une sortie
             </div>
             <div className="text-xs opacity-80">
-              Tracker GPS, saisie manuelle ou Strava — au choix.
+              Tracker GPS ou saisie manuelle — au choix.
             </div>
           </div>
           <div className="font-display text-2xl transition group-hover:translate-x-1">
@@ -91,8 +85,8 @@ export default function RunStartCTA() {
                 Comment tu veux y aller&nbsp;?
               </h3>
               <p className="text-xs text-ink-muted leading-relaxed mt-1.5">
-                Pas besoin d&apos;avoir Strava. Le tracker GPS et la saisie manuelle
-                marchent direct, tout reste dans ton app.
+                Le tracker GPS et la saisie manuelle marchent direct, tout
+                reste dans ton app.
               </p>
             </div>
 
@@ -129,33 +123,6 @@ export default function RunStartCTA() {
                     </div>
                     <div className="text-[11px] text-ink-muted">
                       Tu rentres distance, D+, durée. 30 sec.
-                    </div>
-                  </div>
-                  <div className="text-ink-muted">→</div>
-                </div>
-              </button>
-
-              {/* Strava — note honnête sur le statut */}
-              <button
-                onClick={() => dismissAndGo("/settings/connections/strava")}
-                className="block w-full text-left rounded-xl border border-ink/10 bg-bg-card/30 p-3 hover:bg-bg-card/60 transition"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-white font-display text-sm font-black"
-                    style={{ background: "#fc4c02" }}
-                  >
-                    S
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-display text-sm font-black text-ink">
-                      Sync Strava
-                      <span className="ml-1.5 inline-block rounded-md bg-ink/10 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider text-ink-muted align-middle">
-                        en review
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-ink-muted">
-                      Capacité limitée pendant la review Strava. Bientôt dispo.
                     </div>
                   </div>
                   <div className="text-ink-muted">→</div>

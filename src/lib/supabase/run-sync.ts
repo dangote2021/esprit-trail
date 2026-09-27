@@ -48,8 +48,8 @@ async function getAuthenticatedUserId(): Promise<string | null> {
  *  optionnel `user_badges.run_id`), ou null si l'insertion échoue. */
 async function insertRun(userId: string, run: ManualRun): Promise<string | null> {
   const sb = getSupabaseBrowserClient();
-  // `runs.source` n'accepte que strava/garmin/coros/suunto/manual (contrainte
-  // en base) — il n'existe pas de valeur "tracker" : les deux origines locales
+  // `runs.source` n'accepte que garmin/coros/suunto/manual (contrainte en
+  // base) — il n'existe pas de valeur "tracker" : les deux origines locales
   // (saisie manuelle et tracker natif Esprit Trail) sont donc enregistrées
   // sous "manual", la plus honnête des options existantes.
   const { data, error } = await sb

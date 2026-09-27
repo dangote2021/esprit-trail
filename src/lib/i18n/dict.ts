@@ -82,7 +82,6 @@ const fr: Dict = {
   "action.share": "Partager",
   "action.back": "Retour",
   "action.next": "Suivant",
-  "action.connect_strava": "Connecter Strava",
   "action.see_more": "Voir plus",
   "action.see_all": "Voir tout",
   "action.signup_free": "Crée ton compte gratuit",
@@ -132,8 +131,8 @@ const fr: Dict = {
   "landing.features.off_races.desc": "FKT, courses pirates, GR projects",
   "landing.features.progressive": "Plan progressif",
   "landing.features.progressive.desc": "augmentation douce du volume pour éviter blessures",
-  "landing.features.strava": "Tracker GPS natif",
-  "landing.features.strava.desc": "pas besoin de montre, Strava bientôt en sync",
+  "landing.features.gps": "Tracker GPS natif",
+  "landing.features.gps.desc": "pas besoin de montre, l'app trace tout seule",
   "landing.features.gut": "Gut training",
   "landing.features.gut.desc": "plan 8 semaines pour tolérer 90g glucides/h",
   "landing.install.eyebrow": "Installe Esprit Trail",
@@ -156,17 +155,7 @@ const fr: Dict = {
   // Run start CTA (home loggé)
   "run.cta.eyebrow": "Prêt pour une session trail de zinzins ?",
   "run.cta.title": "Lance une sortie",
-  "run.cta.subtitle": "Synchronise Strava, enchaîne les kilomètres et analyse tes datas.",
-  "run.strava_modal.eyebrow": "Étape conseillée · 30 sec",
-  "run.strava_modal.title": "Tu connectes Strava ?",
-  "run.strava_modal.body": "Avec Strava connecté, tes sorties s'importent automatiquement à chaque fois que tu poses ta montre. Le Coach IA, le radar Forme et le ranking se calibrent sur tes vraies data. Pas de double saisie, pas d'oubli.",
-  "run.strava_modal.benefit1": "✓ Sync auto à chaque run posté sur Strava",
-  "run.strava_modal.benefit2": "✓ Historique des 90 derniers jours importé direct",
-  "run.strava_modal.benefit3": "✓ Volume hebdo, D+, allure : tout est là",
-  "run.strava_modal.connect": "Connecter Strava maintenant →",
-  "run.strava_modal.later": "Plus tard, je démarre ma sortie maintenant",
-  "run.strava_modal.note": "Tu peux toujours connecter Strava ensuite depuis ton profil.",
-
+  "run.cta.subtitle": "Enchaîne les kilomètres et analyse tes datas.",
   // Profile
   "profile.title": "Ton cockpit",
   "profile.best_results": "Tes courses mythiques · TOP 3",
@@ -331,7 +320,6 @@ const en: Dict = {
   "action.share": "Share",
   "action.back": "Back",
   "action.next": "Next",
-  "action.connect_strava": "Connect Strava",
   "action.see_more": "See more",
   "action.see_all": "See all",
   "action.signup_free": "Create your free account",
@@ -381,8 +369,8 @@ const en: Dict = {
   "landing.features.off_races.desc": "FKTs, pirate races, GR projects",
   "landing.features.progressive": "Progressive plan",
   "landing.features.progressive.desc": "gentle volume increase to avoid injuries",
-  "landing.features.strava": "1-click Strava sync",
-  "landing.features.strava.desc": "your history imported",
+  "landing.features.gps": "Native GPS tracker",
+  "landing.features.gps.desc": "no watch needed, the app tracks it all",
   "landing.features.gut": "Gut training",
   "landing.features.gut.desc": "8-week plan to tolerate 90g carbs/h",
   "landing.install.eyebrow": "Install Esprit Trail",
@@ -405,16 +393,7 @@ const en: Dict = {
   // Run start CTA
   "run.cta.eyebrow": "Ready to crush a trail session?",
   "run.cta.title": "Start an outing",
-  "run.cta.subtitle": "GPS tracker, manual entry or Strava — your call.",
-  "run.strava_modal.eyebrow": "Recommended · 30 sec",
-  "run.strava_modal.title": "Connect Strava?",
-  "run.strava_modal.body": "With Strava connected, your runs import automatically every time you sync your watch. The AI Coach, Form radar and ranking calibrate on your real data. No double entry, nothing forgotten.",
-  "run.strava_modal.benefit1": "✓ Auto-sync on every Strava run",
-  "run.strava_modal.benefit2": "✓ Last 90 days history imported",
-  "run.strava_modal.benefit3": "✓ Weekly volume, elevation, pace: all there",
-  "run.strava_modal.connect": "Connect Strava now →",
-  "run.strava_modal.later": "Later, I'll start my outing now",
-  "run.strava_modal.note": "You can always connect Strava later from your profile.",
+  "run.cta.subtitle": "GPS tracker or manual entry — your call.",
 
   // Profile
   "profile.title": "Your cockpit",
@@ -490,7 +469,7 @@ const en: Dict = {
 
   // Discovery banner
   "discovery.eyebrow": "Discovery mode · no account",
-  "discovery.text": "You're visiting Esprit Trail without an account — preview only. To unlock everything (AI Coach, bib draws, ITRA/UTMB ranking, Strava sync, custom GPX), create your account in 30 sec.",
+  "discovery.text": "You're visiting Esprit Trail without an account — preview only. To unlock everything (AI Coach, bib draws, ITRA/UTMB ranking, custom GPX), create your account in 30 sec.",
   "discovery.signup": "Create my free account",
 
   // Errors / 404

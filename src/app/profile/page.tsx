@@ -1,7 +1,6 @@
 import Link from "next/link";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProfileHeroCardClient from "@/components/profile/ProfileHeroCardClient";
-import StravaConnectionStatus from "@/components/profile/StravaConnectionStatus";
 import ConfiguredProfileOnly from "@/components/profile/ConfiguredProfileOnly";
 import FormeRecupPanel from "@/components/profile/FormeRecupPanel";
 import ManualRunsList from "@/components/profile/ManualRunsList";
@@ -99,12 +98,6 @@ export default function ProfilePage() {
 
       {/* ===== Totem animal — cosmétique facultatif ===== */}
       <TotemPicker />
-
-      {/* Sync Strava */}
-      <section className="space-y-3">
-        <SectionHeader eyebrow="Sync" title="Plateforme connectée" />
-        <StravaConnectionStatus />
-      </section>
 
       {/* Wishlist courses (auto-syncée depuis /race/[id]) */}
       <WishlistRaces />

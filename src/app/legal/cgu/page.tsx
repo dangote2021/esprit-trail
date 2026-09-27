@@ -48,7 +48,7 @@ export default function CguPage() {
           L'accès à Esprit Trail est gratuit. Un compte est nécessaire pour utiliser
           les fonctions personnalisées (coach IA, team, stats, synchro
           montre). L'authentification se fait par lien magique envoyé par
-          email, ou via Google/Strava.
+          email, ou via Google.
         </p>
         <p>
           L'utilisateur doit avoir au moins 15 ans pour créer un compte. En
@@ -89,24 +89,14 @@ export default function CguPage() {
           santé. En cas de doute, consulte un médecin.
         </p>
 
-        <h2>6. Données tierces (Strava)</h2>
-        <p>
-          Quand tu connectes Strava, Esprit Trail récupère tes activités via leur
-          API officielle. Tu peux déconnecter à tout moment depuis{" "}
-          <a href="/settings/connections">/settings/connections</a>. Les
-          tokens OAuth sont chiffrés côté serveur Supabase. Si tu utilises
-          une montre Garmin, Coros ou Suunto, c'est leur sync Strava native
-          qui remonte tes données — Esprit Trail n'a pas d'intégration directe.
-        </p>
-
-        <h2>7. Propriété intellectuelle</h2>
+        <h2>6. Propriété intellectuelle</h2>
         <p>
           La marque Esprit Trail, le code source, le design et les contenus édités
           par Esprit Trail sont protégés. Toute reproduction sans autorisation est
           interdite.
         </p>
 
-        <h2>8. Responsabilité</h2>
+        <h2>7. Responsabilité</h2>
         <p>
           Esprit Trail est fourni « tel quel ». L'éditeur ne garantit pas
           l'absence d'interruption, de bug ou de perte de données.
@@ -115,7 +105,7 @@ export default function CguPage() {
           l'usage du service.
         </p>
 
-        <h2>9. Résiliation</h2>
+        <h2>8. Résiliation</h2>
         <p>
           Tu peux supprimer ton compte à tout moment depuis{" "}
           <a href="/settings/account">/settings/account</a>. La suppression
@@ -123,14 +113,14 @@ export default function CguPage() {
           délai de 30 jours (sauf obligations légales de conservation).
         </p>
 
-        <h2>10. Modification des CGU</h2>
+        <h2>9. Modification des CGU</h2>
         <p>
           Esprit Trail peut modifier ces CGU. Les utilisateurs sont informés par
           email. La poursuite de l'usage vaut acceptation des nouvelles
           conditions.
         </p>
 
-        <h2>11. Droit applicable — Litiges</h2>
+        <h2>10. Droit applicable — Litiges</h2>
         <p>
           Les présentes CGU sont régies par le droit français. En cas de
           litige, une solution amiable sera recherchée en priorité. À
@@ -147,7 +137,7 @@ export default function CguPage() {
           .
         </p>
 
-        <h2>12. Contact</h2>
+        <h2>11. Contact</h2>
         <p>
           Pour toute question :{" "}
           <a href="mailto:ravito.trail.app@gmail.com">ravito.trail.app@gmail.com</a>

@@ -133,18 +133,15 @@ export default function CoachHubPage() {
         </div>
       </section>
 
-      {/* Disclaimer cloisonnement Coach IA / Strava — conformité policy API Strava */}
-      {/* Hardening 06/09/26 : ce paragraphe (un engagement de confidentialité
-          affiché à l'utilisateur) était écrit sans aucun accent depuis le
-          départ — accents corrigés. */}
+      {/* Disclaimer confidentialité Coach IA */}
       <section className="rounded-2xl border border-ink/10 bg-bg-card/40 p-3">
         <div className="flex gap-2 items-start">
           <span className="text-base leading-none mt-0.5">🔒</span>
           <p className="text-[11px] text-ink-muted leading-relaxed">
-            <strong className="text-ink">Données Strava jamais envoyées au modèle.</strong>{" "}
+            <strong className="text-ink">Tes données restent privées.</strong>{" "}
             Le Coach IA est généré uniquement à partir de tes saisies (objectif,
-            volume, dispo). Tes activités Strava restent sur ton profil et ne
-            sortent pas pour le coaching — conforme à la policy API Strava.
+            volume, dispo). Tes activités restent sur ton profil et ne sortent
+            pas pour le coaching.
           </p>
         </div>
       </section>
@@ -249,7 +246,7 @@ export default function CoachHubPage() {
             {
               n: 2,
               title: "Le coach IA analyse ton historique",
-              desc: "Tes sorties Strava, ton UTMB Index, ta charge actuelle.",
+              desc: "Tes sorties enregistrées, ton UTMB Index, ta charge actuelle.",
             },
             {
               n: 3,
@@ -272,61 +269,6 @@ export default function CoachHubPage() {
               <div className="flex-1">
                 <div className="text-sm font-bold">{s.title}</div>
                 <div className="text-[11px] text-ink-muted">{s.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Coaches humains */}
-      <section className="space-y-3">
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-violet">
-              Tu préfères l'humain ?
-            </div>
-            <div className="font-display text-lg font-black">Coachs certifiés trail</div>
-          </div>
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-violet/50">
-            Bientôt
-          </span>
-        </div>
-        <div className="space-y-2">
-          {[
-            {
-              name: "Marion D.",
-              avatar: "👩‍🦰",
-              title: "Coach trail · ex-podium CCC",
-              location: "Chamonix",
-              price: "80€/mois",
-              specialty: "Ultra endurance",
-            },
-            {
-              name: "Thomas V.",
-              avatar: "👨",
-              title: "Préparateur physique",
-              location: "Annecy",
-              price: "120€/mois",
-              specialty: "Force + montée",
-            },
-          ].map((c) => (
-            <div
-              key={c.name}
-              className="flex items-center gap-3 rounded-xl border border-violet/20 bg-bg-card/40 p-3"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet/10 text-2xl">
-                {c.avatar}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold truncate">{c.name}</div>
-                <div className="text-[11px] text-ink-muted truncate">{c.title}</div>
-                <div className="text-[10px] font-mono text-violet">
-                  📍 {c.location} · {c.specialty}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-display text-sm font-black">{c.price}</div>
-                <div className="text-[10px] text-ink-dim">par mois</div>
               </div>
             </div>
           ))}

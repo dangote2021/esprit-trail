@@ -5,7 +5,7 @@
 //   • Terrain — endurance, montée, technicité, roulant, mental, descente.
 //     Auto-évaluable par sliders (sondage perso, override localStorage).
 //   • Physio — HRV, sommeil, charge aiguë, charge fond, fraîcheur, régularité.
-//     Lecture seule (alimenté par Strava — sera live quand brancher backend).
+//     Lecture seule (alimenté par ta montre ou tes sorties enregistrées).
 //
 // Retour Marco (32, panel test) : "6 axes c'est peut-être un peu fouillis.
 // Vous pourriez splitter Forme physio vs Tech terrain en 2 radars distincts ?"
@@ -138,7 +138,7 @@ export default function StatRadarEditable({
       {/* Onglets Terrain / Physio — retour Marco panel test */}
       {tab === "physio" && (
         <div className="mb-2 rounded-md bg-violet/5 border border-violet/15 px-2 py-1 text-[10px] font-mono text-violet/80 text-center">
-          🔒 Stats remontées via Strava · non modifiables
+          🔒 Stats remontées depuis ta montre · non modifiables
         </div>
       )}
       {showPhysio && (
@@ -201,7 +201,7 @@ export default function StatRadarEditable({
       <p className="mt-2 text-center text-[10px] font-mono text-ink-dim leading-relaxed">
         {tab === "terrain"
           ? "Note moyenne pondérée sur tes 6 attributs trail."
-          : "Stats physio remontées depuis Strava (HRV, sommeil, charge, fraîcheur)."}
+          : "Stats physio remontées depuis ta montre (HRV, sommeil, charge, fraîcheur)."}
         {hydrated && tab === "terrain" && (
           <span className="block">
             Catégorie :{" "}

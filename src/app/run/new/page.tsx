@@ -12,8 +12,8 @@ export default function NewRunPage() {
           Choisis ta source
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-ink-muted">
-          Tracking live, import auto via Strava, ou saisie à la main —
-          à toi de voir comment tu fonctionnes.
+          Tracking live ou saisie à la main — à toi de voir comment tu
+          fonctionnes.
         </p>
       </div>
 
@@ -38,24 +38,6 @@ export default function NewRunPage() {
           </div>
           <div className="rounded-md bg-lime/30 px-2 py-1 text-[10px] font-mono font-bold text-lime">
             GO
-          </div>
-        </Link>
-
-        {/* Import Strava */}
-        <Link
-          href="/settings/connections/strava"
-          className="flex w-full items-center gap-4 rounded-xl border border-ink/15 bg-bg-card/60 p-4 text-left transition hover:border-[#fc4c02]/40"
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#fc4c02] font-display text-lg font-black text-white">
-            S
-          </div>
-          <div className="flex-1">
-            <div className="font-display text-base font-black">
-              Importer depuis Strava
-            </div>
-            <div className="text-xs text-ink-muted">
-              Tes sorties (Garmin/Coros/Suunto via Strava) remontent direct
-            </div>
           </div>
         </Link>
 
