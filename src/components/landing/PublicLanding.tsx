@@ -430,9 +430,6 @@ export default function PublicLanding({
                 <span className="rounded-md bg-bg-raised px-2 py-0.5 font-bold text-ink-muted">
                   Saisie manuelle
                 </span>
-                <span className="rounded-md bg-bg-raised px-2 py-0.5 font-bold text-ink-muted">
-                  Strava bientôt
-                </span>
               </div>
             </div>
           </div>
@@ -524,7 +521,7 @@ export default function PublicLanding({
             <span>📱</span>
             <span>
               <strong>Tracker GPS natif</strong> · pas besoin de montre, l&apos;app
-              enregistre tes sorties (Strava bientôt en sync)
+              enregistre tes sorties
             </span>
           </li>
           <li className="flex gap-2">
