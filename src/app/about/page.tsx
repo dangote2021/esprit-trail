@@ -357,8 +357,7 @@ export default function AboutPage() {
             <p className="mt-1 text-xs text-ink-muted leading-relaxed">
               L&apos;app a son propre tracker GPS — tu lances, tu cours, ça
               trace. Ou tu saisis ta sortie à la main en 30 sec. Streak, quêtes,
-              coach IA, stats : tout marche pareil. La sync Strava arrive
-              bientôt (review en cours).
+              coach IA, stats : tout marche pareil.
             </p>
             <div className="mt-2 flex gap-2 flex-wrap">
               <Link
